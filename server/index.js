@@ -1,0 +1,19 @@
+const express = require("express"); //import Express
+const app = express(); //create an Express application on the app variable
+const cors = require("cors"); //import cors
+
+// middleware //
+app.use(express.json()); //req.body
+app.use(cors());
+
+/**Routes**/
+
+//Register User
+app.use("/auth", require("./jwtAuth"));
+
+//Login User
+
+
+app.listen(5000, () => {
+    console.log("server is running on port 5000");
+});
