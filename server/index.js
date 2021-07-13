@@ -8,10 +8,15 @@ app.use(cors());
 
 /**Routes**/
 
-//Register User
-app.use("/auth", require("./jwtAuth"));
+//Register and Login User
+app.use("/auth", require("./routes/jwtAuth"));
 
-//Login User
+//Dashboard
+app.use("/dashboard", require("./routes/dashboard"));
+
+
+
+
 
 
 app.listen(5000, () => {
