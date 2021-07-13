@@ -49,7 +49,7 @@ CREATE TABLE vote (
     PRIMARY KEY (user_id, post_id)
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (post_id) REFERENCES post(post_id),
-    FOREIGN KEY (comment_id) REFERENCES comment(comment)
+    FOREIGN KEY (comment_id) REFERENCES comment(comment_id)
 
 );
 
