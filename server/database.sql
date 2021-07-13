@@ -62,10 +62,6 @@ CREATE TABLE vote (
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (post_id) REFERENCES post(post_id),
     FOREIGN KEY (comment_id) REFERENCES comment(comment_id)
-<<<<<<< HEAD
-
-=======
->>>>>>> karl-branch
 );
 
 CREATE TABLE tags (
