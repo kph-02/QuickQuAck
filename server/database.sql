@@ -22,11 +22,14 @@ CREATE TABLE users (
     revealed_users uuid[]
 ); 
 
+/* TODO: Should we also add post type?*/
+ /* TODO: Should this be an array? */
+    /*tags VARCHAR(40),*/
 CREATE TABLE post (
     post_id BIGSERIAL,
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
-    tags VARCHAR(40),
+   
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)

@@ -14,9 +14,8 @@ app.use("/auth", require("./routes/jwtAuth"));
 //Dashboard
 app.use("/dashboard", require("./routes/dashboard"));
 
-
-
-
+//Main Feed and Posts
+app.use("/feed", require("./routes/feed"));
 
 
 app.listen(5000, () => {
