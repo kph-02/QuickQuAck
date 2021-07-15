@@ -78,6 +78,22 @@ router.get("/main-feed", authorization, async (req, res) => {
     }
 });
 
+// update a post
+router.put("/update-post", authorization, async (req, res) => {
+    try {
+        /*const { post_id } = req.body;
+        const { postText } = req.body;*/
+        const {post_id, postText} = req.body;
+        const updatePost = await pool.query("UPDATE post SET post_text = $1 where post_id = $2", [postText, post_id]);
+        res.status(201).json({
+            status: "Update Success"
+        });
+    } catch (err) {
+        res.status(500).send("Server error");
+    }
+});
+
+// delete a post
 router.delete("/delete-post", authorization, async (req, res) => {
     try {
         const { id } = req.body;
