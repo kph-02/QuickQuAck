@@ -53,7 +53,7 @@ const Login = ({ navigation }) => {
           initialValues={{ email: '', password: '' }}
           onSubmit={(values) => {
             console.log(values);
-            navigation.navigate('Signup');
+            navigation.navigate('Welcome');
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -89,11 +89,11 @@ const Login = ({ navigation }) => {
                 <ButtonText>Log In</ButtonText>
               </StyledButton>
               <StyledButton google={true} onPress={handleSubmit}>
-                <Fontisto name="google" color={primary} size={25} />
+                <Fontisto name="google" color={darkgray} size={25} />
                 <ButtonText google={true}>Log in with Google</ButtonText>
               </StyledButton>
               <ExtraView>
-                <TextLink onPress={() => navigation.navigate('Signup')}>
+                <TextLink onPress={() => navigation.navigate('Welcome')}>
                   <TextLinkContent>Forgot Your Password?</TextLinkContent>
                 </TextLink>
               </ExtraView>

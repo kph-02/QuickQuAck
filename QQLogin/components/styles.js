@@ -17,7 +17,7 @@ export const Colors = {
   orange: '#FFA500',
 };
 
-const {width, height} = Dimensions.get('screen');
+const { width, height } = Dimensions.get('screen');
 
 const { primary, yellow, background, lightgray, darkgray, black, shrek, orange } = Colors;
 
@@ -47,6 +47,19 @@ export const PageTitle = styled.Text`
   font-weight: bold;
   color: ${black};
   padding: 70px;
+`;
+// change this shit to recenter splash
+
+export const PageTitleSplash = styled.Text`
+  font-size: 50px;
+  text-align: center;
+  font-weight: bold;
+  color: ${black};
+  padding: 3px;
+  width: 150%;
+  margin-vertical: 35%;
+  margin-bottom: 10px;
+
 `;
 
 export const SubTitle = styled.Text`
@@ -80,7 +93,6 @@ export const StyledInputLabel = styled.Text`
   font-size: 13px;
   text-align: left;
 `;
-
 
 export const RightIcon = styled.TouchableOpacity`
   right: 15px;
