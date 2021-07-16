@@ -78,12 +78,28 @@ router.get("/main-feed", authorization, async (req, res) => {
     }
 });
 
+// update a post
+router.put("/update-post", authorization, async (req, res) => {
+    try {
+        /*const { post_id } = req.body;
+        const { postText } = req.body;*/
+        const {postId, postText} = req.body;
+        const updatePost = await pool.query("UPDATE post SET post_text = $1 where post_id = $2", [postText, postId]);
+        res.status(201).json({
+            status: "Update Success"
+        });
+    } catch (err) {
+        res.status(500).send("Server error");
+    }
+});
+
+// delete a post
 router.delete("/delete-post", authorization, async (req, res) => {
     try {
-        const { id } = req.body;
+        const { postId } = req.body;
         //const selectedPost = 'SELECT * FROM post WHERE post_id = $1';
         //const { rows: [post] } = await pool.query(selectedPost, [id]);
-        const selectedPost = await pool.query("DELETE FROM post WHERE post_id = $1", [id]);
+        const selectedPost = await pool.query("DELETE FROM post WHERE post_id = $1", [postId]);
         //console.log(selectedPost);
 
         /*if (!post) {
