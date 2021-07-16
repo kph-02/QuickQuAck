@@ -37,6 +37,29 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
+const sendToDB = async (body) => {
+
+  console.log(body);
+
+  try{
+  // Update server with user's registration information
+  const response = await fetch("http://192.168.1.51:5000/auth/login", {
+    method: "POST", 
+    headers: {"Content-Type" : "application/json"},
+    body: JSON.stringify(body)
+  });
+
+  const parseRes = await response.json();
+
+  console.log(parseRes);
+  
+  }
+  catch(error){
+
+    console.error(error.message);
+  }
+} 
+
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
   
@@ -52,7 +75,13 @@ const Login = ({ navigation }) => {
         <Formik
           initialValues={{ email: '', password: '' }}
           onSubmit={(values) => {
-            console.log(values);
+
+            body = {
+            email: values.email, 
+            password: values.password, 
+            };
+
+            sendToDB(body);
             navigation.navigate('Signup');
           }}
         >

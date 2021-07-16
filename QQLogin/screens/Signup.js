@@ -41,24 +41,28 @@ const Signup = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
   const [agree, setAgree] = useState(false);
 
-  // const [inputs, setInputs] = useState({
-  //   firstName: "",
-  //   lastName: "",
-  //   email: "",
-  //   password: "",
-  //   dob: "",
-  //   college: "",
-  //   gy: ""
-  // })
+const sendToDB = async (body) => {
 
-  // const { firstName, lastName, email, password, dob, college, gy } = inputs;
-  // const onChange = (e) => {
-  //   setInputs({...inputs, [e.target.name] : e.target.value })
-  // }
+  console.log(body);
 
-  // const onSubmitForm = async e => {
-  //   e.preventDefault();
-  // }
+  try{
+  // Update server with user's registration information
+  const response = await fetch("http://192.168.1.51:5000/auth/register", {
+    method: "POST", 
+    headers: {"Content-Type" : "application/json"},
+    body: JSON.stringify(body)
+  });
+
+  const parseRes = await response.json();
+
+  console.log(parseRes);
+  
+  }
+  catch(error){
+
+    console.error(error.message);
+  }
+} 
 
   return (
     <KeyboardAvoidingWrapper>
@@ -80,7 +84,18 @@ const Signup = ({ navigation }) => {
               gradYear: '',
             }}
             onSubmit={(values) => {
-              console.log(values);
+
+              body = {    
+              firstName: values.name,
+              lastName: values.name,
+              email: values.email, 
+              password: values.password, 
+              dob: values.dateOfBirth,
+              college: values.college,
+              gy: values.gradYear
+              };
+
+              sendToDB(body);
               navigation.navigate('Login');
             }}
           >
@@ -161,7 +176,7 @@ const Signup = ({ navigation }) => {
 
                 <MsgBox>By clicking Sign Up, you agree to Quick QuAck's Terms & Conditions.</MsgBox>
 
-                <StyledButton onPress={() => navigation.navigate('Welcome')}>
+                <StyledButton onPress={handleSubmit}>
                   <ButtonText>Sign Up</ButtonText>
                 </StyledButton>
                 <Line />
