@@ -29,6 +29,7 @@ import {
   TextLink,
   TextLinkContent,
   ExtraViewRight,
+  PageTitleSignUp,
 } from './../components/styles';
 
 import { Button, View } from 'react-native';
@@ -65,7 +66,7 @@ const Signup = ({ navigation }) => {
       <StyledContainer>
         <StatusBar style="black" />
         <InnerContainer>
-          <PageTitle>Sign Up</PageTitle>
+          <PageTitleSignUp>Sign Up</PageTitleSignUp>
 
           <SubTitle></SubTitle>
           <Formik

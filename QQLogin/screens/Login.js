@@ -39,9 +39,9 @@ const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
-  
+
   return (
-      <StyledContainer>
+    <StyledContainer>
       {/* //keyboardavoidingwrapper added in, styledcontainer used to be here wrapping the overall thing */}
       {/* <KeyboardAvoidingWrapper> */}
       <StatusBar style="yellow" />
@@ -67,7 +67,7 @@ const Login = ({ navigation }) => {
                 onBlur={handleBlur('email')}
                 value={values.email}
                 keyboardType="email-address"
-                selectionColor='#FFCC15'
+                selectionColor="#FFCC15"
               />
 
               <MyTextInput
@@ -82,7 +82,7 @@ const Login = ({ navigation }) => {
                 isPassword={true}
                 hidePassword={hidePassword}
                 setHidePassword={setHidePassword}
-                selectionColor='#FFCC15'
+                selectionColor="#FFCC15"
               />
               <MsgBox></MsgBox>
               <StyledButton onPress={handleSubmit}>
@@ -103,7 +103,6 @@ const Login = ({ navigation }) => {
       </InnerContainer>
       {/* </KeyboardAvoidingWrapper> */}
     </StyledContainer>
-    
   );
 };
 
@@ -113,10 +112,10 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
       <StyledInputLabel> {label} </StyledInputLabel>
       <StyledTextInput {...props} />
       {isPassword && (
-        <RightIcon 
+        <RightIcon
           onPress={() => {
             setHidePassword(!hidePassword);
-            }}
+          }}
         >
           <Ionicons name={hidePassword ? 'md-eye-off' : 'md-eye'} size={30} color={darkgray} />
         </RightIcon>

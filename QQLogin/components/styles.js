@@ -59,7 +59,16 @@ export const PageTitleSplash = styled.Text`
   width: 150%;
   margin-vertical: 35%;
   margin-bottom: 10px;
+`;
 
+export const PageTitleSignUp = styled.Text`
+  font-size: 40px;
+  text-align: center;
+  font-weight: bold;
+  color: ${black};
+  padding: 3px;
+  margin-vertical: 1%;
+  margin-bottom: 1px;
 `;
 
 export const SubTitle = styled.Text`
