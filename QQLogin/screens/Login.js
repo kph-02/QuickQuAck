@@ -37,20 +37,21 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
+//Communicating with the database to authenticate login
 const sendToDB = async (body) => {
 
   console.log(body);
 
   try{
   // Update server with user's registration information
-  const response = await fetch("http://192.168.1.51:5000/auth/login", {
+  const response = await fetch("http://[ENTER YOUR IP HERE]:5000/auth/login", {
     method: "POST", 
     headers: {"Content-Type" : "application/json"},
     body: JSON.stringify(body)
   });
 
+  //token from database
   const parseRes = await response.json();
-
   console.log(parseRes);
   
   }
@@ -76,6 +77,7 @@ const Login = ({ navigation }) => {
           initialValues={{ email: '', password: '' }}
           onSubmit={(values) => {
 
+            //send values to database on submit
             body = {
             email: values.email, 
             password: values.password, 

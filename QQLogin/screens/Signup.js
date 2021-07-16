@@ -41,20 +41,21 @@ const Signup = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
   const [agree, setAgree] = useState(false);
 
+//communicate registration information with the database
 const sendToDB = async (body) => {
 
   console.log(body);
 
   try{
   // Update server with user's registration information
-  const response = await fetch("http://192.168.1.51:5000/auth/register", {
+  const response = await fetch("http://[ENTER YOUR IP HERE]:5000/auth/register", {
     method: "POST", 
     headers: {"Content-Type" : "application/json"},
     body: JSON.stringify(body)
   });
 
+  //Token response from database
   const parseRes = await response.json();
-
   console.log(parseRes);
   
   }
@@ -85,6 +86,7 @@ const sendToDB = async (body) => {
             }}
             onSubmit={(values) => {
 
+              //Setting up information to send to database
               body = {    
               firstName: values.name,
               lastName: values.name,
