@@ -121,4 +121,21 @@ router.delete("/delete-post", authorization, async (req, res) => {
     }
 });
 
+// post a comment 
+router.post("/create-comment", authorization, async (req, res) => {
+    try {
+        const { commentText, post_id } = req.body;
+        const user_id = req.user;
+        const newComment = await pool.query
+            ("INSERT INTO comment (comment_text, user_id, post_id) VALUES ($1, $2, $3) RETURNING *",
+                [commentText, user_id, post_id]); 
+        res.status(201).json({
+            status: "Comment Success"
+        });
+    } catch (err) {
+        console.log("Hi");
+        res.status(500).send("Server error");
+    }
+});
+
 module.exports = router;
