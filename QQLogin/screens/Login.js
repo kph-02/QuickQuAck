@@ -8,6 +8,9 @@ import { Formik } from 'formik';
 
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
+//IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
+const serverIp = "192.168.50.115";
+
 import {
   StyledContainer,
   InnerContainer,
@@ -42,30 +45,38 @@ const sendToDB = async (body) => {
 
   console.log(body);
 
-  try{
-  // Update server with user's registration information
-  const response = await fetch("http://[ENTER YOUR IP HERE]:5000/auth/login", {
-    method: "POST", 
-    headers: {"Content-Type" : "application/json"},
-    body: JSON.stringify(body)
-  });
+  try {
+    // Update server with user's registration information
+    const response = await fetch("http://" + serverIp + ":5000/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
 
-  //token from database
-  const parseRes = await response.json();
-  console.log(parseRes);
-  
+    // Token response from database
+
+    //A. Using Async Storage to store token JSON object locally as string
+    const storedToken = async (value) => {
+      try {
+        const jsonValue = JSON.stringify(value)
+        await AsyncStorage.setItem('token', jsonValue)
+      } catch (error) {
+        // saving error
+        console.error(error.message);
+      }
+    };
   }
-  catch(error){
+  catch (error) {
 
     console.error(error.message);
   }
-} 
+}
 
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
-  
+
   return (
-      <StyledContainer>
+    <StyledContainer>
       {/* //keyboardavoidingwrapper added in, styledcontainer used to be here wrapping the overall thing */}
       {/* <KeyboardAvoidingWrapper> */}
       <StatusBar style="yellow" />
@@ -79,12 +90,12 @@ const Login = ({ navigation }) => {
 
             //send values to database on submit
             body = {
-            email: values.email, 
-            password: values.password, 
+              email: values.email,
+              password: values.password,
             };
 
             sendToDB(body);
-            navigation.navigate('Signup');
+            navigation.navigate('Welcome');
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -134,7 +145,7 @@ const Login = ({ navigation }) => {
       </InnerContainer>
       {/* </KeyboardAvoidingWrapper> */}
     </StyledContainer>
-    
+
   );
 };
 
@@ -144,10 +155,10 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
       <StyledInputLabel> {label} </StyledInputLabel>
       <StyledTextInput {...props} />
       {isPassword && (
-        <RightIcon 
+        <RightIcon
           onPress={() => {
             setHidePassword(!hidePassword);
-            }}
+          }}
         >
           <Ionicons name={hidePassword ? 'md-eye-off' : 'md-eye'} size={30} color={darkgray} />
         </RightIcon>

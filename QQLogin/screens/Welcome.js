@@ -35,7 +35,7 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
-const Welcome = ({navigation}) => {
+const Welcome = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
 
   const [agree, setAgree] = useState(false);
@@ -48,64 +48,74 @@ const Welcome = ({navigation}) => {
   };
 
   return (
-    
-      <StyledContainer>
-        <StatusBar style="black" />
-        <InnerContainer>
-          {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
+
+    <StyledContainer>
+      <StatusBar style="black" />
+      <InnerContainer>
+        {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
            */}
-          <PageTitle>WIP Page</PageTitle>
+        <PageTitle>WIP Page</PageTitle>
 
-          <SubTitle></SubTitle>
-          <Formik
-            initialValues={{ toggle: false, checked: [], name: '', email: '', password: '' }}
+        <SubTitle></SubTitle>
+        <Formik
+          initialValues={{ toggle: false, checked: [], name: '', email: '', password: '' }}
 
-            onSubmit={(values) => {
-              console.log(values);
-              navigation.navigate("Signup");
+          onSubmit={(values) => {
+            console.log(values);
+            navigation.navigate("Signup");
             //   navigation.navigate("Log In");
             //   navigation.navigate("Splash");
-            }}
-          >
-            
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
-                
+          }}
+        >
 
-              <StyledFormArea>
-                
-               
-                <StyledButton onPress={() => navigation.navigate('Signup')}>
-                  <ButtonText>Sign Up</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Login')}>
-                  <ButtonText>Log In</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Splash')}>
-                  <ButtonText>Splash</ButtonText>
-                </StyledButton>
-                <Line />
+          {({ handleChange, handleBlur, handleSubmit, values }) => (
 
-                <ExtraView>
-                  <ExtraText></ExtraText>
-                  <TextLink>
-                  </TextLink>
-                </ExtraView>
-                <ExtraViewRight>
-                  <TextLink>
-                  </TextLink>
-                </ExtraViewRight>
-              </StyledFormArea>
-        
+
+            <StyledFormArea>
+
+
+              <StyledButton onPress={() => navigation.navigate('Signup')}>
+                <ButtonText>Sign Up</ButtonText>
+              </StyledButton>
+              <StyledButton onPress={() => navigation.navigate('Login')}>
+                <ButtonText>Log In</ButtonText>
+              </StyledButton>
+              <StyledButton onPress={() => navigation.navigate('Splash')}>
+                <ButtonText>Splash</ButtonText>
+              </StyledButton>
+              <Line />
+
+              <ExtraView>
+                <ExtraText></ExtraText>
+                <TextLink>
+                </TextLink>
+              </ExtraView>
+              <ExtraViewRight>
+                <TextLink>
+                </TextLink>
+              </ExtraViewRight>
+            </StyledFormArea>
+
           )}
 
+        </Formik>
+      </InnerContainer>
+    </StyledContainer>
 
-
-          </Formik>
-        </InnerContainer>
-      </StyledContainer>
-    
   );
 };
 
-
 export default Welcome;
+
+// for using storedValue across screens (storedValue stores the token)
+// export default class Welcome extends React.component {
+
+//   onLoad = async () => {
+//     try {
+//       const storedValue = await AsyncStorage.getItem(key);
+//       this.setState({ storedValue });
+//     } catch (error) {
+//       Alert.alert('Error', 'There was an error.')
+//     }
+//   }
+// }
