@@ -28,7 +28,7 @@ const RootStack = () => {
                     },
                     headerShown:false
                 }}
-                initialRouteName="Welcome"
+                initialRouteName="Splash"
                 >
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="Signup" component={Signup} />
