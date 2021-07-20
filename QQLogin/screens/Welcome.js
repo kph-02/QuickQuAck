@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity} from 'react-native';
 //formik
 import { Formik, Field, Form } from 'formik';
+//search bar
+import {SearchBar} from 'react-native-elements';
 
 //icons
 
@@ -35,6 +38,47 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
+
+const posts = [
+  {
+    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+    title: 'First Item',
+    body: 'This is a sample post!',
+  },
+  {
+    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+    title: 'Second Item',
+    body: 'Who\'s playing at Sun God today at 7pm?',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d72',
+    title: 'Third Item',
+    body: 'Which dining hall has te best special today?',
+  },
+  {
+    id: '58894a0f-3da1-471f-bd96-145571e29d82',
+    title: 'Fourth Item',
+    body: 'Which dining hall has te best special today?',
+  },
+  {
+    id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    title: 'Fifth Item',
+    body: 'What games do you all play?',
+  },
+  {
+    id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    title: 'Sixth Item',
+    body: 'What\'s Poppin? Brand new whip, just hopped in yuh',
+  },
+];
+
+const Item = ({ item, onPress, backgroundColor, textColor }) => (
+  <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
+    <Text style={[styles.title, textColor]}>{item.title}</Text>
+    <Text style={[styles.bodyText, textColor]}>{item.body}</Text>
+  </TouchableOpacity>
+);
+
 const Welcome = ({navigation}) => {
   const [hidePassword, setHidePassword] = useState(true);
 
@@ -47,6 +91,28 @@ const Welcome = ({navigation}) => {
     alert('pog');
   };
 
+  // const updateSearch = (search) => {
+  //   setState({search});
+  // };
+
+  const [selectedId, setSelectedId] = useState(null);
+  
+  //renderItem function
+  const renderItem = ({item}) => {
+    const backgroundColor = item.id === selectedId ? '#FFCC15' : '#EFEFEF';
+    const color = item.id === selectedId ? 'white' : 'black';
+
+    return(
+      <Item
+        item={item}
+        onPress={() => setSelectedId(item.id)}
+        backgroundColor={{backgroundColor}}
+        textColor={{color}}
+      />
+    );
+  };
+  
+
   return (
     
       <StyledContainer>
@@ -54,10 +120,22 @@ const Welcome = ({navigation}) => {
         <InnerContainer>
           {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
            */}
-          <PageTitle>WIP Page</PageTitle>
+          {/* <PageTitle>Feed</PageTitle> */}
+            <Text style={styles.pageTitle}>Feed</Text>
+            <SearchBar 
+              placeholder="Search Tags"
+              // onChangeText={this.updateSearch}
+              lightTheme="true"
+              containerStyle={{width: '95%', height: height * 0.07, alignItems: 'center', marginTop: height * 0.02, borderRadius: 100, backgroundColor:'#F2F2F2', }}
+              inputContainerStyle={{borderRadius: 100, height: '100%', width: '100%', backgroundColor:'#F9F9F9'}}
+            />
 
-          <SubTitle></SubTitle>
-          <Formik
+            <SubTitle style={{fontSize: 14, marginTop: 10}}>Need the various feed tabs here</SubTitle>
+          
+
+
+          
+          {/* <Formik
             initialValues={{ toggle: false, checked: [], name: '', email: '', password: '' }}
 
             onSubmit={(values) => {
@@ -73,7 +151,6 @@ const Welcome = ({navigation}) => {
 
               <StyledFormArea>
                 
-               
                 <StyledButton onPress={() => navigation.navigate('Signup')}>
                   <ButtonText>Sign Up</ButtonText>
                 </StyledButton>
@@ -100,12 +177,48 @@ const Welcome = ({navigation}) => {
 
 
 
-          </Formik>
+          </Formik> */}
         </InnerContainer>
+        <View style={{flex: 2.5}}>
+          <FlatList
+                    numColumns={1}
+                    horizontal={false}
+                    data={posts}
+                    keyExtractor={(item) => item.id}
+                    extraData={selectedId}
+                    renderItem={renderItem}
+          />
+
+        </View>
+        <View style={{flex: 0.5, backgroundColor: 'yellow'}}>
+          <Text> Implement NavBar Here</Text>
+        </View>
       </StyledContainer>
     
   );
 };
 
+const {width, height} = Dimensions.get('screen');
+
+const styles = StyleSheet.create({
+  pageTitle: {
+    fontSize: 40,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  item:{
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  bodyText: {
+    fontSize: 12
+  }
+});
 
 export default Welcome;
