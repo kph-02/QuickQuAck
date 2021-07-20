@@ -4,12 +4,14 @@ import { useFonts } from 'expo-font';
 //formik
 import { Formik } from 'formik';
 
+//local storage
+
 //icons
 
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
-const serverIp = "192.168.50.115";
+const serverIp = '192.168.1.51';
 
 import {
   StyledContainer,
@@ -40,37 +42,36 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-//Communicating with the database to authenticate login
-const sendToDB = async (body) => {
-
-  console.log(body);
-
+/*Using Async Storage to store token JSON object locally as string
+const storedToken = async (value) => {
   try {
-    // Update server with user's registration information
-    const response = await fetch("http://" + serverIp + ":5000/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    // Token response from database
-
-    //A. Using Async Storage to store token JSON object locally as string
-    const storedToken = async (value) => {
-      try {
-        const jsonValue = JSON.stringify(value)
-        await AsyncStorage.setItem('token', jsonValue)
-      } catch (error) {
-        // saving error
-        console.error(error.message);
-      }
-    };
-  }
-  catch (error) {
-
+    console.log('value' + value);
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem('token', jsonValue);
+  } catch (error) {
+    // saving error
     console.error(error.message);
   }
-}
+};
+*/
+//Communicating with the database to authenticate login
+const sendToDB = async (body) => {
+  try {
+    // Update server with user's registration information
+    const response = await fetch('http://' + serverIp + ':5000/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    const parseRes = await response.json();
+    console.log(parseRes);
+    //Store to local storage
+    //storedToken(parseRes.token);
+  } catch (error) {
+    console.error(error.message);
+  }
+};
 
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
@@ -87,7 +88,6 @@ const Login = ({ navigation }) => {
         <Formik
           initialValues={{ email: '', password: '' }}
           onSubmit={(values) => {
-
             //send values to database on submit
             body = {
               email: values.email,
@@ -109,7 +109,7 @@ const Login = ({ navigation }) => {
                 onBlur={handleBlur('email')}
                 value={values.email}
                 keyboardType="email-address"
-                selectionColor='#FFCC15'
+                selectionColor="#FFCC15"
               />
 
               <MyTextInput
@@ -124,7 +124,7 @@ const Login = ({ navigation }) => {
                 isPassword={true}
                 hidePassword={hidePassword}
                 setHidePassword={setHidePassword}
-                selectionColor='#FFCC15'
+                selectionColor="#FFCC15"
               />
               <MsgBox></MsgBox>
               <StyledButton onPress={handleSubmit}>
@@ -145,7 +145,6 @@ const Login = ({ navigation }) => {
       </InnerContainer>
       {/* </KeyboardAvoidingWrapper> */}
     </StyledContainer>
-
   );
 };
 
@@ -168,3 +167,5 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
 };
 
 export default Login;
+//testing purposes, so don't have to redefine across multiple files
+export { serverIp };

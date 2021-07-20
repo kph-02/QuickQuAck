@@ -48,32 +48,25 @@ const Welcome = ({ navigation }) => {
   };
 
   return (
-
     <StyledContainer>
       <StatusBar style="black" />
       <InnerContainer>
         {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
-           */}
+         */}
         <PageTitle>WIP Page</PageTitle>
 
         <SubTitle></SubTitle>
         <Formik
           initialValues={{ toggle: false, checked: [], name: '', email: '', password: '' }}
-
           onSubmit={(values) => {
             console.log(values);
-            navigation.navigate("Signup");
+            navigation.navigate('Signup');
             //   navigation.navigate("Log In");
             //   navigation.navigate("Splash");
           }}
         >
-
           {({ handleChange, handleBlur, handleSubmit, values }) => (
-
-
             <StyledFormArea>
-
-
               <StyledButton onPress={() => navigation.navigate('Signup')}>
                 <ButtonText>Sign Up</ButtonText>
               </StyledButton>
@@ -83,25 +76,28 @@ const Welcome = ({ navigation }) => {
               <StyledButton onPress={() => navigation.navigate('Splash')}>
                 <ButtonText>Splash</ButtonText>
               </StyledButton>
+              <StyledButton
+                onPress={
+                  () =>
+                    navigation.navigate('CreatePost') /* Add turnery for if button can be only pressed if JWT exists */
+                }
+              >
+                <ButtonText>Create Post</ButtonText>
+              </StyledButton>
               <Line />
 
               <ExtraView>
                 <ExtraText></ExtraText>
-                <TextLink>
-                </TextLink>
+                <TextLink></TextLink>
               </ExtraView>
               <ExtraViewRight>
-                <TextLink>
-                </TextLink>
+                <TextLink></TextLink>
               </ExtraViewRight>
             </StyledFormArea>
-
           )}
-
         </Formik>
       </InnerContainer>
     </StyledContainer>
-
   );
 };
 
