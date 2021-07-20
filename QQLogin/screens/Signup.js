@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { AsyncStorage } from '@react-native-async-storage/async-storage';
 
 //formik
 import { Formik, Field, Form } from 'formik';
@@ -7,6 +8,9 @@ import { Formik, Field, Form } from 'formik';
 //icons
 
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
+
+//IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
+const serverIp = "192.168.50.115";
 
 import {
   StyledContainer,
@@ -41,24 +45,55 @@ const Signup = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
   const [agree, setAgree] = useState(false);
 
-  // const [inputs, setInputs] = useState({
-  //   firstName: "",
-  //   lastName: "",
-  //   email: "",
-  //   password: "",
-  //   dob: "",
-  //   college: "",
-  //   gy: ""
-  // })
+  //communicate registration information with the database
+  const sendToDB = async (body) => {
 
-  // const { firstName, lastName, email, password, dob, college, gy } = inputs;
-  // const onChange = (e) => {
-  //   setInputs({...inputs, [e.target.name] : e.target.value })
-  // }
+    console.log(body);
 
-  // const onSubmitForm = async e => {
-  //   e.preventDefault();
-  // }
+    try {
+      // Update server with user's registration information
+      const response = await fetch("http://" + serverIp + ":5000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      // Token response from database
+
+      //A. Using Async Storage to store token JSON object locally as string
+      const storedToken = async (value) => {
+        try {
+          const jsonValue = JSON.stringify(value)
+          await AsyncStorage.setItem('token', jsonValue)
+        } catch (error) {
+          // saving error
+          console.error(error.message);
+        }
+      }
+
+      //B. Using Async Storage to get String token 
+      //This isn't used in this screen, but it is for future reference
+
+      /*
+      const readToken = async () => {
+        try {
+          const value = await AsyncStorage.getItem('token')
+          if(value !== null) {
+            // value previously stored
+          }
+        } catch(e) {
+          // error reading value
+        }
+      }
+      */
+
+      // possibly add if/else statement to determine if setAuth should be true or false
+
+    }
+    catch (error) {
+      console.error(error.message);
+    }
+  }
 
   return (
     <KeyboardAvoidingWrapper>
@@ -72,15 +107,28 @@ const Signup = ({ navigation }) => {
             initialValues={{
               toggle: false,
               checked: [],
-              name: '',
+              firstName: '',
+              lastName: '',
               email: '',
               password: '',
-              dateOfBirth: '',
+              dob: '',
               college: '',
-              gradYear: '',
+              gy: '',
             }}
             onSubmit={(values) => {
-              console.log(values);
+
+              //Setting up information to send to database
+              body = {
+                firstName: values.firstName,
+                lastName: values.lastName,
+                email: values.email,
+                password: values.password,
+                dob: values.dob,
+                college: values.college,
+                gy: values.gy
+              };
+
+              sendToDB(body);
               navigation.navigate('Login');
             }}
           >
@@ -90,12 +138,24 @@ const Signup = ({ navigation }) => {
                 <MyTextInput
                   label=""
                   icon=""
-                  placeholder="Name"
+                  placeholder="First Name"
                   style={{}}
                   placeholderTextColor={darkgray}
-                  onChangeText={handleChange('name')}
-                  onBlur={handleBlur('name')}
-                  value={values.name}
+                  onChangeText={handleChange('firstName')}
+                  onBlur={handleBlur('firstName')}
+                  value={values.firstName}
+                  selectionColor="#FFCC15"
+                />
+
+                <MyTextInput
+                  label=""
+                  icon=""
+                  placeholder="Last Name"
+                  style={{}}
+                  placeholderTextColor={darkgray}
+                  onChangeText={handleChange('lastName')}
+                  onBlur={handleBlur('lastName')}
+                  value={values.lastName}
                   selectionColor="#FFCC15"
                 />
 
@@ -131,9 +191,9 @@ const Signup = ({ navigation }) => {
                   icon=""
                   placeholder="Date of Birth"
                   placeholderTextColor={darkgray}
-                  onChangeText={handleChange('dateOfBirth')}
-                  onBlur={handleBlur('dateOfBirth')}
-                  value={values.dateOfBirth}
+                  onChangeText={handleChange('dob')}
+                  onBlur={handleBlur('dob')}
+                  value={values.dob}
                   selectionColor="#FFCC15"
                 />
 
@@ -153,15 +213,15 @@ const Signup = ({ navigation }) => {
                   icon=""
                   placeholder="Graduation Year"
                   placeholderTextColor={darkgray}
-                  onChangeText={handleChange('gradYear')}
-                  onBlur={handleBlur('gradYear')}
-                  value={values.gradYear}
+                  onChangeText={handleChange('gy')}
+                  onBlur={handleBlur('gy')}
+                  value={values.gy}
                   selectionColor="#FFCC15"
                 />
 
                 <MsgBox>By clicking Sign Up, you agree to Quick QuAck's Terms & Conditions.</MsgBox>
 
-                <StyledButton onPress={() => navigation.navigate('Welcome')}>
+                <StyledButton onPress={handleSubmit}>
                   <ButtonText>Sign Up</ButtonText>
                 </StyledButton>
                 <Line />
