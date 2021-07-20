@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+<<<<<<< HEAD
 //import { AsyncStorage } from '@react-native-async-storage/async-storage';
+=======
+import { AsyncStorage } from '@react-native-async-storage/async-storage';
+>>>>>>> main
 
 //formik
 import { Formik, Field, Form } from 'formik';
@@ -64,7 +68,11 @@ const Signup = ({ navigation }) => {
       const storedToken = async (value) => {
         try {
           const jsonValue = JSON.stringify(value)
+<<<<<<< HEAD
           //await AsyncStorage.setItem('token', jsonValue)
+=======
+          await AsyncStorage.setItem('token', jsonValue)
+>>>>>>> main
         } catch (error) {
           // saving error
           console.error(error.message);
