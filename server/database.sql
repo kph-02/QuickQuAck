@@ -32,18 +32,21 @@ CREATE TABLE post (
    
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE comment (
     comment_id BIGSERIAL,
     post_id INTEGER NOT NULL,
+    parent_comment_id INTEGER,
     user_id uuid NOT NULL,
-    text VARCHAR(100) NOT NULL,
+    /*text VARCHAR(100) NOT NULL,*/
+    comment_text VARCHAR(100),
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (comment_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (post_id) REFERENCES post(post_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
+    /*FOREIGN KEY (parent_comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE*/
 );
 
 CREATE TYPE voting AS ENUM (
