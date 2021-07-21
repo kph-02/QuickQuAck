@@ -11,6 +11,7 @@ import Signup from './../screens/Signup';
 import Welcome from './../screens/Welcome';
 import Splash from './../screens/Splash';
 import CreatePost from './../screens/CreatePost';
+import PostView from './../screens/PostView';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,7 @@ const RootStack = () => {
         <Stack.Screen name="Welcome" component={Welcome} />
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="CreatePost" component={CreatePost} />
+        <Stack.Screen name="PostView" component={PostView} />
       </Stack.Navigator>
     </NavigationContainer>
   );

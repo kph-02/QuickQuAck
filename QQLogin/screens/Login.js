@@ -64,7 +64,7 @@ const sendToDB = async (body) => {
       body: JSON.stringify(body),
     });
 
-    const parseRes = await response.json();
+    const parseRes = await response.text();
     console.log(parseRes);
     //Store to local storage
     //storedToken(parseRes.token);

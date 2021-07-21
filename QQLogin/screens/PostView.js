@@ -45,10 +45,7 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-const CreatePost = ({ navigation }) => {
-  const [hidePassword, setHidePassword] = useState(true);
-  const [agree, setAgree] = useState(false);
-
+const PostView = ({ navigation }) => {
   /*Getting JWT from local storage, must exist otherwise user can't be on this page
   *****Local storage still needs to be set up*********
   const getJWT = async () => {
@@ -63,21 +60,34 @@ const CreatePost = ({ navigation }) => {
   };
   */
   //communicate registration information with the database
+
   const sendToDB = async (body) => {
-    console.log(body.postText);
-    console.log(body.post_text);
-
     try {
-      // Update server with user's registration information
-      const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
-        method: 'POST',
-        headers: { token: JWTtoken },
-        body: JSON.stringify(body),
-      });
+      if (operation === 'update') {
+        // Update server with user's registration information
+        const response = await fetch('http://' + serverIp + ':5000/feed/update-post', {
+          method: 'PUT',
+          headers: { token: JWTtoken },
+          body: JSON.stringify(body),
+        });
 
-      const parseRes = await response.text();
+        const parseRes = await response.text();
 
-      console.log(parseRes);
+        console.log(parseRes);
+      }
+
+      if (operation === 'delete') {
+        // Update server with user's registration information
+        const response = await fetch('http://' + serverIp + ':5000/feed/delete-post', {
+          method: 'DELETE',
+          headers: { token: JWTtoken },
+          body: JSON.stringify(body),
+        });
+
+        const parseRes = await response.text();
+
+        console.log(parseRes);
+      }
     } catch (error) {
       console.error(error.message);
     }
@@ -88,30 +98,29 @@ const CreatePost = ({ navigation }) => {
       <StyledContainer>
         <StatusBar style="black" />
         <InnerContainer>
-          <PageTitle>New Post</PageTitle>
+          <PageTitle>Post View</PageTitle>
 
           <SubTitle></SubTitle>
           <Formik
             initialValues={{
-              //hardcoded for now
-              token: '',
+              operation: '',
+              token: '', //hardcoded for now
+              postTitle: '', //using for postId for now
               postText: '',
-              post_text: '',
-              user: '',
               postId: '',
             }}
             onSubmit={(values) => {
               //Setting up information to send to database
               body = {
+                operation: '',
                 token: JSON.stringify(JWTtoken),
-                postText: values.postText + values.postTitle,
-                post_text: values.postText + values.postTitle,
-                user: values.authorId,
+                postText: 'Title: ' + values.postText + 'Content: ' + values.postTitle,
                 postId: values.postId,
               };
 
+              console.log('operate: ' + operation);
               sendToDB(body);
-              navigation.navigate('PostView');
+              navigation.navigate('CreatePost');
             }}
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -140,11 +149,26 @@ const CreatePost = ({ navigation }) => {
                   selectionColor="#FFCC15"
                 />
 
-                <StyledButton onPress={handleSubmit}>
-                  <ButtonText>Create Post</ButtonText>
+                <MyTextInput
+                  label=""
+                  icon=""
+                  placeholder="Post Id"
+                  style={{}}
+                  placeholderTextColor={darkgray}
+                  onChangeText={handleChange('postId')}
+                  onBlur={handleBlur('postId')}
+                  value={values.postId}
+                  selectionColor="#FFCC15"
+                />
+
+                <StyledButton onPress={((event) => setOpt(event, UPDATE), handleSubmit)}>
+                  <ButtonText>Update Post</ButtonText>
                 </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Login')}>
+                <StyledButton onPress={() => navigation.navigate('CreatePost')}>
                   <ButtonText>Back</ButtonText>
+                </StyledButton>
+                <StyledButton onPress={((event) => setOpt(event, DELETE), handleSubmit)}>
+                  <ButtonText>Delete Post</ButtonText>
                 </StyledButton>
                 <Line />
               </StyledFormArea>
@@ -174,4 +198,4 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
   );
 };
 
-export default CreatePost;
+export default PostView;
