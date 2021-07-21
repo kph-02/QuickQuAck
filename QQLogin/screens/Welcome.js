@@ -57,12 +57,12 @@ const posts = [
   {
     id: '58694a0f-3da1-471f-bd96-145571e29d72',
     title: 'Third Item',
-    body: 'Which dining hall has te best special today?',
+    body: 'Which dining hall has the best special today?',
   },
   {
     id: '58894a0f-3da1-471f-bd96-145571e29d82',
     title: 'Fourth Item',
-    body: 'Which dining hall has te best special today?',
+    body: 'Which dining hall has the best special today?',
   },
   {
     id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
