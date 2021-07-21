@@ -28,6 +28,12 @@ export const StyledContainer = styled.View`
   background-color: ${primary};
 `;
 
+export const StyledFeedContainer = styled.View`
+  flex: 1;
+  padding-top: ${StatusBarHeight + 30}px;
+  background-color: ${primary};
+`;
+
 export const InnerContainer = styled.View`
   flex: 1;
   width: 100%;

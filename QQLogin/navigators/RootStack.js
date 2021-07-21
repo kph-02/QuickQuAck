@@ -11,33 +11,32 @@ import Login from './../screens/Login';
 import Signup from './../screens/Signup';
 import Welcome from './../screens/Welcome';
 import Splash from './../screens/Splash';
+import CreatePost from '../screens/CreatePost';
 
 const Stack = createStackNavigator();
 
 const RootStack = () => {
     return(
-        <NavigationContainer>
-            <Stack.Navigator
-                screenOptions={{
-                    headerStyle: {
-                        backgroundColor: ''
-                    },
-                    headerTransparent: true,
-                    headerLeftContainerStyle: {
-                        paddingLeft:20
-                    },
-                    headerShown:false
-                }}
-                initialRouteName="Splash"
-                >
-                <Stack.Screen name="Login" component={Login} />
-                <Stack.Screen name="Signup" component={Signup} />
-                <Stack.Screen name="Welcome" component={Welcome} />
-                <Stack.Screen name="Splash" component={Splash} />
-                
+        <Stack.Navigator
+            screenOptions={{
+                headerStyle: {
+                    backgroundColor: ''
+                },
+                headerTransparent: true,
+                headerLeftContainerStyle: {
+                    paddingLeft:20
+                },
+                headerShown:false
+            }}
+            initialRouteName="Splash"
+            >
+            <Stack.Screen name="Splash" component={Splash} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Signup" component={Signup} />
+            <Stack.Screen name="Welcome" component={Welcome} />
+            <Stack.Screen name="Create Post" component={CreatePost} />
 
-            </Stack.Navigator>
-        </NavigationContainer>
+        </Stack.Navigator>
     )
 }
 

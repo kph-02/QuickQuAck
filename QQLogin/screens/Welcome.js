@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity} from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert} from 'react-native';
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
@@ -12,6 +12,7 @@ import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 import {
   StyledContainer,
+  StyledFeedContainer,
   InnerContainer,
   PageLogo,
   PageTitle,
@@ -35,6 +36,9 @@ import {
 
 import { Button, View } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
+
+import CreatePost from '../screens/CreatePost';
+
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
@@ -99,7 +103,7 @@ const Welcome = ({navigation}) => {
   
   //renderItem function
   const renderItem = ({item}) => {
-    const backgroundColor = item.id === selectedId ? '#FFCC15' : '#EFEFEF';
+    const backgroundColor = item.id === selectedId ? '#FFCC15' : '#FFFFFF';
     const color = item.id === selectedId ? 'white' : 'black';
 
     return(
@@ -115,9 +119,9 @@ const Welcome = ({navigation}) => {
 
   return (
     
-      <StyledContainer>
+      <StyledFeedContainer>
         <StatusBar style="black" />
-        <InnerContainer>
+        <InnerContainer >
           {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
            */}
           {/* <PageTitle>Feed</PageTitle> */}
@@ -126,7 +130,7 @@ const Welcome = ({navigation}) => {
               placeholder="Search Tags"
               // onChangeText={this.updateSearch}
               lightTheme="true"
-              containerStyle={{width: '95%', height: height * 0.07, alignItems: 'center', marginTop: height * 0.02, borderRadius: 100, backgroundColor:'#F2F2F2', }}
+              containerStyle={{width: '90%', height: height * 0.07, alignItems: 'center', marginTop: height * 0.02, borderRadius: 100, backgroundColor:'#F2F2F2', }}
               inputContainerStyle={{borderRadius: 100, height: '100%', width: '100%', backgroundColor:'#F9F9F9'}}
             />
 
@@ -179,7 +183,7 @@ const Welcome = ({navigation}) => {
 
           </Formik> */}
         </InnerContainer>
-        <View style={{flex: 2.5}}>
+        <View style={{flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5}}>
           <FlatList
                     numColumns={1}
                     horizontal={false}
@@ -190,10 +194,24 @@ const Welcome = ({navigation}) => {
           />
 
         </View>
-        <View style={{flex: 0.5, backgroundColor: 'yellow'}}>
+        <TouchableOpacity activeOpacity={0.5} 
+          onPress={()=> Alert.alert("Create Post Button Clicked")} 
+          style={styles.touchableStyle} 
+        >
+        {/* Note: last worked on: nested navigation for create post */}
+        {/* <TouchableOpacity activeOpacity={0.5} 
+          onPress={()=> navigation.navigate('Create Post')} 
+          style={styles.touchableStyle} 
+        > */}
+          <Image source={require('./../assets/create_post_button.png')} 
+          
+                 style={styles.floatingButtonStyle} />
+       
+        </TouchableOpacity>
+        {/* <View style={{flex: 0.5, backgroundColor: 'yellow'}}>
           <Text> Implement NavBar Here</Text>
-        </View>
-      </StyledContainer>
+        </View> */}
+      </StyledFeedContainer>
     
   );
 };
@@ -208,9 +226,9 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   item:{
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
+    padding: 30,
+    marginVertical: 2.5,
+    //marginHorizontal: 10,
   },
   title: {
     fontSize: 20,
@@ -218,6 +236,20 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     fontSize: 12
+  },
+  touchableStyle:{
+    position: 'absolute',
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 30,
+    bottom: 30,
+  },
+  floatingButtonStyle: {
+    resizeMode: 'contain',
+    width: width * 0.18,
+    height: width * 0.18,
   }
 });
 
