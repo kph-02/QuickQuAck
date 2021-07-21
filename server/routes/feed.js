@@ -138,4 +138,20 @@ router.post("/create-comment", authorization, async (req, res) => {
     }
 });
 
+// delete a comment
+router.delete("/delete-comment", authorization, async (req, res) => {
+    try {
+        const { comment_id } = req.body;
+        // code to select any single comment
+        const deletedComment = await pool.query("DELETE FROM comment WHERE comment_id = $1 RETURNING *", [comment_id]);
+        res.status(201).json({
+            status: "Deleted comment"
+        });
+    } catch (err) {
+        res.status(500).send("Server error");
+    }
+});
+
+// edit a comment
+
 module.exports = router;

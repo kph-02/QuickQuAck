@@ -45,7 +45,7 @@ CREATE TABLE comment (
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (comment_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
+    CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
     /*FOREIGN KEY (parent_comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE*/
 );
 
