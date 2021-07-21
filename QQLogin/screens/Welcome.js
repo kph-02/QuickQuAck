@@ -194,15 +194,14 @@ const Welcome = ({navigation}) => {
           />
 
         </View>
-        <TouchableOpacity activeOpacity={0.5} 
+        {/* <TouchableOpacity activeOpacity={0.5} 
           onPress={()=> Alert.alert("Create Post Button Clicked")} 
           style={styles.touchableStyle} 
-        >
-        {/* Note: last worked on: nested navigation for create post */}
-        {/* <TouchableOpacity activeOpacity={0.5} 
+        > */}
+        <TouchableOpacity activeOpacity={0.5} 
           onPress={()=> navigation.navigate('Create Post')} 
           style={styles.touchableStyle} 
-        > */}
+        >
           <Image source={require('./../assets/create_post_button.png')} 
           
                  style={styles.floatingButtonStyle} />

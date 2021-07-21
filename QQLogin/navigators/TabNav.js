@@ -9,15 +9,18 @@ import Welcome from '../screens/Welcome';
 import CreatePost from '../screens/CreatePost';
 import Signup from '../screens/Signup';
 import Login from '../screens/Login';
+import { createStackNavigator } from '@react-navigation/stack';
 
 
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
+// const FeedStack = createStackNavigator();
+// function FeedStackScreen() {
+//   return (
+//     <FeedStack.Navigator>
+//         <FeedStack.Screen name="Welcome" component={Welcome} />
+//         <FeedStack.Screen name="Create Post" component={CreatePost} />
+//     </FeedStack.Navigator>
+//   );
+// }
 
 function ProfileScreen() {
   return (
@@ -47,7 +50,7 @@ const Tab = createMaterialBottomTabNavigator();
 
 export default function TabNav() {
   return (
-    <Tab.Navigator 
+    <Tab.Navigator
     initialRouteName="Feed"
     activeColor="#FFCC15"
     inactiveColor="#BDBDBD"

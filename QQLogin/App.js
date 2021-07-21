@@ -7,36 +7,29 @@ import { createStackNavigator, HeaderTitle } from '@react-navigation/stack';
 // Nav
 import RootStack from './navigators/RootStack';
 import TabNav from './navigators/TabNav';
+import CreatePost from './screens/CreatePost';
 
 
-import Welcome from './screens/Welcome';
-import Splash from './screens/Splash';
-import { StackActions } from '@react-navigation/native';
+// import { StackActions } from '@react-navigation/native';
+
 
 const Stack = createStackNavigator();
-// export default function App() {
-  
-//   return (
-//     <NavigationContainer>
-//       <Stack.Navigator
-//       initialRouteName="Root"
-//       screenOptions={({route, navigation}) => ({
-//         headerShown: false
-//       })}>
-//         <Stack.Screen name="Root" component={RootStack} />
-//         <Stack.Screen name="TabNav" component={TabNav} />
-
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//   );
-// }
 
 export default function App() {
   return (
     <NavigationContainer>
-      <RootStack/>
-      {/* <TabNav/> */}
+      <Stack.Navigator
+        initialRouteName="RootStack"
+        screenOptions={({route, navigation}) => ({
+        gestureEnabled: false,
+        headerShown: false,
+      })}>
+        <Stack.Screen name='RootStack' component={RootStack} />
+        <Stack.Screen name='TabNav' component={TabNav} />
+        <Stack.Screen name="Create Post" component={CreatePost} />
+      </Stack.Navigator>
     </NavigationContainer>
+    
   );
 }
 

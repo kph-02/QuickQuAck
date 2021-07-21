@@ -95,7 +95,7 @@ const Login = ({ navigation }) => {
             };
 
             sendToDB(body);
-            navigation.navigate('Welcome');
+            navigation.navigate('TabNav', {Screen: 'Feed'});
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values }) => (
