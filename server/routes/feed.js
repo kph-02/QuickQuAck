@@ -66,23 +66,11 @@ router.post("/create-post", authorization, async (req, res) => {
 
 });
 
-//
-router.get("/main-feed", authorization, async (req, res) => {
-    try {
-        //const filters = [''] 
-        
-
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error");
-    }
-});
 
 // update a post
 router.put("/update-post", authorization, async (req, res) => {
     try {
-        /*const { post_id } = req.body;
-        const { postText } = req.body;*/
+
         const {postId, postText} = req.body;
         const updatePost = await pool.query("UPDATE post SET post_text = $1 where post_id = $2", [postText, postId]);
         res.status(201).json({
@@ -97,20 +85,8 @@ router.put("/update-post", authorization, async (req, res) => {
 router.delete("/delete-post", authorization, async (req, res) => {
     try {
         const { postId } = req.body;
-        //const selectedPost = 'SELECT * FROM post WHERE post_id = $1';
-        //const { rows: [post] } = await pool.query(selectedPost, [id]);
+
         const selectedPost = await pool.query("DELETE FROM post WHERE post_id = $1", [postId]);
-        //console.log(selectedPost);
-
-        /*if (!post) {
-            return res.status(404).send({ error: 'Could not find post' });
-        }
-        if (post.author_id !== req.user.id) {
-            return res.status(404).send({ error: 'Must be the post author to delete post' });
-        }*/
-        //res.send(selectedPost);
-
-        //TODO: Delete comments along with the posts
 
         res.status(201).json({
             status: "Delete Success"
@@ -135,6 +111,61 @@ router.post("/create-comment", authorization, async (req, res) => {
     } catch (err) {
         console.log("Hi");
         res.status(500).send("Server error");
+    }
+});
+
+//This renders all-posts in the past 24 hours sorted in Ascending order
+router.get("/all-posts", authorization, async (req, res) => {
+    try {
+
+        const allFeed = await pool.query
+        ("SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
+        "'24 HOURS' AND NOW() ORDER BY time_posted ASC;");
+
+        /* For future reference, this is how to order by upvotes. */
+        // const allFeed = await pool.query
+        // ("SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
+        // "'24 HOURS' AND NOW() ORDER BY votevalue DESC;");
+
+        const numAllPosts = allFeed.rowCount;
+
+        res.status(201).json({
+            postCount: numAllPosts,
+            data: {
+              post: allFeed.rows,
+            },
+          });
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+
+
+
+
+//INCOMPLETE: This renders home-posts in the past 24 hours sorted in Ascending order
+//This is filtered by the selected tags on profile
+router.get("/home-posts", authorization, async (req, res) => {
+    try {
+
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+//INCOMPLETE: This renders search-posts in the past 24 hours. 
+//The user selects < 5 tags for search
+router.get("/search-posts", authorization, async (req, res) => {
+    try {
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
     }
 });
 

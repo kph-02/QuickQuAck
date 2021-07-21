@@ -26,10 +26,9 @@ CREATE TABLE users (
  /* TODO: Should this be an array? */
     /*tags VARCHAR(40),*/
 CREATE TABLE post (
-    post_id BIGSERIAL,
+    post_id BIGSERIAL NOT NULL,
     user_id uuid NOT NULL,
-    post_text VARCHAR(250),
-   
+    post_text VARCHAR(250) NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -73,8 +72,6 @@ CREATE TABLE vote (
 CREATE TABLE tags (
     tag_id INTEGER NOT NULL,
     post_id INTEGER NOT NULL,
-    tag_text VARCHAR(10) NOT NULL,
-    tag_color VARCHAR(7) NOT NULL,
     PRIMARY KEY (tag_id),
     FOREIGN KEY(post_id) REFERENCES post(post_id)
 );
