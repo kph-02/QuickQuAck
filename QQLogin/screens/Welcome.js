@@ -78,7 +78,7 @@ const posts = [
 
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
-    <Text style={[styles.title, textColor]}>{item.title}</Text>
+    {/* <Text style={[styles.title, textColor]}>{item.title}</Text> */}
     <Text style={[styles.bodyText, textColor]}>{item.body}</Text>
   </TouchableOpacity>
 );
@@ -138,50 +138,6 @@ const Welcome = ({navigation}) => {
           
 
 
-          
-          {/* <Formik
-            initialValues={{ toggle: false, checked: [], name: '', email: '', password: '' }}
-
-            onSubmit={(values) => {
-              console.log(values);
-              navigation.navigate("Signup");
-            //   navigation.navigate("Log In");
-            //   navigation.navigate("Splash");
-            }}
-          >
-            
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
-                
-
-              <StyledFormArea>
-                
-                <StyledButton onPress={() => navigation.navigate('Signup')}>
-                  <ButtonText>Sign Up</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Login')}>
-                  <ButtonText>Log In</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Splash')}>
-                  <ButtonText>Splash</ButtonText>
-                </StyledButton>
-                <Line />
-
-                <ExtraView>
-                  <ExtraText></ExtraText>
-                  <TextLink>
-                  </TextLink>
-                </ExtraView>
-                <ExtraViewRight>
-                  <TextLink>
-                  </TextLink>
-                </ExtraViewRight>
-              </StyledFormArea>
-        
-          )}
-
-
-
-          </Formik> */}
         </InnerContainer>
         <View style={{flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5}}>
           <FlatList
@@ -207,9 +163,6 @@ const Welcome = ({navigation}) => {
                  style={styles.floatingButtonStyle} />
        
         </TouchableOpacity>
-        {/* <View style={{flex: 0.5, backgroundColor: 'yellow'}}>
-          <Text> Implement NavBar Here</Text>
-        </View> */}
       </StyledFeedContainer>
     
   );
@@ -234,7 +187,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   bodyText: {
-    fontSize: 12
+    fontSize: 18,
+    fontWeight: 'bold'
   },
   touchableStyle:{
     position: 'absolute',
