@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 //formik
 import { Formik } from 'formik';
 
@@ -42,18 +44,17 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-/*Using Async Storage to store token JSON object locally as string
+//Using Async Storage to store token JSON object locally as string
 const storedToken = async (value) => {
   try {
-    console.log('value' + value);
-    const jsonValue = JSON.stringify(value);
-    await AsyncStorage.setItem('token', jsonValue);
+    await AsyncStorage.setItem('token', value);
+    //console.log('Inserted Token:  ' + value);
   } catch (error) {
     // saving error
     console.error(error.message);
   }
 };
-*/
+
 //Communicating with the database to authenticate login
 const sendToDB = async (body) => {
   try {
@@ -64,8 +65,12 @@ const sendToDB = async (body) => {
       body: JSON.stringify(body),
     });
 
-    const parseRes = await response.text();
-    console.log(parseRes);
+    const parseRes = await response.json();
+    if (!parseRes.token) {
+      console.log(parseRes.token);
+    } else {
+      storedToken(parseRes.token);
+    }
     //Store to local storage
     //storedToken(parseRes.token);
   } catch (error) {
