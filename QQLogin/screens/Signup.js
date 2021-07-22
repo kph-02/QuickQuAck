@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 //import { AsyncStorage } from '@react-native-async-storage/async-storage';
 
+//Testing purposes, change serverIP in login.js to your local IPV4 address
+import { serverIp } from './Login.js';
+
 //formik
 import { Formik, Field, Form } from 'formik';
 
 //icons
 
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
-
-//IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
-const serverIp = "192.168.50.115";
 
 import {
   StyledContainer,
@@ -47,16 +47,19 @@ const Signup = ({ navigation }) => {
 
   //communicate registration information with the database
   const sendToDB = async (body) => {
-
     console.log(body);
 
     try {
       // Update server with user's registration information
-      const response = await fetch("http://" + serverIp + ":5000/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+      const response = await fetch('http://' + serverIp + ':5000/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       });
+
+      const parseRes = await response.json();
+
+      console.log(parseRes);
 
       // Token response from database
 
@@ -69,9 +72,9 @@ const Signup = ({ navigation }) => {
           // saving error
           console.error(error.message);
         }
-      }
+      };
 
-      //B. Using Async Storage to get String token 
+      //B. Using Async Storage to get String token
       //This isn't used in this screen, but it is for future reference
 
       /*
@@ -88,12 +91,10 @@ const Signup = ({ navigation }) => {
       */
 
       // possibly add if/else statement to determine if setAuth should be true or false
-
-    }
-    catch (error) {
+    } catch (error) {
       console.error(error.message);
     }
-  }
+  };
 
   return (
     <KeyboardAvoidingWrapper>
@@ -116,7 +117,6 @@ const Signup = ({ navigation }) => {
               gy: '',
             }}
             onSubmit={(values) => {
-
               //Setting up information to send to database
               body = {
                 firstName: values.firstName,
@@ -125,7 +125,7 @@ const Signup = ({ navigation }) => {
                 password: values.password,
                 dob: values.dob,
                 college: values.college,
-                gy: values.gy
+                gy: values.gy,
               };
 
               sendToDB(body);

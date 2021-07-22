@@ -1,7 +1,6 @@
 import React from 'react';
-import {Colors} from './../components/styles';
-const { primary, yellow, background, lightgray, darkgray, black} = Colors;
-
+import { Colors } from './../components/styles';
+const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, HeaderTitle } from '@react-navigation/stack';
@@ -13,6 +12,7 @@ import Welcome from './../screens/Welcome';
 import Splash from './../screens/Splash';
 import CreatePost from '../screens/CreatePost';
 import TabNav from './TabNav';
+import PostView from './../screens/PostView';
 
 const Stack = createStackNavigator();
 
@@ -30,6 +30,7 @@ const RootStack = () => {
                 <Stack.Screen name="Signup" component={Signup} />
                 <Stack.Screen name="TabNav" component={TabNav} />
                 <Stack.Screen name="Create Post" component={CreatePost} />
+                <Stack.Screen name="PostView" component={PostView} />
         </Stack.Navigator>
        
     )
