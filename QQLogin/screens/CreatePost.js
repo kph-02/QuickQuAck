@@ -64,7 +64,7 @@ const CreatePost = ({ navigation }) => {
   const sendToDB = async (body) => {
     await getJWT();
     try {
-      // console.log('Sent Token:      ' + JWTtoken);
+      //console.log('Sent Token:      ' + JWTtoken);
       // Update server with user's registration information
       const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
         method: 'POST',

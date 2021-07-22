@@ -67,7 +67,8 @@ const sendToDB = async (body) => {
 
     const parseRes = await response.json();
     if (!parseRes.token) {
-      console.log(parseRes.token);
+      //console.log(parseRes.token);
+      storedToken('');
     } else {
       storedToken(parseRes.token);
     }
