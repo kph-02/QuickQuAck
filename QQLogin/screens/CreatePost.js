@@ -95,7 +95,7 @@ const CreatePost = ({ navigation }) => {
             onSubmit={(values) => {
               //Setting up information to send to database
               const postBody = {
-                postText: 'Title: ' + values.postText + 'Content: ' + values.postTitle,
+                postText: values.postText,
                 postId: values.postId,
               };
               sendToDB(postBody);
@@ -104,18 +104,6 @@ const CreatePost = ({ navigation }) => {
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
               <StyledFormArea>
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Title"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postTitle')}
-                  onBlur={handleBlur('postTitle')}
-                  value={values.postTitle}
-                  selectionColor="#FFCC15"
-                />
-
                 <MyTextInput
                   label=""
                   icon=""
