@@ -59,13 +59,13 @@ const PostView = ({ navigation }) => {
 
   const sendToDB = async (body) => {
     try {
-      const operation = 'delete';
+      const operation = 'update';
       await getJWT();
       if (operation === 'update') {
         // Update server with user's registration information
         const response = await fetch('http://' + serverIp + ':5000/feed/update-post', {
           method: 'PUT',
-          headers: { token: JWTtoken },
+          headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         });
 
@@ -78,7 +78,7 @@ const PostView = ({ navigation }) => {
         // Update server with user's registration information
         const response = await fetch('http://' + serverIp + ':5000/feed/delete-post', {
           method: 'DELETE',
-          headers: { token: JWTtoken },
+          headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         });
 
