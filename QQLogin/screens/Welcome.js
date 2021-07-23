@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert} from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
 import { SearchBar } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
-
 
 //icons
 
@@ -41,7 +40,6 @@ import { Button, View } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 import CreatePost from '../screens/CreatePost';
-
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
@@ -104,33 +102,6 @@ let parsePosts;
   "postCount": 5,
 } */
 
-
-//Communicating with the database to authenticate login
-const getFromDB = async () => {
-  
-  await getJWT();
-  
-  try {
-    
-    // Update server with user's registration information
-    const response = await fetch('http://' + serverIp + ':5000/feed/all-posts', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json',
-        'token': JWTtoken }, 
-    });
-
-    const parseRes = await response.json();
-    
-
-    console.log(parseRes);
-
-    return parseRes.post;
-
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     {/* <Text style={[styles.title, textColor]}>{item.title}</Text> */}
@@ -138,10 +109,12 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
   </TouchableOpacity>
 );
 
-const Welcome = ({navigation}) => {
+const Welcome = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
 
   const [agree, setAgree] = useState(false);
+
+  const [postData, setPostData] = useState([]);
 
   const checkboxHandler = () => {
     setAgree(!agree);
@@ -155,81 +128,98 @@ const Welcome = ({navigation}) => {
   // };
 
   const [selectedId, setSelectedId] = useState(null);
-  
+
+  //Communicating with the database to authenticate login
+  const getFromDB = async () => {
+    await getJWT();
+
+    try {
+      // Update server with user's registration information
+      const response = await fetch('http://' + serverIp + ':5000/feed/all-posts', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      const parseRes = await response.json();
+
+      setPostData(parseRes.post);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   //renderItem function
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
     const color = item.post_id === selectedId ? 'white' : 'black';
 
-    return(
+    return (
       <Item
         item={item}
         onPress={() => setSelectedId(item.post_id)}
-        backgroundColor={{backgroundColor}}
-        textColor={{color}}
+        backgroundColor={{ backgroundColor }}
+        textColor={{ color }}
       />
     );
   };
-  
-  const postData = getFromDB();
 
-  console.log("This is what's in postData");
-  console.log(postData);
-
+  useEffect(() => {
+    getFromDB();
+    console.log("This is what's in postData");
+    console.log(postData[0]);
+  }, []);
 
   return (
-    
-      <StyledFeedContainer>
-        <StatusBar style="black" />
-        <InnerContainer >
-          {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
-           */}
-          {/* <PageTitle>Feed</PageTitle> */}
-            <Text style={styles.pageTitle}>Feed</Text>
-            <SearchBar 
-              placeholder="Search Tags"
-              // onChangeText={this.updateSearch}
-              lightTheme="true"
-              containerStyle={{width: '90%', height: height * 0.07, alignItems: 'center', marginTop: height * 0.02, borderRadius: 100, backgroundColor:'#F2F2F2', }}
-              inputContainerStyle={{borderRadius: 100, height: '100%', width: '100%', backgroundColor:'#F9F9F9'}}
-            />
+    <StyledFeedContainer>
+      <StatusBar style="black" />
+      <InnerContainer>
+        {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
+         */}
+        {/* <PageTitle>Feed</PageTitle> */}
+        <Text style={styles.pageTitle}>Feed</Text>
+        <SearchBar
+          placeholder="Search Tags"
+          // onChangeText={this.updateSearch}
+          lightTheme="true"
+          containerStyle={{
+            width: '90%',
+            height: height * 0.07,
+            alignItems: 'center',
+            marginTop: height * 0.02,
+            borderRadius: 100,
+            backgroundColor: '#F2F2F2',
+          }}
+          inputContainerStyle={{ borderRadius: 100, height: '100%', width: '100%', backgroundColor: '#F9F9F9' }}
+        />
 
-            <SubTitle style={{fontSize: 14, marginTop: 10}}>Need the various feed tabs here</SubTitle>
-          
-
-
-        </InnerContainer>
-        <View style={{flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5}}>
-          
-          <FlatList
-                    numColumns={1}
-                    horizontal={false}
-                    data={postData}
-                    keyExtractor={(item) => item.post_id}
-                    extraData={selectedId}
-                    renderItem={renderItem}
-          />
-
-        </View>
-        {/* <TouchableOpacity activeOpacity={0.5} 
+        <SubTitle style={{ fontSize: 14, marginTop: 10 }}>Need the various feed tabs here</SubTitle>
+      </InnerContainer>
+      <View style={{ flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
+        <FlatList
+          numColumns={1}
+          horizontal={false}
+          data={postData}
+          keyExtractor={(item) => item.post_id}
+          extraData={selectedId}
+          renderItem={renderItem}
+        />
+      </View>
+      {/* <TouchableOpacity activeOpacity={0.5} 
           onPress={()=> Alert.alert("Create Post Button Clicked")} 
           style={styles.touchableStyle} 
         > */}
-        <TouchableOpacity activeOpacity={0.5} 
-          onPress={()=> navigation.navigate('Create Post')} 
-          style={styles.touchableStyle} 
-        >
-          <Image source={require('./../assets/create_post_button.png')} 
-          
-                 style={styles.floatingButtonStyle} />
-       
-        </TouchableOpacity>
-      </StyledFeedContainer>
-    
+      <TouchableOpacity
+        activeOpacity={0.5}
+        onPress={() => navigation.navigate('Create Post')}
+        style={styles.touchableStyle}
+      >
+        <Image source={require('./../assets/create_post_button.png')} style={styles.floatingButtonStyle} />
+      </TouchableOpacity>
+    </StyledFeedContainer>
   );
 };
 
-const {width, height} = Dimensions.get('screen');
+const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   pageTitle: {
@@ -238,20 +228,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
-  item:{
+  item: {
     padding: 30,
     marginVertical: 2.5,
     //marginHorizontal: 10,
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   bodyText: {
     fontSize: 18,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
-  touchableStyle:{
+  touchableStyle: {
     position: 'absolute',
     width: 52,
     height: 52,
@@ -264,7 +254,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     width: width * 0.18,
     height: width * 0.18,
-  }
+  },
 });
 
 export default Welcome;
