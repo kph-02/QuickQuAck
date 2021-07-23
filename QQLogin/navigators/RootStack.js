@@ -21,7 +21,6 @@ const RootStack = () => {
         <Stack.Navigator
             initialRouteName="Splash"
             screenOptions={({route, navigation}) => ({
-            gestureEnabled: false,
             headerShown: false,
             headerTransparent: true})
             }>

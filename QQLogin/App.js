@@ -21,7 +21,6 @@ export default function App() {
       <Stack.Navigator
         initialRouteName="RootStack"
         screenOptions={({route, navigation}) => ({
-        gestureEnabled: false,
         headerShown: false,
       })}>
         <Stack.Screen name='RootStack' component={RootStack} />

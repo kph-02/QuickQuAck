@@ -4,7 +4,10 @@ import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert}
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
-import {SearchBar} from 'react-native-elements';
+import { SearchBar } from 'react-native-elements';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { serverIp } from './Login.js';
+
 
 //icons
 
@@ -43,43 +46,95 @@ import CreatePost from '../screens/CreatePost';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-const posts = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item',
-    body: 'This is a sample post!',
+var JWTtoken = '';
+
+//Getting JWT from local storage, must exist otherwise user can't be on this page
+
+const getJWT = async () => {
+  try {
+    await AsyncStorage.getItem('token').then((token) => {
+      console.log(token);
+      // console.log('Retrieved Token: ' + token);
+      JWTtoken = token;
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+let parsePosts;
+
+// const {data} = parseRes
+// const {post} = data
+/* Object {
+  "data": Object {
+    "post": Array [
+      Object {
+        "post_id": "13",
+        "post_text": "This is a test for rendering the all feed.",
+        "time_posted": "2021-07-21T20:28:26.689Z",
+        "user_id": "b1e0c14e-3836-4f34-8616-9b637a5da497",
+      },
+      Object {
+        "post_id": "14",
+        "post_text": "This is another 2nd test for rendering the all feed.",
+        "time_posted": "2021-07-21T20:31:27.131Z",
+        "user_id": "b1e0c14e-3836-4f34-8616-9b637a5da497",
+      },
+      Object {
+        "post_id": "15",
+        "post_text": "More posts and stuff. it is 1:31 PM on 7/21.",
+        "time_posted": "2021-07-21T20:31:51.337Z",
+        "user_id": "b1e0c14e-3836-4f34-8616-9b637a5da497",
+      },
+      Object {
+        "post_id": "16",
+        "post_text": "Empty Post",
+        "time_posted": "2021-07-21T20:32:05.899Z",
+        "user_id": "b1e0c14e-3836-4f34-8616-9b637a5da497",
+      },
+      Object {
+        "post_id": "17",
+        "post_text": "",
+        "time_posted": "2021-07-21T20:32:14.906Z",
+        "user_id": "b1e0c14e-3836-4f34-8616-9b637a5da497",
+      },
+    ],
   },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-    body: 'Who\'s playing at Sun God today at 7pm?',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-    body: 'Which dining hall has the best special today?',
-  },
-  {
-    id: '58894a0f-3da1-471f-bd96-145571e29d82',
-    title: 'Fourth Item',
-    body: 'Which dining hall has the best special today?',
-  },
-  {
-    id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Fifth Item',
-    body: 'What games do you all play?',
-  },
-  {
-    id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Sixth Item',
-    body: 'What\'s Poppin? Brand new whip, just hopped in yuh',
-  },
-];
+  "postCount": 5,
+} */
+
+
+//Communicating with the database to authenticate login
+const getFromDB = async () => {
+  
+  await getJWT();
+  
+  try {
+    
+    // Update server with user's registration information
+    const response = await fetch('http://' + serverIp + ':5000/feed/all-posts', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json',
+        'token': JWTtoken }, 
+    });
+
+    const parseRes = await response.json();
+    
+
+    console.log(parseRes);
+
+    return parseRes.post;
+
+  } catch (error) {
+    console.error(error.message);
+  }
+};
 
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     {/* <Text style={[styles.title, textColor]}>{item.title}</Text> */}
-    <Text style={[styles.bodyText, textColor]}>{item.body}</Text>
+    <Text style={[styles.bodyText, textColor]}>{item.post_text}</Text>
   </TouchableOpacity>
 );
 
@@ -103,19 +158,24 @@ const Welcome = ({navigation}) => {
   
   //renderItem function
   const renderItem = ({item}) => {
-    const backgroundColor = item.id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const color = item.id === selectedId ? 'white' : 'black';
+    const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
+    const color = item.post_id === selectedId ? 'white' : 'black';
 
     return(
       <Item
         item={item}
-        onPress={() => setSelectedId(item.id)}
+        onPress={() => setSelectedId(item.post_id)}
         backgroundColor={{backgroundColor}}
         textColor={{color}}
       />
     );
   };
   
+  const postData = getFromDB();
+
+  console.log("This is what's in postData");
+  console.log(postData);
+
 
   return (
     
@@ -140,11 +200,12 @@ const Welcome = ({navigation}) => {
 
         </InnerContainer>
         <View style={{flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5}}>
+          
           <FlatList
                     numColumns={1}
                     horizontal={false}
-                    data={posts}
-                    keyExtractor={(item) => item.id}
+                    data={postData}
+                    keyExtractor={(item) => item.post_id}
                     extraData={selectedId}
                     renderItem={renderItem}
           />
