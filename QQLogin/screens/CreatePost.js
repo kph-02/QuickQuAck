@@ -61,15 +61,14 @@ const CreatePost = ({ navigation }) => {
   };
 
   //communicate registration information with the database
-  const sendToDB = async (body) => {
+  const sendToDB = async (postBody) => {
     await getJWT();
     try {
-      //console.log('Sent Token:      ' + JWTtoken);
       // Update server with user's registration information
       const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
         method: 'POST',
-        headers: { token: JWTtoken },
-        body: JSON.stringify(body),
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(postBody),
       });
 
       const parseRes = await response.text();
@@ -95,12 +94,11 @@ const CreatePost = ({ navigation }) => {
             }}
             onSubmit={(values) => {
               //Setting up information to send to database
-              body = {
+              const postBody = {
                 postText: 'Title: ' + values.postText + 'Content: ' + values.postTitle,
                 postId: values.postId,
               };
-
-              sendToDB(body);
+              sendToDB(postBody);
               navigation.navigate('PostView');
             }}
           >

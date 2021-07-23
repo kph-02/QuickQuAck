@@ -59,7 +59,7 @@ const PostView = ({ navigation }) => {
 
   const sendToDB = async (body) => {
     try {
-      const operation = 'update';
+      const operation = 'delete';
       await getJWT();
       if (operation === 'update') {
         // Update server with user's registration information
