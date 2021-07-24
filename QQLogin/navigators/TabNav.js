@@ -10,6 +10,7 @@ import CreatePost from '../screens/CreatePost';
 import Signup from '../screens/Signup';
 import Login from '../screens/Login';
 import { createStackNavigator } from '@react-navigation/stack';
+import FeedViews from '../screens/FeedViews';
 
 
 // const FeedStack = createStackNavigator();

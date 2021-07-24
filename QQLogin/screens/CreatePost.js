@@ -133,7 +133,7 @@ const CreatePost = ({ navigation }) => {
                 <StyledButton onPress={handleSubmit}>
                   <ButtonText>Create Post</ButtonText>
                 </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Login')}>
+                <StyledButton onPress={() => navigation.navigate('Feed')}>
                   <ButtonText>Back</ButtonText>
                 </StyledButton>
                 <Line />

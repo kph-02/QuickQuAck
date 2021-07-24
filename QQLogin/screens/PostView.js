@@ -156,7 +156,7 @@ const PostView = ({ navigation }) => {
                 <StyledButton onPress={((event) => setOpt(event, UPDATE), handleSubmit)}>
                   <ButtonText>Update Post</ButtonText>
                 </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('CreatePost')}>
+                <StyledButton onPress={() => navigation.navigate('Feed')}>
                   <ButtonText>Back</ButtonText>
                 </StyledButton>
                 <StyledButton onPress={((event) => setOpt(event, DELETE), handleSubmit)}>

@@ -38,6 +38,7 @@ import { Button, View } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 import CreatePost from '../screens/CreatePost';
+import FeedViews from './FeedViews';
 
 
 //colors
@@ -109,7 +110,7 @@ const Welcome = ({navigation}) => {
     return(
       <Item
         item={item}
-        onPress={() => setSelectedId(item.id)}
+        onPress={() => {setSelectedId(item.id); navigation.navigate('Post View');}}
         backgroundColor={{backgroundColor}}
         textColor={{color}}
       />
@@ -121,7 +122,7 @@ const Welcome = ({navigation}) => {
     
       <StyledFeedContainer>
         <StatusBar style="black" />
-        <InnerContainer >
+        <InnerContainer>
           {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
            */}
           {/* <PageTitle>Feed</PageTitle> */}
@@ -133,13 +134,8 @@ const Welcome = ({navigation}) => {
               containerStyle={{width: '90%', height: height * 0.07, alignItems: 'center', marginTop: height * 0.02, borderRadius: 100, backgroundColor:'#F2F2F2', }}
               inputContainerStyle={{borderRadius: 100, height: '100%', width: '100%', backgroundColor:'#F9F9F9'}}
             />
-
-            <SubTitle style={{fontSize: 14, marginTop: 10}}>Need the various feed tabs here</SubTitle>
-          
-
-
         </InnerContainer>
-        <View style={{flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5}}>
+        {/* <View style={{flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5}}>
           <FlatList
                     numColumns={1}
                     horizontal={false}
@@ -149,7 +145,8 @@ const Welcome = ({navigation}) => {
                     renderItem={renderItem}
           />
 
-        </View>
+        </View> */}
+        <FeedViews navigation={navigation}/>
         {/* <TouchableOpacity activeOpacity={0.5} 
           onPress={()=> Alert.alert("Create Post Button Clicked")} 
           style={styles.touchableStyle} 

@@ -8,6 +8,7 @@ import { createStackNavigator, HeaderTitle } from '@react-navigation/stack';
 import RootStack from './navigators/RootStack';
 import TabNav from './navigators/TabNav';
 import CreatePost from './screens/CreatePost';
+import PostView from './screens/PostView';
 
 
 // import { StackActions } from '@react-navigation/native';
@@ -27,6 +28,7 @@ export default function App() {
         <Stack.Screen name='RootStack' component={RootStack} />
         <Stack.Screen name='TabNav' component={TabNav} />
         <Stack.Screen name="Create Post" component={CreatePost} />
+        <Stack.Screen name="Post View" component={PostView} />
       </Stack.Navigator>
     </NavigationContainer>
     
