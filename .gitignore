@@ -1,8 +1,3 @@
-<<<<<<< Updated upstream
 node_modules
 screens/node_modules
 server/node_modules
-=======
-node_modules/
-node_modules/json-buffer/LICENSE
->>>>>>> Stashed changes
