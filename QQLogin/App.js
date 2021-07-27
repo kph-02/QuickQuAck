@@ -17,6 +17,7 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
+    // <CreatePost />
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="RootStack"
