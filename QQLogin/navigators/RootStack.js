@@ -17,22 +17,23 @@ import PostView from './../screens/PostView';
 const Stack = createStackNavigator();
 
 const RootStack = () => {
-  return (
-    <Stack.Navigator
-      initialRouteName="Splash"
-      screenOptions={({ route, navigation }) => ({
-        headerShown: false,
-        headerTransparent: true,
-      })}
-    >
-      <Stack.Screen name="Splash" component={Splash} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
-      <Stack.Screen name="TabNav" component={TabNav} />
-      <Stack.Screen name="CreatePost" component={CreatePost} />
-      <Stack.Screen name="PostView" component={PostView} />
-    </Stack.Navigator>
-  );
-};
+    return(
+        <Stack.Navigator
+            initialRouteName="Splash"
+            screenOptions={({route, navigation}) => ({
+            gestureEnabled: false,
+            headerShown: false,
+            headerTransparent: true})
+            }>
+                <Stack.Screen name="Splash" component={Splash} />
+                <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="Signup" component={Signup} />
+                <Stack.Screen name="TabNav" component={TabNav} />
+                <Stack.Screen name="Create Post" component={CreatePost} />
+                <Stack.Screen name="PostView" component={PostView} />
+        </Stack.Navigator>
+       
+    )
+}
 
 export default RootStack;
