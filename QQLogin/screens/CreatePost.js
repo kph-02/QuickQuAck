@@ -61,15 +61,14 @@ const CreatePost = ({ navigation }) => {
   };
 
   //communicate registration information with the database
-  const sendToDB = async (body) => {
+  const sendToDB = async (postBody) => {
     await getJWT();
     try {
-      //console.log('Sent Token:      ' + JWTtoken);
       // Update server with user's registration information
       const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
         method: 'POST',
-        headers: { token: JWTtoken },
-        body: JSON.stringify(body),
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(postBody),
       });
 
       const parseRes = await response.text();
@@ -95,29 +94,16 @@ const CreatePost = ({ navigation }) => {
             }}
             onSubmit={(values) => {
               //Setting up information to send to database
-              body = {
-                postText: 'Title: ' + values.postText + 'Content: ' + values.postTitle,
+              const postBody = {
+                postText: values.postText,
                 postId: values.postId,
               };
-
-              sendToDB(body);
+              sendToDB(postBody);
               navigation.navigate('PostView');
             }}
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
               <StyledFormArea>
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Title"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postTitle')}
-                  onBlur={handleBlur('postTitle')}
-                  value={values.postTitle}
-                  selectionColor="#FFCC15"
-                />
-
                 <MyTextInput
                   label=""
                   icon=""
@@ -133,7 +119,7 @@ const CreatePost = ({ navigation }) => {
                 <StyledButton onPress={handleSubmit}>
                   <ButtonText>Create Post</ButtonText>
                 </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Login')}>
+                <StyledButton onPress={() => navigation.navigate('Feed')}>
                   <ButtonText>Back</ButtonText>
                 </StyledButton>
                 <Line />

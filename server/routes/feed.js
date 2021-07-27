@@ -130,10 +130,11 @@ router.get("/all-posts", authorization, async (req, res) => {
         const numAllPosts = allFeed.rowCount;
 
         res.status(201).json({
-            postCount: numAllPosts,
-            data: {
-              post: allFeed.rows,
-            },
+            // postCount: numAllPosts,
+            // data: {
+            //   post: allFeed.rows,
+            // },
+            post: allFeed.rows
           });
 
     } catch (err) {
