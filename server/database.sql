@@ -18,7 +18,7 @@ CREATE TABLE users (
     date_of_birth DATE NOT NULL,
     college VARCHAR(50) NOT NULL, 
     grad_year INTEGER NOT NULL,
-    tag_id VARCHAR(10)[],
+    tag_id VARCHAR(10),
     blocked_users uuid[],
     revealed_users uuid[]
 ); 
@@ -64,7 +64,7 @@ CREATE TABLE vote (
 -- storage of all the tags
 
 CREATE TABLE tags (
-    tag_id VARCHAR(10)[] NOT NULL,
+    tag_id VARCHAR(10) NOT NULL,
     post_id INTEGER NOT NULL,
     PRIMARY KEY (tag_id),
     FOREIGN KEY(post_id) REFERENCES post(post_id)
@@ -75,7 +75,7 @@ CREATE TABLE tags (
 -- connecting a tag to a post
 
 CREATE TABLE post_tags (
-    tag_id VARCHAR(10)[] NOT NULL,
+    tag_id VARCHAR(10) NOT NULL,
     post_id INTEGER NOT NULL,
     FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
     FOREIGN KEY(post_id) REFERENCES post(post_id),
@@ -86,7 +86,7 @@ CREATE TABLE post_tags (
 
 CREATE TABLE user_tags (
     user_id uuid NOT NULL,
-    tag_id VARCHAR(10)[] NOT NULL,
+    tag_id VARCHAR(10) NOT NULL,
     PRIMARY KEY (user_id, tag_id),
     FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
     FOREIGN KEY(user_id) REFERENCES users(user_id)
