@@ -21,21 +21,30 @@ router.post("/create-post", authorization, async (req, res) => {
     try {
       
       //Reading information contained in post
-      const { postText } = req.body;
+      const { postText, postTag } = req.body;
       const author_id = req.user;
       //Name of the dropdown of the post tag tagdropdown
-      var postTag = req.body.tagdropdown;
+      //var postTag = req.body.tagdropdown;
       
       const newPost = await pool.query(
-        "INSERT INTO post (post_text, user_id) VALUES ($1, $2) RETURNING *; INSERT INTO post_tags (post_id, tag_id) VALUES ( $2, ${postTag});",
+        "INSERT INTO post (post_text, user_id) VALUES ($1, $2) RETURNING *;",
         [postText, author_id]
       );
-  
+
+      const postID = newPost.rows[0].post_id;
+
+      const postTags = await pool.query(
+          "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
+          [postID, postTag]
+      );
+
+
       
       res.status(201).json({
         status: "Post Success",
         data: {
           post: newPost.rows[0],
+          tags: postTags.rows[0],
         },
       });
       
