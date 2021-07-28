@@ -48,7 +48,7 @@ const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 const storedToken = async (value) => {
   try {
     await AsyncStorage.setItem('token', value);
-    //console.log('Inserted Token:  ' + value);
+    // console.log('Inserted Token:  ' + value);
   } catch (error) {
     // saving error
     console.error(error.message);
@@ -67,7 +67,7 @@ const sendToDB = async (body) => {
 
     const parseRes = await response.json();
     if (!parseRes.token) {
-      //console.log(parseRes.token);
+      console.log(parseRes);
       storedToken('');
     } else {
       storedToken(parseRes.token);
