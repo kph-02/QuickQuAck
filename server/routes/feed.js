@@ -14,6 +14,7 @@ Create Comment (POST)
 Delete Post (DELETE)
 Update Post(PUT)
 Update Comment(PUT)
+Upvote/Downvote a post (POST)
 */
 
 /*
@@ -153,5 +154,90 @@ router.delete("/delete-comment", authorization, async (req, res) => {
 });
 
 // edit a comment
+
+// check vote type (post or comment)
+const checkVoteType = (voteType) => {
+    const types = ['post', 'comment'];
+    let err;
+    if (!types.includes(voteType)) {
+        err = "Invalid vote type";
+    }
+    //console.log("Part 1");
+    console.log("1. " + voteType);
+    return { voteType, err };
+} 
+
+// check valid vote value 
+const checkVoteValue = async (item_id, vote_value, vote_type) => {
+    let status, error;
+    /*if (!/^\d+$/.test(item_id)) {
+        //console.log("Part 2");
+        status = 400;
+        error = "Invalid ${vote_type} id";
+    }*/
+    /*else*/ if (![-1, 0, 1].includes(parseInt(vote_value))) {
+        status = 400;
+        error = "Invalid vote value";
+    }
+    else {
+        try {
+            const item = await pool.query("SELECT * FROM ${vote_type} WHERE ${vote_type}_id = $1", [item_id]);
+        }
+        catch (err) {
+            console.log(err.message);
+        }    
+        if (!item) {
+            status = 404;
+            error = "Could not find vote type";
+        }
+    }
+    return { status, error };
+}
+
+// get post votes
+router.get('/:voteType', authorization, async (req, res) => {
+    try {
+        const { voteType, error } = checkVoteType(req.params.voteType);
+        console.log(voteType);
+        if (error) {
+            return res.status(400).send({ error });
+        }
+        const postVotes = await pool.query("SELECT * FROM ${voteType}_votes"); 
+        res.send(postVotes.rows);
+    } catch (err) {
+        res.status(500).send({ error: err.message });
+    }
+});
+
+// add post votes
+router.post("/post-vote", authorization, async (req, res) => {
+    try {
+        const { voteType, error: voteTypeError } = checkVoteType(req.params.voteType);
+        if (voteTypeError) {
+            //console.log("Hello");
+            res.status(400).send({ error: voteTypeError });
+        }
+        const { item_id, vote_value } = req.body;
+        const { status, error } = await checkVoteValue(item_id, vote_value, voteType);
+        // the above line produces an error
+        console.log("Hello");
+        if (error) {
+            res.status(400).send({ error });
+        }
+        let item_vote;
+        try {
+            const insertVote = await pool.query("INSERT INTO ${voteType}_votes VALUES($1, $2, $3) RETURNING *",
+                [req.user.id, item_id, vote_value]);
+            item_vote = vote;
+        } catch (err) {
+            const updateVote = await pool.query("UPDATE ${voteType}_votes SET vote_value = $1 WHERE user_id = $2" +  
+                "AND ${voteType}_id = $3 RETURNING *", [vote_value, req.user.id, item_id]);
+            item_vote = vote;
+        }
+        res.status(201).send(item_vote);
+    } catch (err) {
+        res.status(500).send({ error: err.message });
+    }
+});
 
 module.exports = router;

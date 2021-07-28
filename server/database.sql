@@ -29,7 +29,6 @@ CREATE TABLE post (
     post_id BIGSERIAL,
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
-   
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -49,25 +48,33 @@ CREATE TABLE comment (
     /*FOREIGN KEY (parent_comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE*/
 );
 
-CREATE TYPE voting AS ENUM (
+/*CREATE TYPE voting AS ENUM (
     'like',
     'dislike'
-);
+);*/
 
 /*
 SELECT x, (ENUM_RANGE(NULL::voting))[x] 
     FROM generate_series(-1, 1) x
 */
 
-CREATE TABLE vote (
+CREATE TABLE post_votes (
     user_id uuid NOT NULL,
     post_id INTEGER NOT NULL,
-    comment_id INTEGER NOT NULL,
-    vote_value voting, 
+    /*comment_id INTEGER NOT NULL,*/ 
+    vote_value INTEGER NOT NULL CHECK (-1 <= vote_value AND vote_value <= 1), 
     PRIMARY KEY (user_id, post_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (post_id) REFERENCES post(post_id),
-    FOREIGN KEY (comment_id) REFERENCES comment(comment_id)
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
+);
+
+CREATE TABLE comment_votes(
+  user_id uuid NOT NULL,
+  comment_id INTEGER NOT NULL,
+  vote_value INTEGER NOT NULL CHECK (-1 <= vote_value AND vote_value <= 1),
+  PRIMARY KEY (user_id, comment_id),
+  CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_comment FOREIGN KEY(comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE
 );
 
 CREATE TABLE tags (
