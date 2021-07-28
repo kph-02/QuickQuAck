@@ -51,7 +51,6 @@ var JWTtoken = '';
 const getJWT = async () => {
   try {
     await AsyncStorage.getItem('token').then((token) => {
-      console.log(token);
       // console.log('Retrieved Token: ' + token);
       JWTtoken = token;
     });
@@ -59,8 +58,6 @@ const getJWT = async () => {
     console.error(error.message);
   }
 };
-
-let parsePosts;
 
 // const {data} = parseRes
 // const {post} = data
@@ -165,8 +162,7 @@ const Welcome = ({ navigation }) => {
 
   useEffect(() => {
     getFromDB();
-    console.log("This is what's in postData");
-    console.log(postData[0]);
+    //console.log("This is what's in postData \n" + postData);
   }, []);
 
   return (

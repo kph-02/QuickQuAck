@@ -49,14 +49,40 @@ import { Picker } from '@react-native-picker/picker';
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 const CreatePost = ({ navigation }) => {
+  // Use State hooks
   const [composePost, setComposePost] = useState(false);
   const [agree, setAgree] = useState(false);
   const [selectedValue, setSelectedValue] = useState(true);
   const [modalOpen, setModalOpen] = useState(true);
+
+  //Getting user input
+  const [inputs, setInputs] = useState({
+    //Values needed to create post (../server/routes/feed.js)
+    postTitle: '',
+    postText: '',
+    author_id: '',
+    postTag: 'Revelle' /*Initialize as first value in tags drop-down*/,
+  });
+
   var JWTtoken = '';
 
-  //Getting JWT from local storage, must exist otherwise user can't be on this page
+  //Stores values to update input fields from user
+  const { postTitle, postText, author_id, postTag } = inputs;
 
+  //Update inputs when user enters new ones, name is identifier, value as a string
+  const onChange = (name, value) => {
+    setInputs({ ...inputs, [name]: value });
+  };
+
+  //Executes when Post is pressed, sends post information to the database
+  const onPressButton = async (e) => {
+    e.preventDefault();
+
+    sendToDB(inputs);
+    navigation.pop();
+  };
+
+  //Getting JWT from local storage, must exist otherwise user can't be on this page
   const getJWT = async () => {
     try {
       await AsyncStorage.getItem('token').then((token) => {
@@ -71,12 +97,16 @@ const CreatePost = ({ navigation }) => {
   //communicate registration information with the database
   const sendToDB = async (body) => {
     await getJWT();
+    body.author_id = JWTtoken; //Temp set to JWTtoken, change later maybe?
+
+    console.log('Inputs: ' + JSON.stringify(inputs));
+
     try {
-      //console.log('Sent Token:      ' + JWTtoken);
+      // console.log('Sent Token:      ' + JWTtoken);
       // Update server with user's registration information
       const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
         method: 'POST',
-        headers: { token: JWTtoken },
+        headers: { token: JWTtoken, 'content-type': 'application/json' },
         body: JSON.stringify(body),
       });
 
@@ -99,61 +129,40 @@ const CreatePost = ({ navigation }) => {
       <StyledContainer>
         <StatusBar style="black" />
         <InnerPostContainer>
-        <ExtraBackView>
-            <TextLink onPress={() => navigation.pop()} >
+          <ExtraBackView>
+            <TextLink onPress={() => navigation.pop()}>
               <TextPostContent>Back</TextPostContent>
             </TextLink>
           </ExtraBackView>
           <ExtraPostView>
-            <TextLink onPress={() => navigation.pop()} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}>
+            <TextLink onPress={onPressButton} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}>
               <TextPostContent>Post</TextPostContent>
             </TextLink>
           </ExtraPostView>
-
           <PageTitlePost>New Post</PageTitlePost>
+          <StyledPostArea1>
+            <MyTextInput
+              placeholder="Post Title"
+              name="postTitle"
+              style={{}}
+              placeholderTextColor={darkgray}
+              onChangeText={(e) => onChange('postTitle', e)}
+              value={postTitle}
+              selectionColor="#FFCC15"
+            />
 
-          <Formik
-            initialValues={{
-              postText: '',
-              postId: '',
-            }}
-            onSubmit={(values) => {
-              //Setting up information to send to database
-              body = {
-                postText: 'Title: ' + values.postText + 'Content: ' + values.postTitle,
-                postId: values.postId,
-              };
+            <Line />
 
-              sendToDB(body);
-              navigation.navigate('PostView');
-            }}
-          >
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
-              <StyledPostArea1>
-                <MyTextInput
-                  placeholder="Post Title"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postTitle')}
-                  onBlur={handleBlur('postTitle')}
-                  value={values.postTitle}
-                  selectionColor="#FFCC15"
-                />
-
-                <Line />
-
-                <MyTextInput
-                  placeholder="Post Text"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postText')}
-                  onBlur={handleBlur('postText')}
-                  value={values.postText}
-                  selectionColor="#FFCC15"
-                />
-              </StyledPostArea1>
-            )}
-          </Formik>
+            <MyTextInput
+              placeholder="Post Text"
+              name="postText"
+              style={{}}
+              placeholderTextColor={darkgray}
+              onChangeText={(e) => onChange('postText', e)}
+              value={postText}
+              selectionColor="#FFCC15"
+            />
+          </StyledPostArea1>
         </InnerPostContainer>
 
         <TagDropdown>
@@ -164,9 +173,10 @@ const CreatePost = ({ navigation }) => {
             prompt="Select a tag"
             name="tagdropdown"
             dropdownIconColor={darkgray}
-            selectedValue={selectedValue}
-            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+            selectedValue={postTag}
+            onValueChange={(e) => onChange('postTag', e)}
           >
+            {/* If first value changes, make sure to change inputs initialization as well */}
             <Picker.Item color={darkgray} label="Revelle" value="Revelle" />
             <Picker.Item color={darkgray} label="Muir" value="Muir" />
             <Picker.Item color={darkgray} label="Marshall" value="Marshall" />
