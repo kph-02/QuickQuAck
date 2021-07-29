@@ -13,7 +13,7 @@ import { Formik } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
-const serverIp = '192.168.1.51';
+const serverIp = '192.168.1.119';
 
 import {
   StyledContainer,
@@ -74,7 +74,7 @@ const Login = ({ navigation }) => {
 
       //Invalid input, display message from server
       if (!parseRes.token) {
-        alert(parseRes + ' Please try again.');
+        alert(parseRes + '. Please try again.');
         storeToken('');
         auth = 'false';
       }
@@ -110,9 +110,11 @@ const Login = ({ navigation }) => {
             };
 
             sendToDB(body);
-            if (auth) {
+            if (auth == 'true') {
               navigation.navigate('TabNav', { Screen: 'Feed' });
             }
+            
+
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values }) => (
