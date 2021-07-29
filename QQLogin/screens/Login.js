@@ -74,7 +74,7 @@ const Login = ({ navigation }) => {
 
       //Invalid input, display message from server
       if (!parseRes.token) {
-        alert(parseRes + '. Please try again.');
+        alert(parseRes + ' Please try again.');
         storeToken('');
         auth = 'false';
       }
@@ -113,8 +113,6 @@ const Login = ({ navigation }) => {
             if (auth == 'true') {
               navigation.navigate('TabNav', { Screen: 'Feed' });
             }
-            
-
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values }) => (
