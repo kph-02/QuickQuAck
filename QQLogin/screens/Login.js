@@ -13,7 +13,7 @@ import { Formik } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
-const serverIp = '172.30.192.1';
+const serverIp = '172.31.64.1';
 
 import {
   StyledContainer,
@@ -117,6 +117,7 @@ const Login = ({ navigation }) => {
                 keyboardType="email-address"
                 selectionColor="#FFCC15"
                 autoCapitalize="none"
+                style={{color: 'black'}}
               />
 
               <MyTextInput
@@ -133,6 +134,7 @@ const Login = ({ navigation }) => {
                 setHidePassword={setHidePassword}
                 selectionColor="#FFCC15"
                 autoCapitalize="none"
+                style={{color: 'black'}}
               />
               <MsgBox></MsgBox>
               <StyledButton onPress={handleSubmit}>

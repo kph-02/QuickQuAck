@@ -20,7 +20,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="RootStack"
+        // initialRouteName="RootStack"
+        initialRouteName="Post View"
         screenOptions={({route, navigation}) => ({
         gestureEnabled: false,
         headerShown: false,

@@ -34,11 +34,29 @@ export const StyledFeedContainer = styled.View`
   background-color: ${primary};
 `;
 
+export const StyledViewPostContainer = styled.View`
+  flex: 1;
+  padding-top: ${StatusBarHeight + 20}px;
+  background-color: ${primary};
+`;
+
 export const InnerContainer = styled.View`
   flex: 1;
   width: 100%;
   align-items: center;
+  background-color: ${primary};
 `;
+
+export const PostSectionContainer = styled.View`
+  flex: 1;
+  background-color: ${orange};
+`;
+
+export const StyledPostContainer = styled.View`
+  flex: 1;
+  background-color: ${shrek};
+`;
+
 
 export const PageLogo = styled.Image`
   width: 108px;
