@@ -176,45 +176,6 @@ const CreatePost = ({ navigation }) => {
             selectedValue={postTag}
             onValueChange={(e) => onChange('postTag', e)}
           >
-<<<<<<< HEAD
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
-              <StyledFormArea>
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Title"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postTitle')}
-                  onBlur={handleBlur('postTitle')}
-                  value={values.postTitle}
-                  selectionColor="#FFCC15"
-                />
-
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Text"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postText')}
-                  onBlur={handleBlur('postText')}
-                  value={values.postText}
-                  selectionColor="#FFCC15"
-                />
-
-                <StyledButton onPress={handleSubmit}>
-                  <ButtonText>Create Post</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Feed')}>
-                  <ButtonText>Back</ButtonText>
-                </StyledButton>
-                <Line />
-              </StyledFormArea>
-            )}
-          </Formik>
-        </InnerContainer>
-=======
             {/* If first value changes, make sure to change inputs initialization as well */}
             <Picker.Item color={darkgray} label="Revelle" value="Revelle" />
             <Picker.Item color={darkgray} label="Muir" value="Muir" />
@@ -229,7 +190,6 @@ const CreatePost = ({ navigation }) => {
             <Picker.Item color={darkgray} label="Social" value="Social" />
           </Picker>
         </TagDropdown>
->>>>>>> main
       </StyledContainer>
     </Modal>
   );
