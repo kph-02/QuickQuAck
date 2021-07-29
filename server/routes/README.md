@@ -1,5 +1,5 @@
 # Routes
-
+Note: May have to make the URIs more intuitive/specific
 ## Users
 | Verb | URI | Authenticated | Operation | Description
 | :---: | :--- | :---: | :---: | :---
@@ -17,37 +17,30 @@ Parameters
 
 Responses
 <table>
-<tr>
-<th>
-Status
-</th>
-<th>
-Body 
-</th>
-</tr>
+  <tr>
+    <td> 
+      <b>Status</b>
+    </td>
+    <td>
+      <b>Body</b>
+  </tr>
+  <tr>
+    <td>  
+      200
+    </td>
+    <td>   
+      
+      ```
+      {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "johndoe@gmail.com",
+        "password": "password",
+        "dob": "01-01-2020",
+        "college": "UCSD",
+        "gy": "2030"
+      }
 
-<tr>
-
-<td>
-<pre>
-<br/><br/><br/>200<br/><br/><br/><br/><br/>400<br/>
-</pre>
-</td>
-
-<td>
-<pre>
-json
-  {
-    "id": 10,
-    "username": "alanpartridge",
-    "email": "alan@alan.com",
-    "password_hash": "$2a$10$uhUIUmVWVnrBWx9rrDWhS.CPCWCZsyqqa8./whhfzBZydX7yvahHS",
-    "password_salt": "$2a$10$uhUIUmVWVnrBWx9rrDWhS.",
-    "created_at": "2015-02-14T20:45:26.433Z",
-    "updated_at": "2015-02-14T20:45:26.540Z"
-}
-</pre>
-</td>
-
-</tr>
+    </td>
+  </tr>
 </table>
