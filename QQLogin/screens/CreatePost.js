@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Component } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -6,49 +6,83 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
 
 //formik
-import { Formik, Field, Form } from 'formik';
+import { Formik } from 'formik';
 
 //icons
 
-import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
+import { Octicons, Ionicons } from '@expo/vector-icons';
 
 import {
   StyledContainer,
-  InnerContainer,
   PageLogo,
   PageTitle,
   SubTitle,
   StyledFormArea,
-  LeftIcon,
   StyledInputLabel,
   StyledTextInput,
   StyledButton,
   RightIcon,
   Colors,
   ButtonText,
-  MsgBox,
   Line,
   ExtraView,
   ExtraText,
   TextLink,
   TextLinkContent,
   ExtraViewRight,
+  StyledPostArea,
+  StyledPostInput,
+  PageTitlePost,
+  InnerPostContainer,
+  ExtraPostView,
+  TextPostContent,
+  ExtraBackView,
+  TagDropdown,
+  StyledPostArea1,
+  StyledPostArea2,
 } from './../components/styles';
-
-import { Button, View } from 'react-native';
+import { Button, View, Modal, StyleSheet } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
+import { Picker } from '@react-native-picker/picker';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 const CreatePost = ({ navigation }) => {
-  const [hidePassword, setHidePassword] = useState(true);
+  // Use State hooks
+  const [composePost, setComposePost] = useState(false);
   const [agree, setAgree] = useState(false);
+  const [selectedValue, setSelectedValue] = useState(true);
+  const [modalOpen, setModalOpen] = useState(true);
+
+  //Getting user input
+  const [inputs, setInputs] = useState({
+    //Values needed to create post (../server/routes/feed.js)
+    postTitle: '',
+    postText: '',
+    author_id: '',
+    postTag: 'Revelle' /*Initialize as first value in tags drop-down*/,
+  });
 
   var JWTtoken = '';
 
-  //Getting JWT from local storage, must exist otherwise user can't be on this page
+  //Stores values to update input fields from user
+  const { postTitle, postText, author_id, postTag } = inputs;
 
+  //Update inputs when user enters new ones, name is identifier, value as a string
+  const onChange = (name, value) => {
+    setInputs({ ...inputs, [name]: value });
+  };
+
+  //Executes when Post is pressed, sends post information to the database
+  const onPressButton = async (e) => {
+    e.preventDefault();
+
+    sendToDB(inputs);
+    navigation.pop();
+  };
+
+  //Getting JWT from local storage, must exist otherwise user can't be on this page
   const getJWT = async () => {
     try {
       await AsyncStorage.getItem('token').then((token) => {
@@ -63,12 +97,16 @@ const CreatePost = ({ navigation }) => {
   //communicate registration information with the database
   const sendToDB = async (body) => {
     await getJWT();
+    body.author_id = JWTtoken; //Temp set to JWTtoken, change later maybe?
+
+    console.log('Inputs: ' + JSON.stringify(inputs));
+
     try {
-      //console.log('Sent Token:      ' + JWTtoken);
+      // console.log('Sent Token:      ' + JWTtoken);
       // Update server with user's registration information
       const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
         method: 'POST',
-        headers: { token: JWTtoken },
+        headers: { token: JWTtoken, 'content-type': 'application/json' },
         body: JSON.stringify(body),
       });
 
@@ -81,29 +119,64 @@ const CreatePost = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingWrapper>
+    <Modal
+      transparent={true}
+      statusBarTranslucent={false}
+      visible={modalOpen}
+      animationType="slide"
+      onRequestClose={() => navigation.pop()}
+    >
       <StyledContainer>
         <StatusBar style="black" />
-        <InnerContainer>
-          <PageTitle>New Post</PageTitle>
+        <InnerPostContainer>
+          <ExtraBackView>
+            <TextLink onPress={() => navigation.pop()}>
+              <TextPostContent>Back</TextPostContent>
+            </TextLink>
+          </ExtraBackView>
+          <ExtraPostView>
+            <TextLink onPress={onPressButton} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}>
+              <TextPostContent>Post</TextPostContent>
+            </TextLink>
+          </ExtraPostView>
+          <PageTitlePost>New Post</PageTitlePost>
+          <StyledPostArea1>
+            <MyTextInput
+              placeholder="Post Title"
+              name="postTitle"
+              style={{}}
+              placeholderTextColor={darkgray}
+              onChangeText={(e) => onChange('postTitle', e)}
+              value={postTitle}
+              selectionColor="#FFCC15"
+            />
 
-          <SubTitle></SubTitle>
-          <Formik
-            initialValues={{
-              postText: '',
-              postId: '',
-            }}
-            onSubmit={(values) => {
-              //Setting up information to send to database
-              body = {
-                postText: 'Title: ' + values.postText + 'Content: ' + values.postTitle,
-                postId: values.postId,
-              };
+            <Line />
 
-              sendToDB(body);
-              navigation.navigate('PostView');
-            }}
+            <MyTextInput
+              placeholder="Post Text"
+              name="postText"
+              style={{}}
+              placeholderTextColor={darkgray}
+              onChangeText={(e) => onChange('postText', e)}
+              value={postText}
+              selectionColor="#FFCC15"
+            />
+          </StyledPostArea1>
+        </InnerPostContainer>
+
+        <TagDropdown>
+          <Picker
+            testID="tagdropdown"
+            nativeID="tagdropdown"
+            mode="dialog"
+            prompt="Select a tag"
+            name="tagdropdown"
+            dropdownIconColor={darkgray}
+            selectedValue={postTag}
+            onValueChange={(e) => onChange('postTag', e)}
           >
+<<<<<<< HEAD
             {({ handleChange, handleBlur, handleSubmit, values }) => (
               <StyledFormArea>
                 <MyTextInput
@@ -141,8 +214,24 @@ const CreatePost = ({ navigation }) => {
             )}
           </Formik>
         </InnerContainer>
+=======
+            {/* If first value changes, make sure to change inputs initialization as well */}
+            <Picker.Item color={darkgray} label="Revelle" value="Revelle" />
+            <Picker.Item color={darkgray} label="Muir" value="Muir" />
+            <Picker.Item color={darkgray} label="Marshall" value="Marshall" />
+            <Picker.Item color={darkgray} label="Warren" value="Warren" />
+            <Picker.Item color={darkgray} label="ERC" value="ERC" />
+            <Picker.Item color={darkgray} label="Sixth" value="Sixth" />
+            <Picker.Item color={darkgray} label="Seventh" value="Seventh" />
+            <Picker.Item color={darkgray} label="Question" value="Question" />
+            <Picker.Item color={darkgray} label="Poll" value="Poll" />
+            <Picker.Item color={darkgray} label="Food" value="Food" />
+            <Picker.Item color={darkgray} label="Social" value="Social" />
+          </Picker>
+        </TagDropdown>
+>>>>>>> main
       </StyledContainer>
-    </KeyboardAvoidingWrapper>
+    </Modal>
   );
 };
 
@@ -150,7 +239,7 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
   return (
     <View>
       <StyledInputLabel> {label} </StyledInputLabel>
-      <StyledTextInput {...props} />
+      <StyledPostInput {...props} />
       {isPassword && (
         <RightIcon
           onPress={() => {

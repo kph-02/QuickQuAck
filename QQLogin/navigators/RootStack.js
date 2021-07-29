@@ -22,7 +22,7 @@ const RootStack = () => {
         <Stack.Navigator
             initialRouteName="Splash"
             screenOptions={({route, navigation}) => ({
-            gestureEnabled: false,
+            gestureEnabled: true,
             headerShown: false,
             headerTransparent: true})
             }>

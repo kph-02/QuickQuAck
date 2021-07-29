@@ -23,7 +23,6 @@ export default function App() {
         initialRouteName="RootStack"
         // initialRouteName="Post View"
         screenOptions={({route, navigation}) => ({
-        gestureEnabled: false,
         headerShown: false,
       })}>
         <Stack.Screen name='RootStack' component={RootStack} />

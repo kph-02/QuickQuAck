@@ -17,7 +17,9 @@ export const Colors = {
   orange: '#FFA500',
 };
 
-const {width, height} = Dimensions.get('screen');
+const { width, height } = Dimensions.get('screen');
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const { primary, yellow, background, lightgray, darkgray, black, shrek, orange } = Colors;
 
@@ -56,8 +58,17 @@ export const StyledPostContainer = styled.View`
   flex: 1;
   background-color: ${shrek};
 `;
-
-
+export const InnerPostContainer = styled.View`
+  flex: 1;
+  width: 100%;
+  align-items: center;
+  top: -60px;
+`;
+export const TagDropdown = styled.View`
+  width: 50%;
+  top: -10px;
+  right: 10px;
+`;
 export const PageLogo = styled.Image`
   width: 108px;
   height: 108px;
@@ -71,6 +82,27 @@ export const PageTitle = styled.Text`
   font-weight: bold;
   color: ${black};
   padding: 70px;
+`;
+
+export const PageTitleSplash = styled.Text`
+  font-size: 50px;
+  text-align: center;
+  font-weight: bold;
+  color: ${black};
+  padding: 3px;
+  width: 150%;
+  margin-vertical: 35%;
+  margin-bottom: 10px;
+
+`;
+
+export const PageTitlePost = styled.Text`
+  font-size: 20px;
+  font-weight: bold;
+  color: ${black};
+  padding: 90px;
+  right: 125px;
+  bottom: 50px;
 `;
 
 export const SubTitle = styled.Text`
@@ -98,13 +130,37 @@ export const StyledTextInput = styled.TextInput`
   margin-bottom: 10px;
   color: ${background};
 `;
+export const StyledPostInput = styled.TextInput`
+  background-color: ${primary};
+  padding: 15px;
+  border-radius: 5px;
+  font-size: 16px;
+  height: 60px;
+  margin-vertical: 3px;
+  margin-bottom: 10px;
+  color: ${black};
+`;
+
+export const StyledPostArea1 = styled.View`
+  width: 100%;
+  align-self: center;
+  color: ${shrek};
+  right: 15px;
+  bottom: 140px;
+`;
+export const StyledPostArea2 = styled.View`
+  width: 100%;
+  align-self: center;
+  color: ${shrek};
+  right: 15px;
+  bottom: 140px;
+`;
 
 export const StyledInputLabel = styled.Text`
   color: ${black};
   font-size: 13px;
   text-align: left;
 `;
-
 
 export const RightIcon = styled.TouchableOpacity`
   right: 15px;
@@ -156,9 +212,9 @@ export const MsgBox = styled.Text`
 
 export const Line = styled.View`
   height: 1px;
-  width: 100%;
+  width: 150%;
   background-color: ${lightgray};
-  margin-vertical: 10px;
+  margin-vertical: -1px;
 `;
 
 export const ExtraView = styled.View`
@@ -166,6 +222,19 @@ export const ExtraView = styled.View`
   flex-direction: row;
   align-items: center;
   padding: 10px;
+`;
+export const ExtraBackView = styled.View`
+  
+  right: 140px;
+  top: 40px;
+
+`;
+
+export const ExtraPostView = styled.View`
+  justify-content: center;
+  flex-direction: row;
+  left: 145px;
+  top: 65px;
 `;
 
 export const ExtraViewRight = styled.View`
@@ -193,6 +262,11 @@ export const TextLinkContent = styled.Text`
   color: ${yellow};
   font-size: 15px;
   font-weight: bold;
+`;
+
+export const TextPostContent = styled.Text`
+  color: ${yellow};
+  font-size: 20px;
 `;
 
 const RoundedTouchableOpacitySignIn = styled.TouchableOpacity`
