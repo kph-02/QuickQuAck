@@ -59,6 +59,29 @@ const getJWT = async () => {
   }
 };
 
+// const getCurrentAllPostsFromDB = async () => {
+//   try {
+//     await AsyncStorage.getItem('CurrentAllPosts').then((value) => {
+//       // console.log('Retrieved Token: ' + token);
+//       const postData = value.parse();
+//       return postData;
+//     });
+//   } catch (error) {
+//     console.error(error.message);
+//   }
+// };
+
+const getCurrentAllPostsFromDB = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('CurrentAllPosts');
+    console.log("Checkpoint 4");
+    console.log(jsonValue);
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
 // const {data} = parseRes
 // const {post} = data
 /* Object {
@@ -111,7 +134,8 @@ const Welcome = ({ navigation }) => {
 
   const [agree, setAgree] = useState(false);
 
-  const [postData, setPostData] = useState([]);
+  //const [postData, setPostData] = useState([]);
+  const postData = getCurrentAllPostsFromDB();
 
   const checkboxHandler = () => {
     setAgree(!agree);
@@ -139,7 +163,7 @@ const Welcome = ({ navigation }) => {
 
       const parseRes = await response.json();
 
-      setPostData(parseRes.post);
+      //setPostData(parseRes.post);    
     } catch (error) {
       console.error(error.message);
     }

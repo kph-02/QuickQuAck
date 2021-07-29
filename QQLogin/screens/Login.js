@@ -13,7 +13,7 @@ import { Formik } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
-const serverIp = '192.168.1.51';
+const serverIp = '192.168.50.115';
 
 import {
   StyledContainer,
@@ -55,6 +55,39 @@ const storeToken = async (value) => {
   }
 };
 
+const storePostData = async (value) => {
+  try {
+
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem('CurrentAllPosts', jsonValue);
+    console.log("Checkpoint 3");
+    console.log(jsonValue);
+  } catch (error) {
+    // saving error
+    console.error(error.message);
+  }
+}
+const getCurrentAllPostsFromDB = async (value) => {
+  JWTtoken = value;
+  console.log("Checkpoint 1");
+  console.log(JWTtoken);
+  try {
+    // Update server with user's registration information
+    const secondResponse = await fetch('http://' + serverIp + ':5000/feed/all-posts', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', token: JWTtoken },
+    });
+
+    secondParseRes = await secondResponse.json();
+    console.log("Checkpoint 2");
+    console.log(secondParseRes);
+    storePostData(secondParseRes);
+
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
 
@@ -83,6 +116,7 @@ const Login = ({ navigation }) => {
       else {
         storeToken(parseRes.token);
         auth = 'true';
+        getCurrentAllPostsFromDB(parseRes.token);
       }
       //Store to local storage
       //storedToken(parseRes.token);
