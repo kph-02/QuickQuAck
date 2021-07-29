@@ -13,7 +13,7 @@ import { Formik } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
-const serverIp = '192.168.50.115';
+const serverIp = '192.168.1.51';
 
 import {
   StyledContainer,
@@ -45,7 +45,7 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 //Using Async Storage to store token JSON object locally as string
-const storedToken = async (value) => {
+const storeToken = async (value) => {
   try {
     await AsyncStorage.setItem('token', value);
     // console.log('Inserted Token:  ' + value);
@@ -55,32 +55,41 @@ const storedToken = async (value) => {
   }
 };
 
-//Communicating with the database to authenticate login
-const sendToDB = async (body) => {
-  try {
-    // Update server with user's registration information
-    const response = await fetch('http://' + serverIp + ':5000/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    const parseRes = await response.json();
-    if (!parseRes.token) {
-      console.log(parseRes);
-      storedToken('');
-    } else {
-      storedToken(parseRes.token);
-    }
-    //Store to local storage
-    //storedToken(parseRes.token);
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
+
+  let auth = 'false';
+
+  //Communicating with the database to authenticate login
+  const sendToDB = async (body) => {
+    try {
+      // Update server with user's registration information
+      const response = await fetch('http://' + serverIp + ':5000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      //Invalid input, display message from server
+      if (!parseRes.token) {
+        alert(parseRes + ' Please try again.');
+        storeToken('');
+        auth = 'false';
+      }
+
+      //Valid input, continue to feed
+      else {
+        storeToken(parseRes.token);
+        auth = 'true';
+      }
+      //Store to local storage
+      //storedToken(parseRes.token);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
   return (
     <StyledContainer>
@@ -101,7 +110,9 @@ const Login = ({ navigation }) => {
             };
 
             sendToDB(body);
-            navigation.navigate('TabNav', { Screen: 'Feed' });
+            if (auth) {
+              navigation.navigate('TabNav', { Screen: 'Feed' });
+            }
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values }) => (

@@ -59,36 +59,15 @@ const Signup = ({ navigation }) => {
 
       const parseRes = await response.json();
 
-      console.log(parseRes);
-
-      // Token response from database
-
-      //A. Using Async Storage to store token JSON object locally as string
-      const storedToken = async (value) => {
-        try {
-          const jsonValue = JSON.stringify(value)
-          //await AsyncStorage.setItem('token', jsonValue)
-        } catch (error) {
-          // saving error
-          console.error(error.message);
-        }
-      };
-
-      //B. Using Async Storage to get String token
-      //This isn't used in this screen, but it is for future reference
-
-      /*
-      const readToken = async () => {
-        try {
-          const value = await AsyncStorage.getItem('token')
-          if(value !== null) {
-            // value previously stored
-          }
-        } catch(e) {
-          // error reading value
-        }
+      //Sign-Up unsuccessful
+      if (!parseRes.token) {
+        alert(parseRes);
       }
-      */
+      //Sign-Up successful
+      else {
+        alert('Account Creation Successful!');
+        navigation.navigate('Login');
+      }
 
       // possibly add if/else statement to determine if setAuth should be true or false
     } catch (error) {
@@ -129,7 +108,6 @@ const Signup = ({ navigation }) => {
               };
 
               sendToDB(body);
-              navigation.navigate('Login');
             }}
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
