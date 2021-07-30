@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
 
     if (req.path === "/register"){
         if(![firstName, lastName, email, password, dob, college, gy].every(Boolean)){
-            return res.status(401).json("Missing Credentials");
+            return res.status(401).json("Missing Credentials.");
         } 
         else if (!validEmail(email)){
             return res.status(401).json("Invalid Email");
@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
     }
     else if (req.path === "/login"){
         if (![email, password].every(Boolean)){
-            return res.status(401).json("Missing Credentials");
+            return res.status(401).json("Incorrect Credentials.");
         }
         else if (!validEmail(email)){
             return res.status(401).json("Invalid Email");

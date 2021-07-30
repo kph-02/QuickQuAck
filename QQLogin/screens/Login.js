@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 //formik
 import { Formik } from 'formik';
+
+//local storage
 
 //icons
 
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
+
+//IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
+const serverIp = '192.168.1.51';
 
 import {
   StyledContainer,
@@ -37,11 +44,54 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
+var JWTtoken = '';
+
+//Using Async Storage to store token JSON object locally as string
+const storeToken = async (value) => {
+  try {
+    await AsyncStorage.setItem('token', value);
+    // console.log('Inserted Token:  ' + value);
+  } catch (error) {
+    // saving error
+    console.error(error.message);
+  }
+};
+
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
-  
+
+  //Communicating with the database to authenticate login
+  const sendToDB = async (body) => {
+    try {
+      // Update server with user's registration information
+      const response = await fetch('http://' + serverIp + ':5000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      //Invalid input, display message from server
+      if (!parseRes.token) {
+        alert(parseRes + ' Please try again.');
+        storeToken('');
+      }
+
+      //Valid input, continue to feed
+      else {
+        storeToken(parseRes.token);
+        navigation.navigate('TabNav', { Screen: 'Feed' });
+      }
+      //Store to local storage
+      //storedToken(parseRes.token);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   return (
-      <StyledContainer>
+    <StyledContainer>
       {/* //keyboardavoidingwrapper added in, styledcontainer used to be here wrapping the overall thing */}
       {/* <KeyboardAvoidingWrapper> */}
       <StatusBar style="yellow" />
@@ -52,8 +102,13 @@ const Login = ({ navigation }) => {
         <Formik
           initialValues={{ email: '', password: '' }}
           onSubmit={(values) => {
-            console.log(values);
-            navigation.navigate('Signup');
+            //send values to database on submit
+            body = {
+              email: values.email,
+              password: values.password,
+            };
+
+            sendToDB(body);
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -67,7 +122,9 @@ const Login = ({ navigation }) => {
                 onBlur={handleBlur('email')}
                 value={values.email}
                 keyboardType="email-address"
-                selectionColor='#FFCC15'
+                selectionColor="#FFCC15"
+                autoCapitalize="none"
+                style={{ color: 'black' }}
               />
 
               <MyTextInput
@@ -82,7 +139,9 @@ const Login = ({ navigation }) => {
                 isPassword={true}
                 hidePassword={hidePassword}
                 setHidePassword={setHidePassword}
-                selectionColor='#FFCC15'
+                selectionColor="#FFCC15"
+                autoCapitalize="none"
+                style={{ color: 'black' }}
               />
               <MsgBox></MsgBox>
               <StyledButton onPress={handleSubmit}>
@@ -103,7 +162,6 @@ const Login = ({ navigation }) => {
       </InnerContainer>
       {/* </KeyboardAvoidingWrapper> */}
     </StyledContainer>
-    
   );
 };
 
@@ -113,10 +171,10 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
       <StyledInputLabel> {label} </StyledInputLabel>
       <StyledTextInput {...props} />
       {isPassword && (
-        <RightIcon 
+        <RightIcon
           onPress={() => {
             setHidePassword(!hidePassword);
-            }}
+          }}
         >
           <Ionicons name={hidePassword ? 'md-eye-off' : 'md-eye'} size={30} color={darkgray} />
         </RightIcon>
@@ -126,3 +184,5 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
 };
 
 export default Login;
+//testing purposes, so don't have to redefine across multiple files
+export { serverIp };

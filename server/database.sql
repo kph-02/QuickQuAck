@@ -18,34 +18,37 @@ CREATE TABLE users (
     date_of_birth DATE NOT NULL,
     college VARCHAR(50) NOT NULL, 
     grad_year INTEGER NOT NULL,
+    tag_id VARCHAR(10),
     blocked_users uuid[],
     revealed_users uuid[]
 ); 
 
-/* TODO: Should we also add post type?*/
- /* TODO: Should this be an array? */
-    /*tags VARCHAR(40),*/
+
 CREATE TABLE post (
     post_id BIGSERIAL,
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT post_unique UNIQUE (post_id)
 );
 
 CREATE TABLE comment (
     comment_id BIGSERIAL,
     post_id INTEGER NOT NULL,
-    parent_comment_id INTEGER,
     user_id uuid NOT NULL,
-    /*text VARCHAR(100) NOT NULL,*/
-    comment_text VARCHAR(100),
+    text VARCHAR(100) NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (comment_id),
+<<<<<<< HEAD
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
     /*FOREIGN KEY (parent_comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE*/
+=======
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (post_id) REFERENCES post(post_id)
+>>>>>>> origin/main
 );
 
 /*CREATE TYPE voting AS ENUM (
@@ -53,17 +56,22 @@ CREATE TABLE comment (
     'dislike'
 );*/
 
+<<<<<<< HEAD
 /*
 SELECT x, (ENUM_RANGE(NULL::voting))[x] 
     FROM generate_series(-1, 1) x
 */
 
 CREATE TABLE post_votes (
+=======
+CREATE TABLE vote (
+>>>>>>> origin/main
     user_id uuid NOT NULL,
     post_id INTEGER NOT NULL,
     /*comment_id INTEGER NOT NULL,*/ 
     vote_value INTEGER NOT NULL CHECK (-1 <= vote_value AND vote_value <= 1), 
     PRIMARY KEY (user_id, post_id),
+<<<<<<< HEAD
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
 );
@@ -75,16 +83,40 @@ CREATE TABLE comment_votes(
   PRIMARY KEY (user_id, comment_id),
   CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   CONSTRAINT fk_comment FOREIGN KEY(comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE
+=======
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE
+>>>>>>> origin/main
 );
+
+-- storage of all the tags
 
 CREATE TABLE tags (
-    tag_id INTEGER NOT NULL,
-    post_id INTEGER NOT NULL,
-    tag_text VARCHAR(10) NOT NULL,
-    tag_color VARCHAR(7) NOT NULL,
-    PRIMARY KEY (tag_id),
-    FOREIGN KEY(post_id) REFERENCES post(post_id)
+    tag_id VARCHAR(10) NOT NULL,
+    PRIMARY KEY (tag_id)
 );
 
+
+-- insert into this table to connect tags to posts 
+-- connecting a tag to a post
+
+CREATE TABLE post_tags (
+    tag_id VARCHAR(10) NOT NULL,
+    post_id INTEGER NOT NULL,
+    FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES post(post_id),
+    PRIMARY KEY (post_id, tag_id)
+);
+
+-- connecting tags to a user 
+
+CREATE TABLE user_tags (
+    user_id uuid NOT NULL,
+    tag_id VARCHAR(10) NOT NULL,
+    PRIMARY KEY (user_id, tag_id),
+    FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
 
 
