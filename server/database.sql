@@ -65,7 +65,7 @@ CREATE TABLE vote (
 
 CREATE TABLE tags (
     tag_id VARCHAR(10) NOT NULL,
-    PRIMARY KEY (tag_id),
+    PRIMARY KEY (tag_id)
 );
 
 
