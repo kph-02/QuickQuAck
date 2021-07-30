@@ -111,7 +111,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       <Text style={[styles.name]}>{item.time} ago</Text>
       <TouchableOpacity title="Upvote" onPress={() => console.log("Upvoted!")} style={{marginLeft: 10, flexDirection: 'row', alignItems:'center'}}>
         <MaterialCommunityIcons name="chevron-up" color='#BDBDBD' size={35} style={{width: 29}}/>
-        <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>{item.likes}</Text>
+        <Text style={[styles.name, {color: '#BDBDBD', marginHorizontal: 0}]}>{item.likes}</Text>
       </TouchableOpacity>
     </View>
   </View>
@@ -234,8 +234,29 @@ const PostView = ({ navigation }) => {
         </View>
 
         {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
+        {/* <View style={{backgroundColor: 'pink', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginLeft: 20, alignContent: 'space-around'}}> */}
+      
+
+        {/* </View> */}
         <View style={styles.postTouchables}>
-          <Text style={styles.ogPostText}>We'll put all the touchables here!</Text>
+          <View style={[styles.infoRow, {marginRight: 5}]}>
+            <MaterialCommunityIcons name="eye-outline" color='#BDBDBD' size={20} />
+            <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>12</Text>
+          </View>
+          <TouchableOpacity title="Upvote" onPress={() => console.log("Upvoted!")} style={{marginRight: 15, flexDirection: 'row', alignItems:'center'}}>
+            <MaterialCommunityIcons name="chevron-up" color='#BDBDBD' size={35} style={{width: 29}}/>
+            <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>21</Text>
+          </TouchableOpacity>
+          <View style={styles.infoRow}>
+            <MaterialCommunityIcons name="chat-outline" color='#BDBDBD' size={20} />
+            <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>12</Text>
+          </View>
+          <View style={[styles.infoRow, {marginLeft: 10}]}>
+            <Text style={[styles.name, {color: '#BDBDBD', marginHorizontal: 0}]}>Blue Raccoon</Text>
+          </View>
+          <View style={{marginLeft: 10}}>
+            <Text style={[styles.name, {color: '#BDBDBD', marginHorizontal: 0}]}>8m ago</Text>
+          </View>
         </View>
         
 
@@ -368,15 +389,16 @@ const styles = StyleSheet.create({
     // flexBasis: height * 0.04,
     alignItems: 'center',
     //justifyContent: 'center',
-    marginHorizontal: 20,
+    marginLeft: 35,
+    marginRight: 20,
   },
   postTouchables: {
     // flex: 0.4,
     alignItems: 'center',
     //justifyContent: 'center',
     flexDirection: 'row',
-    marginHorizontal: 20,
-    backgroundColor: 'lightskyblue'
+    marginLeft: 35,
+    marginRight: 20,
   },
   ogPostText:{
     // fontSize: height * 0.025,
@@ -388,8 +410,6 @@ const styles = StyleSheet.create({
   },
   commentText:{
     fontSize: height * 0.02,
-    //justifyContent: 'center',
-    //position: 'absolute',
     fontWeight: '600',
     color: '#000',
     marginHorizontal: 20
@@ -414,6 +434,12 @@ const styles = StyleSheet.create({
   bodyText: {
     fontSize: 18,
     fontWeight: 'bold'
+  },
+  infoRow: {
+    flexDirection: 'row', 
+    //alignContent: 'space-around', 
+    alignItems: 'center', 
+    marginRight: 10
   },
   touchableStyle:{
     position: 'absolute',
