@@ -155,15 +155,13 @@ const FirstRoute = () => {
   };
 
   //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
-  useEffect(
-    () => {
-      getFromDB();
-      //console.log("This is what's in postData \n" + postData);
-    },
-    [
-      /* Can put values in here that, when updated, will run everything inside useEffect*/
-    ],
-  );
+  useEffect(() => {
+    getFromDB();
+    //console.log("This is what's in postData \n" + postData);
+  }, [
+    /* Can put values in here that, when updated, will run everything inside useEffect*/
+    navigation,
+  ]);
 
   return (
     // <StyledFeedContainer>
