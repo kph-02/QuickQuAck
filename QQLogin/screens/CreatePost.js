@@ -80,7 +80,7 @@ const CreatePost = ({ navigation }) => {
     e.preventDefault();
 
     sendToDB(inputs);
-    navigation.pop();
+    navigation.navigate('TabNav', { Screen: 'Feed' });
   };
 
   //Getting JWT from local storage, must exist otherwise user can't be on this page

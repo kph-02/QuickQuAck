@@ -100,6 +100,8 @@ const FirstRoute = () => {
   const [postData, setPostData] = useState([]); //useStates can only be defined within functions
 
   const [selectedId, setSelectedId] = useState(null);
+  const [refresh, setRefresh] = useState(false); //handle refreshing logic
+  const [update, setUpdate] = useState(false);
   const navigation = useNavigation();
 
   //renderItem function
@@ -157,11 +159,18 @@ const FirstRoute = () => {
   //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
   useEffect(() => {
     getFromDB();
-    //console.log("This is what's in postData \n" + postData);
+    console.log('updated');
+    setRefresh(false);
   }, [
     /* Can put values in here that, when updated, will run everything inside useEffect*/
-    navigation,
+    update,
   ]);
+
+  //Handle the logic for what to do when flatlist is refreshed
+  const handleRefresh = () => {
+    setRefresh(true);
+    setUpdate(!update);
+  };
 
   return (
     // <StyledFeedContainer>
@@ -175,6 +184,8 @@ const FirstRoute = () => {
         keyExtractor={(item) => item.post_id}
         extraData={selectedId}
         renderItem={renderItem}
+        refreshing={refresh}
+        onRefresh={handleRefresh}
       />
     </View>
     // </StyledFeedContainer>
