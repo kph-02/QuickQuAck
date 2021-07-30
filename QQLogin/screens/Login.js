@@ -44,6 +44,8 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
+var JWTtoken = '';
+
 //Using Async Storage to store token JSON object locally as string
 const storeToken = async (value) => {
   try {
@@ -57,8 +59,6 @@ const storeToken = async (value) => {
 
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
-
-  let auth = 'false';
 
   //Communicating with the database to authenticate login
   const sendToDB = async (body) => {
@@ -76,13 +76,12 @@ const Login = ({ navigation }) => {
       if (!parseRes.token) {
         alert(parseRes + ' Please try again.');
         storeToken('');
-        auth = 'false';
       }
 
       //Valid input, continue to feed
       else {
         storeToken(parseRes.token);
-        auth = 'true';
+        navigation.navigate('TabNav', { Screen: 'Feed' });
       }
       //Store to local storage
       //storedToken(parseRes.token);
@@ -110,9 +109,6 @@ const Login = ({ navigation }) => {
             };
 
             sendToDB(body);
-            if (auth == 'true') {
-              navigation.navigate('TabNav', { Screen: 'Feed' });
-            }
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values }) => (
