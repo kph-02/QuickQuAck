@@ -36,6 +36,7 @@ router.post("/create-post", authorization, async (req, res) => {
       "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
       [postID, postTag]
     );
+<<<<<<< HEAD
 
     res.status(201).json({
       status: "Post Success",
@@ -68,6 +69,40 @@ router.get("/home-feed", authorization, async (req, res) => {
   }
 });
 
+=======
+
+    res.status(201).json({
+      status: "Post Success",
+      data: {
+        post: newPost.rows[0],
+        tags: postTags.rows[0],
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
+
+// This renders a page of posts based upon filtering of tags selected during user creation sorted in ascending order of time posted
+
+router.get("/home-feed", authorization, async (req, res) => {
+  try {
+    var tag = req.body.tagpicker;
+    // add a date time filter so its only last 24 hrs
+    const filteredFeed = await pool.query(
+      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, ut.tag_id FROM post AS p JOIN user_tags as ut ON ut.user_id = p.user_id JOIN tags AS t on t.tag_id = ut.tag_id WHERE (t.tag_id = '${tag}') ORDER BY time_posted DESC;"
+    );
+    res.status(200).json({
+      status: "feed filtered",
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+>>>>>>> origin/main
 router.get("/filtered-feed", authorization, async (req, res) => {
   try {
     //This will select from the 'tagpicker' dropdown within the post functionality
@@ -123,6 +158,7 @@ router.put("/update-post", authorization, async (req, res) => {
   } catch (err) {
     res.status(500).send("Server error");
   }
+<<<<<<< HEAD
 });
 
 // delete a post
@@ -307,6 +343,91 @@ router.post("/post-vote", authorization, async (req, res) => {
     } catch (err) {
         res.status(500).send({ error: err.message });
     }
+=======
+});
+
+// delete a post
+router.delete("/delete-post", authorization, async (req, res) => {
+  try {
+    const { postId } = req.body;
+
+    const selectedPost = await pool.query(
+      "DELETE FROM post WHERE post_id = $1",
+      [postId]
+    );
+
+    res.status(201).json({
+      status: "Delete Success",
+    });
+  } catch (err) {
+    res.status(500).send("Server error");
+  }
+});
+
+// post a comment
+router.post("/create-comment", authorization, async (req, res) => {
+  try {
+    const { commentText, post_id } = req.body;
+    const user_id = req.user;
+    const newComment = await pool.query(
+      "INSERT INTO comment (comment_text, user_id, post_id) VALUES ($1, $2, $3) RETURNING *",
+      [commentText, user_id, post_id]
+    );
+    res.status(201).json({
+      status: "Comment Success",
+    });
+  } catch (err) {
+    console.log("Hi");
+    res.status(500).send("Server error");
+  }
+});
+
+//This renders all-posts in the past 24 hours sorted in Ascending order
+router.get("/all-posts", authorization, async (req, res) => {
+  try {
+    const allFeed = await pool.query(
+      "SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
+        "'24 HOURS' AND NOW() ORDER BY time_posted DESC;"
+    );
+
+    /* For future reference, this is how to order by upvotes. */
+    // const allFeed = await pool.query
+    // ("SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
+    // "'24 HOURS' AND NOW() ORDER BY votevalue DESC;");
+
+    const numAllPosts = allFeed.rowCount;
+
+    res.status(201).json({
+      postCount: numAllPosts,
+      data: {
+        post: allFeed.rows,
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+//INCOMPLETE: This renders home-posts in the past 24 hours sorted in Ascending order
+//This is filtered by the selected tags on profile
+router.get("/home-posts", authorization, async (req, res) => {
+  try {
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+//INCOMPLETE: This renders search-posts in the past 24 hours.
+//The user selects < 5 tags for search
+router.get("/search-posts", authorization, async (req, res) => {
+  try {
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+>>>>>>> origin/main
 });
 
 module.exports = router;

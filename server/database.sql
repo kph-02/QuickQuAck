@@ -42,9 +42,14 @@ CREATE TABLE comment (
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (comment_id),
 <<<<<<< HEAD
+<<<<<<< HEAD
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
     /*FOREIGN KEY (parent_comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE*/
+=======
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (post_id) REFERENCES post(post_id)
+>>>>>>> origin/main
 =======
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (post_id) REFERENCES post(post_id)
@@ -57,6 +62,7 @@ CREATE TABLE comment (
 );*/
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /*
 SELECT x, (ENUM_RANGE(NULL::voting))[x] 
     FROM generate_series(-1, 1) x
@@ -64,6 +70,8 @@ SELECT x, (ENUM_RANGE(NULL::voting))[x]
 
 CREATE TABLE post_votes (
 =======
+=======
+>>>>>>> origin/main
 CREATE TABLE vote (
 >>>>>>> origin/main
     user_id uuid NOT NULL,
@@ -71,6 +79,7 @@ CREATE TABLE vote (
     /*comment_id INTEGER NOT NULL,*/ 
     vote_value INTEGER NOT NULL CHECK (-1 <= vote_value AND vote_value <= 1), 
     PRIMARY KEY (user_id, post_id),
+<<<<<<< HEAD
 <<<<<<< HEAD
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
@@ -83,6 +92,11 @@ CREATE TABLE comment_votes(
   PRIMARY KEY (user_id, comment_id),
   CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   CONSTRAINT fk_comment FOREIGN KEY(comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE
+=======
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE
+>>>>>>> origin/main
 =======
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE,
