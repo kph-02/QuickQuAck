@@ -71,14 +71,14 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       </View>
       <View style={{marginRight: 15, flexDirection: 'row', alignItems:'center'}}>
         <MaterialCommunityIcons name="chevron-up" color='#BDBDBD' size={35} style={{width: 29}}/>
-        <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>{item.likes}</Text>
+        <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>21</Text>
       </View>
       <View style={styles.infoRow}>
         <MaterialCommunityIcons name="chat-outline" color='#BDBDBD' size={20} />
         <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>12</Text>
       </View>
       <View style={[styles.infoRow, {marginLeft: 10}]}>
-        <Text style={[styles.name, {color: '#BDBDBD', marginHorizontal: 0}]}>{item.user}</Text>
+        <Text style={[styles.name, {color: '#BDBDBD', marginHorizontal: 0}]}>Blue Raccoon</Text>
       </View>
       <View style={{marginLeft: 10}}>
         <Text style={[styles.name, {color: '#BDBDBD', marginHorizontal: 0}]}>8m ago</Text>
