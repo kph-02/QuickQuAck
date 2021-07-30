@@ -160,7 +160,7 @@ const FirstRoute = () => {
   useEffect(() => {
     getFromDB();
     console.log('updated');
-    setRefresh(false);
+    setRefresh(false); //End refresh animation
   }, [
     /* Can put values in here that, when updated, will run everything inside useEffect*/
     update,
@@ -168,8 +168,8 @@ const FirstRoute = () => {
 
   //Handle the logic for what to do when flatlist is refreshed
   const handleRefresh = () => {
-    setRefresh(true);
-    setUpdate(!update);
+    setRefresh(true); //update animation
+    setUpdate(!update); //Change variable to trigger useEffect to pull posts from database
   };
 
   return (
@@ -184,8 +184,8 @@ const FirstRoute = () => {
         keyExtractor={(item) => item.post_id}
         extraData={selectedId}
         renderItem={renderItem}
-        refreshing={refresh}
-        onRefresh={handleRefresh}
+        refreshing={refresh} //true: shows spinning animation to show loading
+        onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
       />
     </View>
     // </StyledFeedContainer>
