@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
 import { SearchBar } from 'react-native-elements';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { serverIp } from './Login.js';
 
 //icons
 
@@ -44,21 +42,6 @@ import FeedViews from './FeedViews';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
-
-var JWTtoken = '';
-
-//Getting JWT from local storage, must exist otherwise user can't be on this page
-
-const getJWT = async () => {
-  try {
-    await AsyncStorage.getItem('token').then((token) => {
-      // console.log('Retrieved Token: ' + token);
-      JWTtoken = token;
-    });
-  } catch (error) {
-    console.error(error.message);
-  }
-};
 
 // const {data} = parseRes
 // const {post} = data
@@ -112,8 +95,6 @@ const Welcome = ({ navigation }) => {
 
   const [agree, setAgree] = useState(false);
 
-  const [postData, setPostData] = useState([]);
-
   const checkboxHandler = () => {
     setAgree(!agree);
   };
@@ -127,25 +108,6 @@ const Welcome = ({ navigation }) => {
 
   const [selectedId, setSelectedId] = useState(null);
 
-  //Communicating with the database to authenticate login
-  const getFromDB = async () => {
-    await getJWT();
-
-    try {
-      // Update server with user's registration information
-      const response = await fetch('http://' + serverIp + ':5000/feed/all-posts', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json', token: JWTtoken },
-      });
-
-      const parseRes = await response.json();
-
-      setPostData(parseRes.post);
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
-
   //renderItem function
   const renderItem = ({ item }) => {
     const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
@@ -154,37 +116,41 @@ const Welcome = ({ navigation }) => {
     return (
       <Item
         item={item}
-        onPress={() => {setSelectedId(item.id); navigation.navigate('Post View');}}
-        backgroundColor={{backgroundColor}}
-        textColor={{color}}
+        onPress={() => {
+          setSelectedId(item.id);
+          navigation.navigate('Post View');
+        }}
+        backgroundColor={{ backgroundColor }}
+        textColor={{ color }}
       />
     );
   };
 
-  useEffect(() => {
-    getFromDB();
-    //console.log("This is what's in postData \n" + postData);
-  }, []);
-
   return (
-    
-      <StyledFeedContainer>
-        <StatusBar style="black" />
-        <InnerContainer>
-          {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
-           */}
-          {/* <PageTitle>Feed</PageTitle> */}
-            <Text style={styles.pageTitle}>Feed</Text>
-            <SearchBar 
-              placeholder="Search Tags"
-              // onChangeText={this.updateSearch}
-              lightTheme="true"
-              containerStyle={{width: '90%', height: height * 0.07, alignItems: 'center', marginTop: height * 0.02, borderRadius: 100, backgroundColor:'#F2F2F2', }}
-              inputContainerStyle={{borderRadius: 100, height: '100%', width: '100%', backgroundColor:'#F9F9F9'}}
-            />
-        </InnerContainer>
-        
-        <FeedViews navigation={navigation}/>
+    <StyledFeedContainer>
+      <StatusBar style="black" />
+      <InnerContainer>
+        {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
+         */}
+        {/* <PageTitle>Feed</PageTitle> */}
+        <Text style={styles.pageTitle}>Feed</Text>
+        <SearchBar
+          placeholder="Search Tags"
+          // onChangeText={this.updateSearch}
+          lightTheme="true"
+          containerStyle={{
+            width: '90%',
+            height: height * 0.07,
+            alignItems: 'center',
+            marginTop: height * 0.02,
+            borderRadius: 100,
+            backgroundColor: '#F2F2F2',
+          }}
+          inputContainerStyle={{ borderRadius: 100, height: '100%', width: '100%', backgroundColor: '#F9F9F9' }}
+        />
+      </InnerContainer>
+
+      <FeedViews navigation={navigation} />
 
       <TouchableOpacity
         activeOpacity={0.5}

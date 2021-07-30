@@ -99,7 +99,7 @@ const CreatePost = ({ navigation }) => {
     await getJWT();
     body.author_id = JWTtoken; //Temp set to JWTtoken, change later maybe?
 
-    console.log('Inputs: ' + JSON.stringify(inputs));
+    // console.log('Inputs: ' + JSON.stringify(inputs));
 
     try {
       // console.log('Sent Token:      ' + JWTtoken);
@@ -110,7 +110,7 @@ const CreatePost = ({ navigation }) => {
         body: JSON.stringify(body),
       });
 
-      const parseRes = await response.text();
+      const parseRes = await response.json();
 
       console.log(parseRes);
     } catch (error) {
