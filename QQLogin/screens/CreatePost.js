@@ -58,16 +58,17 @@ const CreatePost = ({ navigation }) => {
   //Getting user input
   const [inputs, setInputs] = useState({
     //Values needed to create post (../server/routes/feed.js)
-    postTitle: '',
+    //postTitle: '',
     postText: '',
-    author_id: '',
+    //author_id: '',
     postTag: 'Revelle' /*Initialize as first value in tags drop-down*/,
   });
 
   var JWTtoken = '';
 
   //Stores values to update input fields from user
-  const { postTitle, postText, author_id, postTag } = inputs;
+  //const { postTitle, postText, author_id, postTag } = inputs;
+  const { postText, postTag } = inputs;
 
   //Update inputs when user enters new ones, name is identifier, value as a string
   const onChange = (name, value) => {
@@ -97,7 +98,7 @@ const CreatePost = ({ navigation }) => {
   //communicate registration information with the database
   const sendToDB = async (body) => {
     await getJWT();
-    body.author_id = JWTtoken; //Temp set to JWTtoken, change later maybe?
+    //body.author_id = JWTtoken; //Temp set to JWTtoken, change later maybe?
 
     console.log('Inputs: ' + JSON.stringify(inputs));
 
@@ -141,7 +142,7 @@ const CreatePost = ({ navigation }) => {
           </ExtraPostView>
           <PageTitlePost>New Post</PageTitlePost>
           <StyledPostArea1>
-            <MyTextInput
+            {/* <MyTextInput
               placeholder="Post Title"
               name="postTitle"
               style={{}}
@@ -149,7 +150,7 @@ const CreatePost = ({ navigation }) => {
               onChangeText={(e) => onChange('postTitle', e)}
               value={postTitle}
               selectionColor="#FFCC15"
-            />
+            /> */}
 
             <Line />
 
