@@ -13,7 +13,11 @@ import { Formik } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
+<<<<<<< HEAD
 const serverIp = '172.31.64.1';
+=======
+const serverIp = '192.168.1.119';
+>>>>>>> main
 
 import {
   StyledContainer,
@@ -110,7 +114,7 @@ const Login = ({ navigation }) => {
             };
 
             sendToDB(body);
-            if (auth) {
+            if (auth == 'true') {
               navigation.navigate('TabNav', { Screen: 'Feed' });
             }
           }}
