@@ -47,7 +47,7 @@ const homeposts = [
     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
     user: 'Yellow Squirrel',
     likes: '25',
-    body: "What's Poppin? Brand new whip, just hopped in yuh",
+    body: "Test post lol",
   },
 ];
 
@@ -62,7 +62,7 @@ const allposts = [
     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
     user: 'Yellow Squirrel',
     likes: '25',
-    post_text: "What's Poppin? Brand new whip, just hopped in yuh",
+    post_text: "Test post lol",
   },
 ];
 

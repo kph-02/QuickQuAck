@@ -56,7 +56,7 @@ router.get("/home-feed", authorization, async (req, res) => {
     var tag = req.body.tagpicker;
     // add a date time filter so its only last 24 hrs
     const filteredFeed = await pool.query(
-      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, ut.tag_id FROM post AS p JOIN user_tags as ut ON ut.user_id = p.user_id JOIN tags AS t on t.tag_id = ut.tag_id WHERE (t.tag_id = '${tag}') ORDER BY time_posted ASC;"
+      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, ut.tag_id FROM post AS p JOIN user_tags as ut ON ut.user_id = p.user_id JOIN tags AS t on t.tag_id = ut.tag_id WHERE (t.tag_id = '${tag}') ORDER BY time_posted DESC;"
     );
     res.status(200).json({
       status: "feed filtered",
@@ -74,7 +74,7 @@ router.get("/filtered-feed", authorization, async (req, res) => {
     var tag = req.body.tagpicker;
 
     let sql =
-      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, pt.tag_id FROM post AS p JOIN post_tags as pt ON pt.post_id = p.post_id JOIN tags AS t on t.tag_id = pt.tag_id WHERE (t.tag_id = ${tag}) ORDER BY time_posted ASC;";
+      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, pt.tag_id FROM post AS p JOIN post_tags as pt ON pt.post_id = p.post_id JOIN tags AS t on t.tag_id = pt.tag_id WHERE (t.tag_id = ${tag}) ORDER BY time_posted DESC;";
 
     const filteredFeed = await pool.query(sql);
     res.status(200).json({
@@ -96,7 +96,7 @@ router.get("/filtered-feed2", authorization, async (req, res) => {
     var tag2 = req.body.tagpicker2;
 
     let sql =
-      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, pt.tag_id FROM post AS p JOIN post_tags as pt ON pt.post_id = p.post_id JOIN tags AS t on t.tag_id = pt.tag_id WHERE (t.tag_id = ${tag} OR t.tag_id = ${tag2}) ORDER BY time_posted ASC;";
+      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, pt.tag_id FROM post AS p JOIN post_tags as pt ON pt.post_id = p.post_id JOIN tags AS t on t.tag_id = pt.tag_id WHERE (t.tag_id = ${tag} OR t.tag_id = ${tag2}) ORDER BY time_posted DESC;";
 
     const filteredFeed = await pool.query(sql);
     res.status(200).json({
@@ -165,7 +165,7 @@ router.get("/all-posts", authorization, async (req, res) => {
   try {
     const allFeed = await pool.query(
       "SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
-        "'24 HOURS' AND NOW() ORDER BY time_posted ASC;"
+        "'24 HOURS' AND NOW() ORDER BY time_posted DESC;"
     );
 
     /* For future reference, this is how to order by upvotes. */
