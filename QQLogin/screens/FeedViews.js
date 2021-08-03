@@ -47,7 +47,7 @@ const homeposts = [
     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
     user: 'Yellow Squirrel',
     likes: '25',
-    body: "Test post lol",
+    body: 'Test post lol',
   },
 ];
 
@@ -62,7 +62,7 @@ const allposts = [
     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
     user: 'Yellow Squirrel',
     likes: '25',
-    post_text: "Test post lol",
+    post_text: 'Test post lol',
   },
 ];
 
@@ -113,7 +113,7 @@ const FirstRoute = () => {
         item={item}
         onPress={() => {
           setSelectedId(item.post_id);
-          navigation.navigate('Post View');
+          navigation.navigate('Post View', { post: item });
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}

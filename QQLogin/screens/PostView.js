@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable} from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
@@ -56,50 +56,50 @@ const comments = [
     user: 'Green Turtle',
     body: 'David Guetta is playing songs from his new album!',
     likes: '10',
-    time: '1hr'
+    time: '1hr',
   },
   {
     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
     user: 'Purple Armadillo',
     body: 'I heard Mr. Worldwide is after this act...',
     likes: '7',
-    time: '30m'
+    time: '30m',
   },
   {
     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
     user: 'Yellow Orangutan',
     body: 'This song is pretty good, what is it?',
     likes: '2',
-    time: '22m'
+    time: '22m',
   },
   {
     id: '58694a0f-3da1-471f-bd96-145571e29d72',
     user: 'Blue Donkey',
-    body: 'I think this is \'Low\' by Flo Rida',
+    body: "I think this is 'Low' by Flo Rida",
     likes: '0',
-    time: '15m'
+    time: '15m',
   },
   {
     id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
     user: 'Red Zebra',
-    body: 'Blue Donkey must be trolling, this is \'Party Rock Anthem\' by LMFAO',
+    body: "Blue Donkey must be trolling, this is 'Party Rock Anthem' by LMFAO",
     likes: '5',
-    time: '13m'
+    time: '13m',
   },
 ];
-
 
 /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <View style={[styles.item, backgroundColor]}>
-    <View style={{marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent:'space-between'}}>
-
+    <View
+      style={{ marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent: 'space-between' }}
+    >
       {/* (Anonymous) name of the commenter */}
       <Text style={[styles.name]}>{item.user}</Text>
 
       {/* The ... button for each comment */}
-      <TouchableOpacity title="Options" onPress={() => console.log("Clicked on Options")}>
-        <MaterialCommunityIcons name="dots-horizontal" color='#BDBDBD' size={height * 0.035}/>
+      <TouchableOpacity title="Options" onPress={() => console.log('Clicked on Options')}>
+        <MaterialCommunityIcons name="dots-horizontal" color="#BDBDBD" size={height * 0.035} />
       </TouchableOpacity>
     </View>
 
@@ -107,18 +107,33 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
     <Text style={[styles.commentText, textColor]}>{item.body}</Text>
 
     {/* The row of when the comment was posted, along with the number of upvotes */}
-    <View style={{flexDirection: 'row', marginTop: 10, alignItems: 'center', marginLeft: 20, alignContent: 'space-around'}}>
+    <View
+      style={{
+        flexDirection: 'row',
+        marginTop: 10,
+        alignItems: 'center',
+        marginLeft: 20,
+        alignContent: 'space-around',
+      }}
+    >
       <Text style={[styles.name]}>{item.time} ago</Text>
-      <TouchableOpacity title="Upvote" onPress={() => console.log("Upvoted!")} style={{marginLeft: 10, flexDirection: 'row', alignItems:'center'}}>
-        <MaterialCommunityIcons name="chevron-up" color='#BDBDBD' size={35} style={{width: 29}}/>
-        <Text style={[styles.name, {color: '#BDBDBD', marginHorizontal: 0}]}>{item.likes}</Text>
+      <TouchableOpacity
+        title="Upvote"
+        onPress={() => console.log('Upvoted!')}
+        style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
+      >
+        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.likes}</Text>
       </TouchableOpacity>
     </View>
   </View>
 );
 
+//passing through route allows us to take in input from feedviews.js
+const PostView = ({ route, navigation }) => {
+  //Get input from feedViews.js into post by calling on route.params
+  const { post } = route.params;
 
-const PostView = ({ navigation }) => {
   const getJWT = async () => {
     try {
       await AsyncStorage.getItem('token').then((token) => {
@@ -165,156 +180,141 @@ const PostView = ({ navigation }) => {
     }
   };
 
-
   /* Controls the size of the font in the original post, so that it fits in the View */
-  const AdjustLabel = ({fontSize, text, style, numberOfLines}) => {
+  const AdjustLabel = ({ fontSize, text, style, numberOfLines }) => {
     const [currentFont, setCurrentFont] = useState(fontSize);
     return (
       <Text
-        numberOfLines={ numberOfLines }
+        numberOfLines={numberOfLines}
         adjustsFontSizeToFit
-        style={ [style, { fontSize: currentFont }] }
-        onTextLayout={ (e) => {
+        style={[style, { fontSize: currentFont }]}
+        onTextLayout={(e) => {
           const { lines } = e.nativeEvent;
           if (lines.length > numberOfLines) {
             setCurrentFont(currentFont - 1);
           }
-        } }
+        }}
       >
-        { text }
+        {text}
       </Text>
     );
   };
 
   /* Controls the look of each "item", or comment in this context */
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     const backgroundColor = '#FFFFFF';
-    const color ='black';
-    return(
-      <Item
-        item={item}
-        backgroundColor={{backgroundColor}}
-        textColor={{color}}
-      />
-    );
+    const color = 'black';
+    return <Item item={item} backgroundColor={{ backgroundColor }} textColor={{ color }} />;
   };
 
   return (
+    /* Style for the entire screen, controls how children are aligned */
+    <StyledViewPostContainer>
+      {/* Back Button */}
+      <TouchableOpacity
+        style={{ marginLeft: 10, width: 50, paddingLeft: 5 }}
+        onPress={() => navigation.navigate('Feed')}
+      >
+        <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
+      </TouchableOpacity>
+      <StatusBar style="black" />
 
-      /* Style for the entire screen, controls how children are aligned */
-      <StyledViewPostContainer>
+      {/* The ... button above the original post's text */}
+      <TouchableOpacity
+        title="Options"
+        onPress={() => console.log('Clicked on Options')}
+        style={{ alignSelf: 'flex-end', marginRight: 20 }}
+      >
+        <MaterialCommunityIcons name="dots-horizontal" color="#BDBDBD" size={height * 0.035} />
+      </TouchableOpacity>
 
-        {/* Back Button */}
-        <TouchableOpacity 
-          style={{marginLeft: 10, width: 50, paddingLeft: 5}}
-          onPress={() => navigation.navigate('Feed')}
+      {/* The Original Post's Text */}
+      <View style={styles.postBox}>
+        <AdjustLabel fontSize={50} text={post.post_text} style={styles.ogPostText} numberOfLines={8} />
+      </View>
+
+      {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
+      {/* <View style={{backgroundColor: 'pink', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginLeft: 20, alignContent: 'space-around'}}> */}
+
+      {/* </View> */}
+      <View style={styles.postTouchables}>
+        <View style={[styles.infoRow, { marginRight: 5 }]}>
+          <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
+          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+        </View>
+        <TouchableOpacity
+          title="Upvote"
+          onPress={() => console.log('Upvoted!')}
+          style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}
         >
-          <Text style={{fontSize: 18, fontWeight: '600', color: '#FFCC15'}}>Back</Text>
+          <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
+          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>21</Text>
         </TouchableOpacity>
-        <StatusBar style="black" />
-
-        
-        {/* The ... button above the original post's text */}
-        <TouchableOpacity 
-          title="Options" 
-          onPress={() => console.log("Clicked on Options")} 
-          style={{alignSelf: 'flex-end', marginRight: 20}}
-        >
-            <MaterialCommunityIcons name="dots-horizontal" color='#BDBDBD' size={height * 0.035}/>
-        </TouchableOpacity>
-
-        {/* The Original Post's Text */}
-        <View style={styles.postBox}>
-          <AdjustLabel
-            fontSize={50}
-            text="Lorem ipsum dolor sit amet, nonummy ligula volutpat hac integer nonummy. Suspendisse ultricies, congue etiam tellus, erat libero, nulla eleifend, mauris pellentesque. Suspendisse integer praesent vel, integer gravida mauris, fringilla vehicula lacinia non"
-            style={styles.ogPostText}
-            numberOfLines={8}
-          />
+        <View style={styles.infoRow}>
+          <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
+          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
         </View>
-
-        {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
-        {/* <View style={{backgroundColor: 'pink', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginLeft: 20, alignContent: 'space-around'}}> */}
-      
-
-        {/* </View> */}
-        <View style={styles.postTouchables}>
-          <View style={[styles.infoRow, {marginRight: 5}]}>
-            <MaterialCommunityIcons name="eye-outline" color='#BDBDBD' size={20} />
-            <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>12</Text>
-          </View>
-          <TouchableOpacity title="Upvote" onPress={() => console.log("Upvoted!")} style={{marginRight: 15, flexDirection: 'row', alignItems:'center'}}>
-            <MaterialCommunityIcons name="chevron-up" color='#BDBDBD' size={35} style={{width: 29}}/>
-            <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>21</Text>
-          </TouchableOpacity>
-          <View style={styles.infoRow}>
-            <MaterialCommunityIcons name="chat-outline" color='#BDBDBD' size={20} />
-            <Text style={[styles.commentText, {color: '#BDBDBD', marginHorizontal: 0}]}>12</Text>
-          </View>
-          <View style={[styles.infoRow, {marginLeft: 10}]}>
-            <Text style={[styles.name, {color: '#BDBDBD', marginHorizontal: 0}]}>Blue Raccoon</Text>
-          </View>
-          <View style={{marginLeft: 10}}>
-            <Text style={[styles.name, {color: '#BDBDBD', marginHorizontal: 0}]}>8m ago</Text>
-          </View>
+        <View style={[styles.infoRow, { marginLeft: 10 }]}>
+          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>Blue Raccoon</Text>
         </View>
-        
-
-        {/* Comment Section (Scrollable) */}
-        <View style={{flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5}}>
-          <FlatList
-                    numColumns={1}
-                    horizontal={false}
-                    data={comments}
-                    keyExtractor={(item) => item.id}
-                    // extraData={id}
-                    renderItem={renderItem}
-          />
-
+        <View style={{ marginLeft: 10 }}>
+          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>8m ago</Text>
         </View>
-        
-        {/* Comment Section (TextInput) */}
-        <Formik
-          initialValues={{
-              commentText: '',
-              commentId: '',
-          }}
-          onSubmit={(values) => {
-              //Setting up information to send to database
-              body = {
-              commentText: 'Content: ' + values.commentText,
-              commentId: values.commentId,
-              };
+      </View>
 
-              sendToDB(body);
-          }}
-        >
-          {({ handleChange, handleBlur, handleSubmit, values }) => (
-              <View style={{flex: 0.3, justifyContent:'center'}}>
-                  <MyTextInput
-                      label=""
-                      icon=""
-                      placeholder="Add a comment"
-                      placeholderTextColor={darkgray}
-                      onChangeText={handleChange('commentText')}
-                      onBlur={handleBlur('commentText')}
-                      //onSubmitEditing={}
-                      value={values.commentText}
-                      selectionColor="#FFCC15"
-                      style={{color: 'black', backgroundColor: 'white', borderTopWidth: 1, borderColor: '#F6F6F6'}}
-                      //keyboardType='default'
-                  />
-                  
-              </View>
-          )}
-        </Formik>
-        <Line />
+      {/* Comment Section (Scrollable) */}
+      <View style={{ flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
+        <FlatList
+          numColumns={1}
+          horizontal={false}
+          data={comments}
+          keyExtractor={(item) => item.id}
+          // extraData={id}
+          renderItem={renderItem}
+        />
+      </View>
 
-        {/* What Ajay originally had in PostView: */}
-        {/* <View style={{flex: 0.2, backgroundColor: 'lightcyan', justifyContent: 'center'}}>
+      {/* Comment Section (TextInput) */}
+      <Formik
+        initialValues={{
+          commentText: '',
+          commentId: '',
+        }}
+        onSubmit={(values) => {
+          //Setting up information to send to database
+          body = {
+            commentText: 'Content: ' + values.commentText,
+            commentId: values.commentId,
+          };
+
+          sendToDB(body);
+        }}
+      >
+        {({ handleChange, handleBlur, handleSubmit, values }) => (
+          <View style={{ flex: 0.3, justifyContent: 'center' }}>
+            <MyTextInput
+              label=""
+              icon=""
+              placeholder="Add a comment"
+              placeholderTextColor={darkgray}
+              onChangeText={handleChange('commentText')}
+              onBlur={handleBlur('commentText')}
+              //onSubmitEditing={}
+              value={values.commentText}
+              selectionColor="#FFCC15"
+              style={{ color: 'black', backgroundColor: 'white', borderTopWidth: 1, borderColor: '#F6F6F6' }}
+              //keyboardType='default'
+            />
+          </View>
+        )}
+      </Formik>
+      <Line />
+
+      {/* What Ajay originally had in PostView: */}
+      {/* <View style={{flex: 0.2, backgroundColor: 'lightcyan', justifyContent: 'center'}}>
           <Text style={styles.commentText}>Slight margin bottom adder thing</Text>
         </View> */}
-          {/* <SubTitle></SubTitle>
+      {/* <SubTitle></SubTitle>
           <Formik
             initialValues={{
               postText: '',
@@ -370,11 +370,11 @@ const PostView = ({ navigation }) => {
               </StyledFormArea>
             )}
           </Formik> */}
-      </StyledViewPostContainer>
+    </StyledViewPostContainer>
   );
 };
 
-const {width, height} = Dimensions.get('screen');
+const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   pageTitle: {
@@ -400,26 +400,26 @@ const styles = StyleSheet.create({
     marginLeft: 35,
     marginRight: 20,
   },
-  ogPostText:{
+  ogPostText: {
     // fontSize: height * 0.025,
     fontSize: 24,
     //position: 'absolute',
     //textAlign: 'auto',
     fontWeight: 'bold',
-    color: '#000'
+    color: '#000',
   },
-  commentText:{
+  commentText: {
     fontSize: height * 0.02,
     fontWeight: '600',
     color: '#000',
-    marginHorizontal: 20
+    marginHorizontal: 20,
   },
   commentBox: {
     flex: 1,
     alignContent: 'center',
-    backgroundColor: 'dodgerblue'
+    backgroundColor: 'dodgerblue',
   },
-  item:{
+  item: {
     padding: 15,
     marginVertical: 2.5,
     //marginHorizontal: 10,
@@ -433,15 +433,15 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     fontSize: 18,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   infoRow: {
-    flexDirection: 'row', 
-    //alignContent: 'space-around', 
-    alignItems: 'center', 
-    marginRight: 10
+    flexDirection: 'row',
+    //alignContent: 'space-around',
+    alignItems: 'center',
+    marginRight: 10,
   },
-  touchableStyle:{
+  touchableStyle: {
     position: 'absolute',
     width: 52,
     height: 52,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     width: width * 0.18,
     height: width * 0.18,
-  }
+  },
 });
 
 const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, ...props }) => {
