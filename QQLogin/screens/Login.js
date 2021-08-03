@@ -44,6 +44,8 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
+var JWTtoken = '';
+
 //Using Async Storage to store token JSON object locally as string
 const storeToken = async (value) => {
   try {
@@ -91,8 +93,6 @@ const getCurrentAllPostsFromDB = async (value) => {
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
 
-  let auth = 'false';
-
   //Communicating with the database to authenticate login
   const sendToDB = async (body) => {
     try {
@@ -109,14 +109,17 @@ const Login = ({ navigation }) => {
       if (!parseRes.token) {
         alert(parseRes + ' Please try again.');
         storeToken('');
-        auth = 'false';
       }
 
       //Valid input, continue to feed
       else {
         storeToken(parseRes.token);
+<<<<<<< HEAD
         auth = 'true';
         getCurrentAllPostsFromDB(parseRes.token);
+=======
+        navigation.navigate('TabNav', { Screen: 'Feed' });
+>>>>>>> main
       }
       //Store to local storage
       //storedToken(parseRes.token);
@@ -144,9 +147,6 @@ const Login = ({ navigation }) => {
             };
 
             sendToDB(body);
-            if (auth) {
-              navigation.navigate('TabNav', { Screen: 'Feed' });
-            }
           }}
         >
           {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -161,6 +161,8 @@ const Login = ({ navigation }) => {
                 value={values.email}
                 keyboardType="email-address"
                 selectionColor="#FFCC15"
+                autoCapitalize="none"
+                style={{ color: 'black' }}
               />
 
               <MyTextInput
@@ -176,6 +178,8 @@ const Login = ({ navigation }) => {
                 hidePassword={hidePassword}
                 setHidePassword={setHidePassword}
                 selectionColor="#FFCC15"
+                autoCapitalize="none"
+                style={{ color: 'black' }}
               />
               <MsgBox></MsgBox>
               <StyledButton onPress={handleSubmit}>

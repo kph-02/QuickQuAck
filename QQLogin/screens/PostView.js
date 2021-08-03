@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
+import { MaterialCommunityIcons, EvilIcons } from '@expo/vector-icons';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
@@ -16,7 +18,9 @@ import { Formik, Field, Form } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 import {
-  StyledContainer,
+  StyledViewPostContainer,
+  StyledPostContainer,
+  PostSectionContainer,
   InnerContainer,
   PageLogo,
   PageTitle,
@@ -38,13 +42,98 @@ import {
   ExtraViewRight,
 } from './../components/styles';
 
-import { Button, View } from 'react-native';
+import { Button, View, TextInput } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
+import ListItemSwipeable from 'react-native-elements/dist/list/ListItemSwipeable';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-const PostView = ({ navigation }) => {
+/* Hardcoded comments */
+const comments = [
+  {
+    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+    user: 'Green Turtle',
+    body: 'David Guetta is playing songs from his new album!',
+    likes: '10',
+    time: '1hr',
+  },
+  {
+    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user: 'Purple Armadillo',
+    body: 'I heard Mr. Worldwide is after this act...',
+    likes: '7',
+    time: '30m',
+  },
+  {
+    id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user: 'Yellow Orangutan',
+    body: 'This song is pretty good, what is it?',
+    likes: '2',
+    time: '22m',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d72',
+    user: 'Blue Donkey',
+    body: "I think this is 'Low' by Flo Rida",
+    likes: '0',
+    time: '15m',
+  },
+  {
+    id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user: 'Red Zebra',
+    body: "Blue Donkey must be trolling, this is 'Party Rock Anthem' by LMFAO",
+    likes: '5',
+    time: '13m',
+  },
+];
+
+/* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
+const Item = ({ item, onPress, backgroundColor, textColor }) => (
+  <View style={[styles.item, backgroundColor]}>
+    <View
+      style={{ marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent: 'space-between' }}
+    >
+      {/* (Anonymous) name of the commenter */}
+      <Text style={[styles.name]}>{item.user}</Text>
+
+      {/* The ... button for each comment */}
+      <TouchableOpacity title="Options" onPress={() => console.log('Clicked on Options')}>
+        <MaterialCommunityIcons name="dots-horizontal" color="#BDBDBD" size={height * 0.035} />
+      </TouchableOpacity>
+    </View>
+
+    {/* The text for the comment */}
+    <Text style={[styles.commentText, textColor]}>{item.body}</Text>
+
+    {/* The row of when the comment was posted, along with the number of upvotes */}
+    <View
+      style={{
+        flexDirection: 'row',
+        marginTop: 10,
+        alignItems: 'center',
+        marginLeft: 20,
+        alignContent: 'space-around',
+      }}
+    >
+      <Text style={[styles.name]}>{item.time} ago</Text>
+      <TouchableOpacity
+        title="Upvote"
+        onPress={() => console.log('Upvoted!')}
+        style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
+      >
+        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.likes}</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+
+//passing through route allows us to take in input from feedviews.js
+const PostView = ({ route, navigation }) => {
+  //Get input from feedViews.js into post by calling on route.params
+  const { post } = route.params;
+
   const getJWT = async () => {
     try {
       await AsyncStorage.getItem('token').then((token) => {
@@ -57,48 +146,243 @@ const PostView = ({ navigation }) => {
   };
   //communicate registration information with the database
 
-  const sendToDB = async (body) => {
-    try {
-      const operation = 'update';
-      await getJWT();
-      if (operation === 'update') {
-        // Update server with user's registration information
+  const sendToDB = async (operation, body) => {
+    await getJWT();
+
+    //Create a comment on the post
+    if (operation === 'comment') {
+      try {
+        const response = await fetch('http://' + serverIp + ':5000/feed/create-comment', {
+          method: 'POST',
+          headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          user: 'Purple Elephant',
+        });
+
+        const parseRes = await response.json();
+
+        console.log('COMMENT: ' + JSON.stringify(parseRes));
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+
+    //Update the current post
+    if (operation === 'update') {
+      try {
         const response = await fetch('http://' + serverIp + ':5000/feed/update-post', {
           method: 'PUT',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         });
 
-        const parseRes = await response.text();
+        const parseRes = await response.json();
 
-        console.log(parseRes);
+        console.log('UPDATE: ' + parseRes);
+      } catch (error) {
+        console.error(error.message);
       }
+    }
 
-      if (operation === 'delete') {
-        // Update server with user's registration information
+    //Delete the current post
+    if (operation === 'delete') {
+      try {
         const response = await fetch('http://' + serverIp + ':5000/feed/delete-post', {
           method: 'DELETE',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         });
 
-        const parseRes = await response.text();
+        const parseRes = await response.json();
 
-        console.log(parseRes);
+        console.log('DELETE' + parseRes);
+      } catch (error) {
+        console.error(error.message);
       }
-    } catch (error) {
-      console.error(error.message);
     }
   };
 
-  return (
-    <KeyboardAvoidingWrapper>
-      <StyledContainer>
-        <StatusBar style="black" />
-        <InnerContainer>
-          <PageTitle>Post View</PageTitle>
+  /* Controls the size of the font in the original post, so that it fits in the View */
+  const AdjustLabel = ({ fontSize, text, style, numberOfLines }) => {
+    const [currentFont, setCurrentFont] = useState(fontSize);
+    const [comment, SetComment] = useState([]);
 
-          <SubTitle></SubTitle>
+    //Getting comments from the database to show for post
+    const getFromDB = async (body) => {
+      await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
+
+      try {
+        // Update server with user's registration information
+        const response = await fetch('http://' + serverIp + ':5000/feed/all-comment' /*ROUTE NOT SETUP YET*/, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', token: JWTtoken },
+          body: JSON.stringify(body),
+        });
+
+        //The response includes post information, need in json format
+        const parseRes = await response.json();
+
+        //Updates postData to have post information using useState
+        setComment(parseRes.data.comment);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
+    //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
+    useEffect(() => {
+      const body = { post_id: post.post_id };
+      // getFromDB(body); DOESNT WORK RN B/C CANT ADD BODY TO GET REQUEST AND IDK WHAT TO DO
+    }, []);
+
+    return (
+      <Text
+        numberOfLines={numberOfLines}
+        adjustsFontSizeToFit
+        style={[style, { fontSize: currentFont }]}
+        onTextLayout={(e) => {
+          const { lines } = e.nativeEvent;
+          if (lines.length > numberOfLines) {
+            setCurrentFont(currentFont - 1);
+          }
+        }}
+      >
+        {text}
+      </Text>
+    );
+  };
+
+  /* Controls the look of each "item", or comment in this context */
+  const renderItem = ({ item }) => {
+    const backgroundColor = '#FFFFFF';
+    const color = 'black';
+    return <Item item={item} backgroundColor={{ backgroundColor }} textColor={{ color }} />;
+  };
+
+  return (
+    /* Style for the entire screen, controls how children are aligned */
+    <StyledViewPostContainer>
+      {/* Back Button */}
+      <TouchableOpacity
+        style={{ marginLeft: 10, width: 50, paddingLeft: 5 }}
+        onPress={() => navigation.navigate('Feed')}
+      >
+        <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
+      </TouchableOpacity>
+      <StatusBar style="black" />
+
+      {/* The ... button above the original post's text */}
+      <TouchableOpacity
+        title="Options"
+        onPress={() => console.log('Clicked on Options')}
+        style={{ alignSelf: 'flex-end', marginRight: 20 }}
+      >
+        <MaterialCommunityIcons name="dots-horizontal" color="#BDBDBD" size={height * 0.035} />
+      </TouchableOpacity>
+
+      {/* The Original Post's Text */}
+      <View style={styles.postBox}>
+        <AdjustLabel fontSize={50} text={post.post_text} style={styles.ogPostText} numberOfLines={8} />
+      </View>
+
+      {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
+      {/* <View style={{backgroundColor: 'pink', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginLeft: 20, alignContent: 'space-around'}}> */}
+
+      {/* </View> */}
+      <View style={styles.postTouchables}>
+        <View style={[styles.infoRow, { marginRight: 5 }]}>
+          <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
+          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+        </View>
+        <TouchableOpacity
+          title="Upvote"
+          onPress={() => console.log('Upvoted!')}
+          style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}
+        >
+          <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
+          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>21</Text>
+        </TouchableOpacity>
+        <View style={styles.infoRow}>
+          <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
+          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+        </View>
+        <View style={[styles.infoRow, { marginLeft: 10 }]}>
+          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>Blue Raccoon</Text>
+        </View>
+        <View style={{ marginLeft: 10 }}>
+          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>8m ago</Text>
+        </View>
+      </View>
+
+      {/* Comment Section (Scrollable) */}
+      <View style={{ flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
+        <FlatList
+          numColumns={1}
+          horizontal={false}
+          data={comments}
+          keyExtractor={(item) => item.id}
+          // extraData={id}
+          renderItem={renderItem}
+        />
+      </View>
+
+      {/* Comment Section (TextInput) */}
+      <Formik
+        initialValues={{
+          commentText: '',
+          post_id: '',
+        }}
+        onSubmit={(values) => {
+          //Setting up information to send to database
+          body = {
+            commentText: 'Content: ' + values.commentText,
+            post_id: post.post_id,
+          };
+
+          console.log(body);
+
+          sendToDB('comment', body);
+        }}
+      >
+        {({ handleChange, handleBlur, handleSubmit, values }) => (
+          <View style={{ flex: 0.3, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <TextInput
+              label=""
+              icon=""
+              placeholder="Add a comment"
+              placeholderTextColor={darkgray}
+              onChangeText={handleChange('commentText')}
+              onBlur={handleBlur('commentText')}
+              //onSubmitEditing={}
+              value={values.commentText}
+              selectionColor="#FFCC15"
+              style={{
+                flex: 0.98,
+                color: 'black',
+                backgroundColor: 'white',
+                borderTopWidth: 1,
+                borderColor: '#F6F6F6',
+              }}
+              //keyboardType='default'
+            />
+            <EvilIcons
+              name="arrow-up"
+              size={35}
+              color="black"
+              justifyContent="center"
+              borderTopWidth={10}
+              onPress={handleSubmit}
+            />
+          </View>
+        )}
+      </Formik>
+      <Line />
+
+      {/* What Ajay originally had in PostView: */}
+      {/* <View style={{flex: 0.2, backgroundColor: 'lightcyan', justifyContent: 'center'}}>
+          <Text style={styles.commentText}>Slight margin bottom adder thing</Text>
+        </View> */}
+      {/* <SubTitle></SubTitle>
           <Formik
             initialValues={{
               postText: '',
@@ -144,7 +428,7 @@ const PostView = ({ navigation }) => {
                 <StyledButton onPress={((event) => setOpt(event, UPDATE), handleSubmit)}>
                   <ButtonText>Update Post</ButtonText>
                 </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('CreatePost')}>
+                <StyledButton onPress={() => navigation.navigate('Feed')}>
                   <ButtonText>Back</ButtonText>
                 </StyledButton>
                 <StyledButton onPress={((event) => setOpt(event, DELETE), handleSubmit)}>
@@ -153,12 +437,93 @@ const PostView = ({ navigation }) => {
                 <Line />
               </StyledFormArea>
             )}
-          </Formik>
-        </InnerContainer>
-      </StyledContainer>
-    </KeyboardAvoidingWrapper>
+          </Formik> */}
+    </StyledViewPostContainer>
   );
 };
+
+const { width, height } = Dimensions.get('screen');
+
+const styles = StyleSheet.create({
+  pageTitle: {
+    fontSize: 40,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  postBox: {
+    flex: 1,
+    // flexGrow: 1,
+    // flexBasis: height * 0.04,
+    alignItems: 'center',
+    //justifyContent: 'center',
+    marginLeft: 35,
+    marginRight: 20,
+  },
+  postTouchables: {
+    // flex: 0.4,
+    alignItems: 'center',
+    //justifyContent: 'center',
+    flexDirection: 'row',
+    marginLeft: 35,
+    marginRight: 20,
+  },
+  ogPostText: {
+    // fontSize: height * 0.025,
+    fontSize: 24,
+    //position: 'absolute',
+    //textAlign: 'auto',
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  commentText: {
+    fontSize: height * 0.02,
+    fontWeight: '600',
+    color: '#000',
+    marginHorizontal: 20,
+  },
+  commentBox: {
+    flex: 1,
+    alignContent: 'center',
+    backgroundColor: 'dodgerblue',
+  },
+  item: {
+    padding: 15,
+    marginVertical: 2.5,
+    //marginHorizontal: 10,
+  },
+  name: {
+    fontSize: height * 0.02,
+    fontWeight: '600',
+    color: '#BDBDBD',
+    // marginLeft: 20,
+    // marginBottom: 15
+  },
+  bodyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    //alignContent: 'space-around',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  touchableStyle: {
+    position: 'absolute',
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 30,
+    bottom: 30,
+  },
+  floatingButtonStyle: {
+    resizeMode: 'contain',
+    width: width * 0.18,
+    height: width * 0.18,
+  },
+});
 
 const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, ...props }) => {
   return (

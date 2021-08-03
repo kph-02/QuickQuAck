@@ -80,7 +80,7 @@ const CreatePost = ({ navigation }) => {
     e.preventDefault();
 
     sendToDB(inputs);
-    navigation.pop();
+    navigation.navigate('TabNav', { Screen: 'Feed' });
   };
 
   //Getting JWT from local storage, must exist otherwise user can't be on this page
@@ -100,7 +100,7 @@ const CreatePost = ({ navigation }) => {
     await getJWT();
     //body.author_id = JWTtoken; //Temp set to JWTtoken, change later maybe?
 
-    console.log('Inputs: ' + JSON.stringify(inputs));
+    // console.log('Inputs: ' + JSON.stringify(inputs));
 
     try {
       // console.log('Sent Token:      ' + JWTtoken);
@@ -111,7 +111,7 @@ const CreatePost = ({ navigation }) => {
         body: JSON.stringify(body),
       });
 
-      const parseRes = await response.text();
+      const parseRes = await response.json();
 
       console.log(parseRes);
     } catch (error) {
@@ -142,7 +142,10 @@ const CreatePost = ({ navigation }) => {
           </ExtraPostView>
           <PageTitlePost>New Post</PageTitlePost>
           <StyledPostArea1>
+<<<<<<< HEAD
           
+=======
+>>>>>>> main
             {/* <MyTextInput
               placeholder="Post Title"
               name="postTitle"
