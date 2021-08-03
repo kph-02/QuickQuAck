@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, EvilIcons } from '@expo/vector-icons';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
@@ -42,7 +42,7 @@ import {
   ExtraViewRight,
 } from './../components/styles';
 
-import { Button, View } from 'react-native';
+import { Button, View, TextInput } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import ListItemSwipeable from 'react-native-elements/dist/list/ListItemSwipeable';
 
@@ -146,12 +146,29 @@ const PostView = ({ route, navigation }) => {
   };
   //communicate registration information with the database
 
-  const sendToDB = async (body) => {
-    try {
-      const operation = 'update';
-      await getJWT();
-      if (operation === 'update') {
-        // Update server with user's registration information
+  const sendToDB = async (operation, body) => {
+    await getJWT();
+
+    //Create a comment on the post
+    if (operation == 'comment') {
+      try {
+        const response = await fetch('http://' + serverIp + ':5000/feed/create-comment', {
+          method: 'POST',
+          headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        const parseRes = await response.text();
+
+        console.log(parseRes);
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+
+    //Update the current post
+    if (operation === 'update') {
+      try {
         const response = await fetch('http://' + serverIp + ':5000/feed/update-post', {
           method: 'PUT',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
@@ -161,10 +178,14 @@ const PostView = ({ route, navigation }) => {
         const parseRes = await response.text();
 
         console.log(parseRes);
+      } catch (error) {
+        console.error(error.message);
       }
+    }
 
-      if (operation === 'delete') {
-        // Update server with user's registration information
+    //Delete the current post
+    if (operation === 'delete') {
+      try {
         const response = await fetch('http://' + serverIp + ':5000/feed/delete-post', {
           method: 'DELETE',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
@@ -174,9 +195,9 @@ const PostView = ({ route, navigation }) => {
         const parseRes = await response.text();
 
         console.log(parseRes);
+      } catch (error) {
+        console.error(error.message);
       }
-    } catch (error) {
-      console.error(error.message);
     }
   };
 
@@ -278,21 +299,21 @@ const PostView = ({ route, navigation }) => {
       <Formik
         initialValues={{
           commentText: '',
-          commentId: '',
+          post_Id: '',
         }}
         onSubmit={(values) => {
           //Setting up information to send to database
           body = {
             commentText: 'Content: ' + values.commentText,
-            commentId: values.commentId,
+            post_Id: post.post_id,
           };
 
-          sendToDB(body);
+          sendToDB('comment', body);
         }}
       >
         {({ handleChange, handleBlur, handleSubmit, values }) => (
-          <View style={{ flex: 0.3, justifyContent: 'center' }}>
-            <MyTextInput
+          <View style={{ flex: 0.3, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <TextInput
               label=""
               icon=""
               placeholder="Add a comment"
@@ -302,8 +323,22 @@ const PostView = ({ route, navigation }) => {
               //onSubmitEditing={}
               value={values.commentText}
               selectionColor="#FFCC15"
-              style={{ color: 'black', backgroundColor: 'white', borderTopWidth: 1, borderColor: '#F6F6F6' }}
+              style={{
+                flex: 0.98,
+                color: 'black',
+                backgroundColor: 'white',
+                borderTopWidth: 1,
+                borderColor: '#F6F6F6',
+              }}
               //keyboardType='default'
+            />
+            <EvilIcons
+              name="arrow-up"
+              size={35}
+              color="black"
+              justifyContent="center"
+              borderTopWidth={10}
+              onPress={handleSubmit}
             />
           </View>
         )}
