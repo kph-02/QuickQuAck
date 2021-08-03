@@ -138,7 +138,7 @@ router.delete("/delete-post", authorization, async (req, res) => {
       status: "Delete Success",
     });
   } catch (err) {
-    res.status(500).send("Server error");
+    res.status(500).json("Server error");
   }
 });
 
@@ -148,15 +148,41 @@ router.post("/create-comment", authorization, async (req, res) => {
     const { commentText, post_id } = req.body;
     const user_id = req.user;
     const newComment = await pool.query(
-      "INSERT INTO comment (comment_text, user_id, post_id) VALUES ($1, $2, $3) RETURNING *",
+      "INSERT INTO comment (text, user_id, post_id) VALUES ($1, $2, $3) RETURNING *",
       [commentText, user_id, post_id]
     );
     res.status(201).json({
       status: "Comment Success",
     });
   } catch (err) {
-    console.log("Hi");
-    res.status(500).send("Server error");
+    console.log(err.message);
+    res.status(500).json("Server error");
+  }
+});
+
+//Get commits from given post_id
+router.get("/all-comments", authorization, async (req, res) => {
+  try {
+    const { post_id } = req.body;
+
+    const allComment = await pool.query(
+      "SELECT * FROM comment WHERE post_id=(post_id)",
+      [post_id]
+    );
+
+    /* For future reference, this is how to order by upvotes. */
+    // const allFeed = await pool.query
+    // ("SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
+    // "'24 HOURS' AND NOW() ORDER BY votevalue DESC;");
+
+    res.status(201).json({
+      data: {
+        comment: allComment.rows,
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
   }
 });
 
@@ -183,7 +209,7 @@ router.get("/all-posts", authorization, async (req, res) => {
     });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server Error");
+    res.status(500).json("Server Error");
   }
 });
 

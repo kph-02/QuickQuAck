@@ -150,17 +150,18 @@ const PostView = ({ route, navigation }) => {
     await getJWT();
 
     //Create a comment on the post
-    if (operation == 'comment') {
+    if (operation === 'comment') {
       try {
         const response = await fetch('http://' + serverIp + ':5000/feed/create-comment', {
           method: 'POST',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
+          user: 'Purple Elephant',
         });
 
-        const parseRes = await response.text();
+        const parseRes = await response.json();
 
-        console.log(parseRes);
+        console.log('COMMENT: ' + JSON.stringify(parseRes));
       } catch (error) {
         console.error(error.message);
       }
@@ -175,9 +176,9 @@ const PostView = ({ route, navigation }) => {
           body: JSON.stringify(body),
         });
 
-        const parseRes = await response.text();
+        const parseRes = await response.json();
 
-        console.log(parseRes);
+        console.log('UPDATE: ' + parseRes);
       } catch (error) {
         console.error(error.message);
       }
@@ -192,9 +193,9 @@ const PostView = ({ route, navigation }) => {
           body: JSON.stringify(body),
         });
 
-        const parseRes = await response.text();
+        const parseRes = await response.json();
 
-        console.log(parseRes);
+        console.log('DELETE' + parseRes);
       } catch (error) {
         console.error(error.message);
       }
@@ -204,6 +205,36 @@ const PostView = ({ route, navigation }) => {
   /* Controls the size of the font in the original post, so that it fits in the View */
   const AdjustLabel = ({ fontSize, text, style, numberOfLines }) => {
     const [currentFont, setCurrentFont] = useState(fontSize);
+    const [comment, SetComment] = useState([]);
+
+    //Getting comments from the database to show for post
+    const getFromDB = async (body) => {
+      await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
+
+      try {
+        // Update server with user's registration information
+        const response = await fetch('http://' + serverIp + ':5000/feed/all-comment' /*ROUTE NOT SETUP YET*/, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', token: JWTtoken },
+          body: JSON.stringify(body),
+        });
+
+        //The response includes post information, need in json format
+        const parseRes = await response.json();
+
+        //Updates postData to have post information using useState
+        setComment(parseRes.data.comment);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
+    //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
+    useEffect(() => {
+      const body = { post_id: post.post_id };
+      // getFromDB(body); DOESNT WORK RN B/C CANT ADD BODY TO GET REQUEST AND IDK WHAT TO DO
+    }, []);
+
     return (
       <Text
         numberOfLines={numberOfLines}
@@ -299,14 +330,16 @@ const PostView = ({ route, navigation }) => {
       <Formik
         initialValues={{
           commentText: '',
-          post_Id: '',
+          post_id: '',
         }}
         onSubmit={(values) => {
           //Setting up information to send to database
           body = {
             commentText: 'Content: ' + values.commentText,
-            post_Id: post.post_id,
+            post_id: post.post_id,
           };
+
+          console.log(body);
 
           sendToDB('comment', body);
         }}
