@@ -89,7 +89,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>Blue Raccoon</Text>
       </View>
       <View style={{ marginLeft: 10 }}>
-        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>8m ago</Text>
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{//TODO: ADD AGE VALUE}m ago</Text>
       </View>
     </View>
   </TouchableOpacity>
@@ -98,7 +98,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
 const FirstRoute = () => {
   //Used to store post data from the Database
   const [postData, setPostData] = useState([]); //useStates can only be defined within functions
-
+  const [postAge, setPostAge] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [refresh, setRefresh] = useState(false); //handle refreshing logic
   const [update, setUpdate] = useState(false);
@@ -151,6 +151,28 @@ const FirstRoute = () => {
 
       //Updates postData to have post information using useState
       setPostData(parseRes.data.post);
+      setPostAge(parseRes.data.postAge); //Post Age looks like "HH:MM:SS.mmmmmm"
+
+      /* TODO: This could be done to turn into MM for screen
+      postAge = postAge.toString();
+      if (postAge.substring(0,1) == "00") {
+        postAge = postAge.substring(3,4);
+        if (postAge.charAt(0) == 0) {
+          postAge = postAge.charAt(1);
+        }
+        postAgetext = postAge + "m";
+      } else {
+        postAge = postAge.substring(0,1);
+        if (postAge.charAt(0) == 0) {
+          postAge = postAge.charAt(1);
+        }
+        postAgetext = postAge + "h";
+      }
+      if ((postAgetext.charAt(postAge.length - 1) != 'h') || (postAgetext.charAt(postAge.length - 1) != 'm')) {
+        console.error(error.message);
+      }
+      */
+
     } catch (error) {
       console.error(error.message);
     }
@@ -181,6 +203,7 @@ const FirstRoute = () => {
         numColumns={1}
         horizontal={false}
         data={postData} /*postData to display*/
+        age={postAge} //TODO: Is this Right?
         keyExtractor={(item) => item.post_id}
         extraData={selectedId}
         renderItem={renderItem}
