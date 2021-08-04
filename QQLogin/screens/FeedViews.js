@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 //Used for local storage to store JWTtoken
@@ -156,15 +156,16 @@ const FirstRoute = () => {
     }
   };
 
-  //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
-  useEffect(() => {
-    getFromDB();
-    console.log('updated');
-    setRefresh(false); //End refresh animation
-  }, [
-    /* Can put values in here that, when updated, will run everything inside useEffect*/
-    update,
-  ]);
+  //useFocusEffect triggers works like useEffect, but only when this screen is focused
+  // this lets us use navigation as the variable to track changes with, so feed updates
+  // whenever the page is loaded
+  useFocusEffect(
+    React.useCallback(() => {
+      getFromDB();
+      console.log('updated');
+      setRefresh(false); //End refresh animation
+    }, [navigation, update]),
+  );
 
   //Handle the logic for what to do when flatlist is refreshed
   const handleRefresh = () => {

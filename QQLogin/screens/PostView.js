@@ -50,43 +50,43 @@ import ListItemSwipeable from 'react-native-elements/dist/list/ListItemSwipeable
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 /* Hardcoded comments */
-const comments = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    user: 'Green Turtle',
-    body: 'David Guetta is playing songs from his new album!',
-    likes: '10',
-    time: '1hr',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Purple Armadillo',
-    body: 'I heard Mr. Worldwide is after this act...',
-    likes: '7',
-    time: '30m',
-  },
-  {
-    id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Yellow Orangutan',
-    body: 'This song is pretty good, what is it?',
-    likes: '2',
-    time: '22m',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    user: 'Blue Donkey',
-    body: "I think this is 'Low' by Flo Rida",
-    likes: '0',
-    time: '15m',
-  },
-  {
-    id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Red Zebra',
-    body: "Blue Donkey must be trolling, this is 'Party Rock Anthem' by LMFAO",
-    likes: '5',
-    time: '13m',
-  },
-];
+// const comments = [
+//   {
+//     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+//     user: 'Green Turtle',
+//     body: 'David Guetta is playing songs from his new album!',
+//     likes: '10',
+//     time: '1hr',
+//   },
+//   {
+//     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Purple Armadillo',
+//     body: 'I heard Mr. Worldwide is after this act...',
+//     likes: '7',
+//     time: '30m',
+//   },
+//   {
+//     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Yellow Orangutan',
+//     body: 'This song is pretty good, what is it?',
+//     likes: '2',
+//     time: '22m',
+//   },
+//   {
+//     id: '58694a0f-3da1-471f-bd96-145571e29d72',
+//     user: 'Blue Donkey',
+//     body: "I think this is 'Low' by Flo Rida",
+//     likes: '0',
+//     time: '15m',
+//   },
+//   {
+//     id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Red Zebra',
+//     body: "Blue Donkey must be trolling, this is 'Party Rock Anthem' by LMFAO",
+//     likes: '5',
+//     time: '13m',
+//   },
+// ];
 
 /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
@@ -95,7 +95,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       style={{ marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent: 'space-between' }}
     >
       {/* (Anonymous) name of the commenter */}
-      <Text style={[styles.name]}>{item.user}</Text>
+      <Text style={[styles.name]}>{item.user_id}</Text>
 
       {/* The ... button for each comment */}
       <TouchableOpacity title="Options" onPress={() => console.log('Clicked on Options')}>
@@ -104,7 +104,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
     </View>
 
     {/* The text for the comment */}
-    <Text style={[styles.commentText, textColor]}>{item.body}</Text>
+    <Text style={[styles.commentText, textColor]}>{item.text}</Text>
 
     {/* The row of when the comment was posted, along with the number of upvotes */}
     <View
@@ -116,7 +116,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         alignContent: 'space-around',
       }}
     >
-      <Text style={[styles.name]}>{item.time} ago</Text>
+      <Text style={[styles.name]}>{item.time_posted} ago</Text>
       <TouchableOpacity
         title="Upvote"
         onPress={() => console.log('Upvoted!')}
@@ -133,6 +133,8 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
   const { post } = route.params;
+  const [comments, SetComments] = useState([]);
+  const [newComments, refreshNewComments] = useState(false);
 
   const getJWT = async () => {
     try {
@@ -149,6 +151,8 @@ const PostView = ({ route, navigation }) => {
   const sendToDB = async (operation, body) => {
     await getJWT();
 
+    console.log(JSON.stringify(body));
+
     //Create a comment on the post
     if (operation === 'comment') {
       try {
@@ -156,12 +160,12 @@ const PostView = ({ route, navigation }) => {
           method: 'POST',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
-          user: 'Purple Elephant',
         });
 
         const parseRes = await response.json();
 
         console.log('COMMENT: ' + JSON.stringify(parseRes));
+        refreshNewComments(!newComments);
       } catch (error) {
         console.error(error.message);
       }
@@ -205,35 +209,6 @@ const PostView = ({ route, navigation }) => {
   /* Controls the size of the font in the original post, so that it fits in the View */
   const AdjustLabel = ({ fontSize, text, style, numberOfLines }) => {
     const [currentFont, setCurrentFont] = useState(fontSize);
-    const [comment, SetComment] = useState([]);
-
-    //Getting comments from the database to show for post
-    const getFromDB = async (body) => {
-      await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
-
-      try {
-        // Update server with user's registration information
-        const response = await fetch('http://' + serverIp + ':5000/feed/all-comment' /*ROUTE NOT SETUP YET*/, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json', token: JWTtoken },
-          body: JSON.stringify(body),
-        });
-
-        //The response includes post information, need in json format
-        const parseRes = await response.json();
-
-        //Updates postData to have post information using useState
-        setComment(parseRes.data.comment);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-
-    //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
-    useEffect(() => {
-      const body = { post_id: post.post_id };
-      // getFromDB(body); DOESNT WORK RN B/C CANT ADD BODY TO GET REQUEST AND IDK WHAT TO DO
-    }, []);
 
     return (
       <Text
@@ -251,6 +226,35 @@ const PostView = ({ route, navigation }) => {
       </Text>
     );
   };
+
+  //Getting comments from the database to show for post
+  const getFromDB = async (body) => {
+    await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
+    const query = 'post_id=' + post.post_id;
+    console.log(query);
+
+    try {
+      // Update server with user's registration information
+      const response = await fetch('http://' + serverIp + ':5000/feed/post-comments?' + query, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+
+      //Updates postData to have post information using useState
+      SetComments(parseRes.data.comment);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
+  useEffect(() => {
+    const body = { post_id: post.post_id };
+    getFromDB(body);
+  }, [newComments]);
 
   /* Controls the look of each "item", or comment in this context */
   const renderItem = ({ item }) => {
@@ -320,7 +324,7 @@ const PostView = ({ route, navigation }) => {
           numColumns={1}
           horizontal={false}
           data={comments}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.comment_id}
           // extraData={id}
           renderItem={renderItem}
         />
@@ -335,11 +339,9 @@ const PostView = ({ route, navigation }) => {
         onSubmit={(values) => {
           //Setting up information to send to database
           body = {
-            commentText: 'Content: ' + values.commentText,
+            commentText: values.commentText,
             post_id: post.post_id,
           };
-
-          console.log(body);
 
           sendToDB('comment', body);
         }}
