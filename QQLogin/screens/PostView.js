@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Touchable,
+  KeyboardAvoidingView,
+} from 'react-native';
 import { MaterialCommunityIcons, EvilIcons } from '@expo/vector-icons';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
 
-//used for testing, hardcoded token value
+//Store Authentication Token
 var JWTtoken = '';
 
 //formik
@@ -228,11 +238,9 @@ const PostView = ({ route, navigation }) => {
   };
 
   //Getting comments from the database to show for post
-  const getFromDB = async (body) => {
+  const getFromDB = async () => {
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
     const query = 'post_id=' + post.post_id;
-    console.log(query);
-
     try {
       // Update server with user's registration information
       const response = await fetch('http://' + serverIp + ':5000/feed/post-comments?' + query, {
@@ -252,8 +260,8 @@ const PostView = ({ route, navigation }) => {
 
   //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
   useEffect(() => {
-    const body = { post_id: post.post_id };
-    getFromDB(body);
+    getFromDB();
+    console.log('Comments Refreshed');
   }, [newComments]);
 
   /* Controls the look of each "item", or comment in this context */
@@ -344,10 +352,14 @@ const PostView = ({ route, navigation }) => {
           };
 
           sendToDB('comment', body);
+          values.commentText = '';
         }}
       >
         {({ handleChange, handleBlur, handleSubmit, values }) => (
-          <View style={{ flex: 0.3, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 0.3, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}
+          >
             <TextInput
               label=""
               icon=""
@@ -358,7 +370,9 @@ const PostView = ({ route, navigation }) => {
               //onSubmitEditing={}
               value={values.commentText}
               selectionColor="#FFCC15"
+              multiline
               style={{
+                maxHeight: 10000,
                 flex: 0.98,
                 color: 'black',
                 backgroundColor: 'white',
@@ -370,12 +384,12 @@ const PostView = ({ route, navigation }) => {
             <EvilIcons
               name="arrow-up"
               size={35}
-              color="black"
+              color={yellow}
               justifyContent="center"
               borderTopWidth={10}
               onPress={handleSubmit}
             />
-          </View>
+          </KeyboardAvoidingView>
         )}
       </Formik>
       <Line />

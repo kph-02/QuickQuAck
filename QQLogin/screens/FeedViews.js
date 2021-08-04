@@ -162,7 +162,7 @@ const FirstRoute = () => {
   useFocusEffect(
     React.useCallback(() => {
       getFromDB();
-      console.log('updated');
+      console.log('Feed Refreshed');
       setRefresh(false); //End refresh animation
     }, [navigation, update]),
   );
