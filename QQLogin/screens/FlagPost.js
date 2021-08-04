@@ -1,8 +1,6 @@
 import React, { useState, Component } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import MultipleChoice from 'react-native-multiple-choice-picker'; 
-//import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {CheckBox} from 'react-native-elements';
 
 
@@ -58,6 +56,8 @@ const FlagPost = ({ navigation }) => {
   const [agree, setAgree] = useState(false);
   const [selectedValue, setSelectedValue] = useState(true);
   const [modalOpen, setModalOpen] = useState(true);
+
+  //Hooks and initial states for the Selectors
   const [checkboxState, setCheckboxState] = useState([
    { label: 'Bullying / Harassment', value: 'harassment', checked: false },
    { label: 'Inappropriate Content', value: 'inappropriate', checked: false },
@@ -133,6 +133,7 @@ const FlagPost = ({ navigation }) => {
     }
   };
 
+  // Function to handle the checked state of Selectors
   const selectorHandler = (value, index) => {
     const newValue = checkboxState.map((selector, i) => {
       if (i !== index)
@@ -162,28 +163,36 @@ const FlagPost = ({ navigation }) => {
     >
       <StyledViewPostContainer>
         <StatusBar style="black" />
+
+        {/* Back Button */}
         <TextLink onPress={() => navigation.pop()} style={{marginLeft: 10, width: 55, paddingHorizontal: 5}}>
             <TextPostContent>Back</TextPostContent>
         </TextLink>
-        {/* <InnerPostContainer style={{backgroundColor: 'yellow'}}> */}
-          {/* <ExtraBackView style={{backgroundColor: 'red'}}> */}
-            
-          {/* </ExtraBackView> */}
+        
+        {/* Flag as Inappropriate Title, with the Flag button across from it */}
         <View style={{flexDirection: 'row', marginTop: 50, width: '100%', alignContent: 'space-between', paddingBottom: 15}}>
             <PageTitleFlag style={{marginLeft: 15, fontSize: 22}}>Flag as inappropriate?</PageTitleFlag>
             <TouchableOpacity onPress={onPressButton} style={{marginLeft: 115}}>
                 <TextPostContent>Flag</TextPostContent>
             </TouchableOpacity>
         </View>
+        
+        {/* Section/Container for Anonymous Username */}
         <View style={{backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1}}>
           <Text style={{marginLeft: 15, color: 'black', fontSize: 14}}>Blue Raccoon</Text>
         </View>
+
+        {/* Section/Container for Text in the Post/Comment to be reported */}
         <View style={{backgroundColor: 'white', paddingVertical: 15 , borderTopColor: '#DADADA', borderTopWidth: 1}}>
           <Text style={{marginLeft: 15, color: 'black', fontSize: 14}}>Who's playing at Sun God today at 7pm?</Text>
         </View>
+
+        {/* Section to separate Post/Comment data from Selectors */}
         <View style={{backgroundColor: '#DADADA', paddingVertical: 15, borderTopColor: '#DADADA'}}>
           <Text style={{marginLeft: 15, color: 'black', fontSize: 14}}>This post falls under:</Text>
         </View>
+
+        {/* Renders the different Flag Selection Choices (selectors/checkboxes) */}
         {checkboxState.map((selector, i) => (
           <View style={{backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1}} key={i}>
             <CheckBox
@@ -198,60 +207,9 @@ const FlagPost = ({ navigation }) => {
             />
           </View>
         ))}
-         <View style={{backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1}}/>
-        
-        
-              {/* <Line style={{backgroundColor: 'black', borderWidth: 3, width: '100%'}}/> */}
-          {/* <StyledPostArea1 style={{backgroundColor: 'dodgerblue'}}> */}
-            {/* <MyTextInput
-              placeholder="Post Title"
-              name="postTitle"
-              style={{}}
-              placeholderTextColor={darkgray}
-              onChangeText={(e) => onChange('postTitle', e)}
-              value={postTitle}
-              selectionColor="#FFCC15"
-            /> */}
 
-            
-
-            {/* <MyTextInput
-              placeholder="Post Text"
-              name="postText"
-              style={{}}
-              placeholderTextColor={darkgray}
-              onChangeText={(e) => onChange('postText', e)}
-              value={postText}
-              selectionColor="#FFCC15"
-            />
-          </StyledPostArea1> */}
-        {/* </InnerPostContainer> */}
-
-        {/* <TagDropdown>
-          <Picker
-            testID="tagdropdown"
-            nativeID="tagdropdown"
-            mode="dialog"
-            prompt="Select a tag"
-            name="tagdropdown"
-            dropdownIconColor={darkgray}
-            selectedValue={postTag}
-            onValueChange={(e) => onChange('postTag', e)}
-          > */}
-            {/* If first value changes, make sure to change inputs initialization as well */}
-            {/* <Picker.Item color={darkgray} label="Revelle" value="Revelle" />
-            <Picker.Item color={darkgray} label="Muir" value="Muir" />
-            <Picker.Item color={darkgray} label="Marshall" value="Marshall" />
-            <Picker.Item color={darkgray} label="Warren" value="Warren" />
-            <Picker.Item color={darkgray} label="ERC" value="ERC" />
-            <Picker.Item color={darkgray} label="Sixth" value="Sixth" />
-            <Picker.Item color={darkgray} label="Seventh" value="Seventh" />
-            <Picker.Item color={darkgray} label="Question" value="Question" />
-            <Picker.Item color={darkgray} label="Poll" value="Poll" />
-            <Picker.Item color={darkgray} label="Food" value="Food" />
-            <Picker.Item color={darkgray} label="Social" value="Social" />
-          </Picker>
-        </TagDropdown> */}
+        {/* Bottom line divider (styling purposes) */}
+        <View style={{backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1}}/>
       </StyledViewPostContainer>
     </Modal>
   );
