@@ -217,7 +217,8 @@ const PostView = ({ navigation }) => {
         {/* The ... button above the original post's text */}
         <TouchableOpacity 
           title="Options" 
-          onPress={() => console.log("Clicked on Options")} 
+          // onPress={() => console.log("Clicked on Options")}
+          onPress={() => navigation.navigate('Flag Post')}
           style={{alignSelf: 'flex-end', marginRight: 20}}
         >
             <MaterialCommunityIcons name="dots-horizontal" color='#BDBDBD' size={height * 0.035}/>

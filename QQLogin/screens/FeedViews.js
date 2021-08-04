@@ -66,10 +66,23 @@ const allposts = [
   },
 ];
 
+//Limits the number of lines and characters that can be shown on each of the post previews on the feed.
+const AdjustTextPreview = ({style, text}) => {
+  return (
+    <Text style={style} numberOfLines={2}>
+      {text.length <= 88
+        ? `${text}`
+        : `${text.substring(0, 85)}...`}
+    </Text>
+  );
+};
+
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
+    {/* View for the text preview of each post as shown on the feed */}
     <View style={{ justifyContent: 'center', marginLeft: 25, marginRight: 25 }}>
-      <Text style={[styles.bodyText, textColor]}>{item.post_text}</Text>
+      <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.post_text}/>
+      {/* <Text style={[styles.bodyText, textColor]}>{item.post_text}</Text> */}
     </View>
     {/* The Data of each Post */}
     <View style={[styles.postTouchables, { backgroundColor: 'white' }]}>
@@ -273,9 +286,6 @@ const styles = StyleSheet.create({
     // marginTop: StatusBar.currentHeight,
     flex: 4,
     justifyContent: 'flex-start',
-  },
-  scene: {
-    flex: 1,
   },
   pageTitle: {
     fontSize: 40,
