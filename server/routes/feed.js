@@ -35,12 +35,35 @@ router.post("/create-post", authorization, async (req, res) => {
       "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
       [postID, postTag]
     );
+    
+    const nameAdjectives = ["Red","Orange","Yellow","Green","Blue","Purple",
+    "Pink","Gray","Turquoise","Brown"];
+    const nameAnimals = ["Dog","Cat","Raccoon","Giraffe","Elephant","Panda",
+    "Koala","Rabbit","Turtle","Fox"];
+    
+    const adjIndex = parseInt(Math.random() * 10);
+    const animalIndex = parseInt(Math.random() * 10);
+
+    let anonAdj = nameAdjectives[adjIndex];
+    let anonAnimal = nameAnimals[animalIndex];
+    const anonName = anonAdj + " " + anonAnimal;
+
+    const createAnonName = await pool.query(
+      "INSERT INTO anon_names (anon_name_id) VALUES ($1) ON CONFLICT DO NOTHING;",
+      [anonName]      
+    );
+
+    const postName = await pool.query(
+      "INSERT INTO post_names (user_id, anon_name_id, post_id) VALUES ($1, $2, $3) RETURNING *;",
+      [author_id, anonName, postID]
+    );
 
     res.status(201).json({
       status: "Post Success",
       data: {
         post: newPost.rows[0],
         tags: postTags.rows[0],
+        anonName: postName.rows[0],
       },
     });
   } catch (err) {
