@@ -160,13 +160,13 @@ router.post("/create-comment", authorization, async (req, res) => {
   }
 });
 
-//Get commits from given post_id
-router.get("/all-comments", authorization, async (req, res) => {
+//Get comments from given post_id as a query parameter
+router.get("/post-comments", authorization, async (req, res) => {
   try {
-    const { post_id } = req.body;
+    const { post_id } = req.query;
 
     const allComment = await pool.query(
-      "SELECT * FROM comment WHERE post_id=(post_id)",
+      "SELECT * FROM comment WHERE post_id=($1)",
       [post_id]
     );
 

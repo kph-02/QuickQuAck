@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useFocusEffect } from '@react-navigation/native';
 //formik
 import { Formik } from 'formik';
 
@@ -89,6 +90,15 @@ const Login = ({ navigation }) => {
       console.error(error.message);
     }
   };
+
+  // Everytime the user navigates to this page, authentication will be removed
+  // By adding an empty string in local storage for token
+  useFocusEffect(
+    React.useCallback(() => {
+      storeToken('');
+      console.log('Cleared Authentication');
+    }, [navigation]),
+  );
 
   return (
     <StyledContainer>
