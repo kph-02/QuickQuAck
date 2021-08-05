@@ -19,14 +19,14 @@ Update Comment(PUT)
 router.post("/create-post", authorization, async (req, res) => {
   try {
     //Reading information contained in post
-    const { postText, postTag } = req.body;
+    const { postText, postTag, num_comments } = req.body;
     const author_id = req.user;
     //Name of the dropdown of the post tag tagdropdown
     //var postTag = req.body.tagdropdown;
 
     const newPost = await pool.query(
-      "INSERT INTO post (post_text, user_id) VALUES ($1, $2) RETURNING *;",
-      [postText, author_id]
+      "INSERT INTO post (post_text, user_id, num_comments) VALUES ($1, $2, $3) RETURNING *;",
+      [postText, author_id, num_comments]
     );
 
     const postID = newPost.rows[0].post_id;
@@ -111,11 +111,24 @@ router.get("/filtered-feed2", authorization, async (req, res) => {
 // update a post
 router.put("/update-post", authorization, async (req, res) => {
   try {
-    const { postId, postText } = req.body;
-    const updatePost = await pool.query(
-      "UPDATE post SET post_text = $1 where post_id = $2",
-      [postText, postId]
-    );
+    const { post_id, postText, num_comments } = req.body;
+
+    //Only update if postText is not empty
+    if (postText) {
+      const updatePost = await pool.query(
+        "UPDATE post SET post_text = $1 where post_id = $2",
+        [postText, post_id]
+      );
+    }
+
+    //Only update if num_comments is not empty
+    if (num_comments) {
+      const updatePost = await pool.query(
+        "UPDATE post SET num_comments = $1 where post_id = $2",
+        [num_comments, post_id]
+      );
+    }
+
     res.status(201).json({
       status: "Update Success",
     });

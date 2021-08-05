@@ -12,55 +12,55 @@ import { serverIp } from './Login.js';
 
 var JWTtoken = ''; //Store JWT for authentication
 
-const homeposts = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    user: 'Blue Raccoon',
-    likes: '2',
-    body: 'This is a sample post!',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Red Monkey',
-    likes: '12',
-    body: "Who's playing at Sun God today at 7pm?",
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    user: 'Purple Unicorn',
-    likes: '21',
-    body: 'Which dining hall has the best special today?',
-  },
-  {
-    id: '58894a0f-3da1-471f-bd96-145571e29d82',
-    user: 'Green Tortoise',
-    likes: '10',
-    body: 'Which dining hall has the best special today?',
-  },
-  {
-    id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Pink Seahorse',
-    likes: '16',
-    body: 'What games do you all play?',
-  },
-  {
-    id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Yellow Squirrel',
-    likes: '25',
-    body: 'Test post lol',
-  },
-];
+// const homeposts = [
+//   {
+//     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+//     user: 'Blue Raccoon',
+//     likes: '2',
+//     body: 'This is a sample post!',
+//   },
+//   {
+//     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Red Monkey',
+//     likes: '12',
+//     body: "Who's playing at Sun God today at 7pm?",
+//   },
+//   {
+//     id: '58694a0f-3da1-471f-bd96-145571e29d72',
+//     user: 'Purple Unicorn',
+//     likes: '21',
+//     body: 'Which dining hall has the best special today?',
+//   },
+//   {
+//     id: '58894a0f-3da1-471f-bd96-145571e29d82',
+//     user: 'Green Tortoise',
+//     likes: '10',
+//     body: 'Which dining hall has the best special today?',
+//   },
+//   {
+//     id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Pink Seahorse',
+//     likes: '16',
+//     body: 'What games do you all play?',
+//   },
+//   {
+//     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Yellow Squirrel',
+//     likes: '25',
+//     body: 'Test post lol',
+//   },
+// ];
 
 const allposts = [
   {
-    id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Pink Seahorse',
+    post_id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user_id: 'Pink Seahorse',
     likes: '16',
     post_text: 'What games do you all play?',
   },
   {
-    id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Yellow Squirrel',
+    post_id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user_id: 'Yellow Squirrel',
     likes: '25',
     post_text: 'Test post lol',
   },
@@ -83,7 +83,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       </View>
       <View style={styles.infoRow}>
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
       </View>
       <View style={[styles.infoRow, { marginLeft: 10 }]}>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>Blue Raccoon</Text>
@@ -135,7 +135,7 @@ const FirstRoute = () => {
     }
   };
 
-  //Communicating with the database to authenticate login
+  //Communicating with the database to get all the posts
   const getFromDB = async () => {
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
 
@@ -164,6 +164,7 @@ const FirstRoute = () => {
       getFromDB();
       console.log('Feed Refreshed');
       setRefresh(false); //End refresh animation
+      setSelectedId(null); //reset Selected Id
     }, [navigation, update]),
   );
 
@@ -198,14 +199,14 @@ const SecondRoute = () => {
   const navigation = useNavigation();
   //renderItem function
   const renderItem = ({ item }) => {
-    const backgroundColor = item.id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const color = item.id === selectedId ? 'white' : 'black';
+    const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
+    const color = item.post_id === selectedId ? 'white' : 'black';
     return (
       <Item
         item={item}
         onPress={() => {
-          setSelectedId(item.id);
-          navigation.navigate('Post View');
+          setSelectedId(item.post_id);
+          navigation.navigate('Post View', { post: item });
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
@@ -222,7 +223,7 @@ const SecondRoute = () => {
         numColumns={1}
         horizontal={false}
         data={allposts}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.post_id}
         extraData={selectedId}
         renderItem={renderItem}
       />
