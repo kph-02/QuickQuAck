@@ -19,14 +19,14 @@ Update Comment(PUT)
 router.post("/create-post", authorization, async (req, res) => {
   try {
     //Reading information contained in post
-    const { postText, postTag } = req.body;
+    const { postText, postTag, num_comments } = req.body;
     const author_id = req.user;
     //Name of the dropdown of the post tag tagdropdown
     //var postTag = req.body.tagdropdown;
 
     const newPost = await pool.query(
-      "INSERT INTO post (post_text, user_id) VALUES ($1, $2) RETURNING *;",
-      [postText, author_id]
+      "INSERT INTO post (post_text, user_id, num_comments) VALUES ($1, $2, $3) RETURNING *;",
+      [postText, author_id, num_comments]
     );
 
     const postID = newPost.rows[0].post_id;
@@ -111,11 +111,24 @@ router.get("/filtered-feed2", authorization, async (req, res) => {
 // update a post
 router.put("/update-post", authorization, async (req, res) => {
   try {
-    const { postId, postText } = req.body;
-    const updatePost = await pool.query(
-      "UPDATE post SET post_text = $1 where post_id = $2",
-      [postText, postId]
-    );
+    const { post_id, postText, num_comments } = req.body;
+
+    //Only update if postText is not empty
+    if (postText) {
+      const updatePost = await pool.query(
+        "UPDATE post SET post_text = $1 where post_id = $2",
+        [postText, post_id]
+      );
+    }
+
+    //Only update if num_comments is not empty
+    if (num_comments) {
+      const updatePost = await pool.query(
+        "UPDATE post SET num_comments = $1 where post_id = $2",
+        [num_comments, post_id]
+      );
+    }
+
     res.status(201).json({
       status: "Update Success",
     });
@@ -138,7 +151,7 @@ router.delete("/delete-post", authorization, async (req, res) => {
       status: "Delete Success",
     });
   } catch (err) {
-    res.status(500).send("Server error");
+    res.status(500).json("Server error");
   }
 });
 
@@ -148,15 +161,41 @@ router.post("/create-comment", authorization, async (req, res) => {
     const { commentText, post_id } = req.body;
     const user_id = req.user;
     const newComment = await pool.query(
-      "INSERT INTO comment (comment_text, user_id, post_id) VALUES ($1, $2, $3) RETURNING *",
+      "INSERT INTO comment (text, user_id, post_id) VALUES ($1, $2, $3) RETURNING *",
       [commentText, user_id, post_id]
     );
     res.status(201).json({
       status: "Comment Success",
     });
   } catch (err) {
-    console.log("Hi");
-    res.status(500).send("Server error");
+    console.log(err.message);
+    res.status(500).json("Server error");
+  }
+});
+
+//Get comments from given post_id as a query parameter
+router.get("/post-comments", authorization, async (req, res) => {
+  try {
+    const { post_id } = req.query;
+
+    const allComment = await pool.query(
+      "SELECT * FROM comment WHERE post_id=($1)",
+      [post_id]
+    );
+
+    /* For future reference, this is how to order by upvotes. */
+    // const allFeed = await pool.query
+    // ("SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
+    // "'24 HOURS' AND NOW() ORDER BY votevalue DESC;");
+
+    res.status(201).json({
+      data: {
+        comment: allComment.rows,
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
   }
 });
 
@@ -183,7 +222,7 @@ router.get("/all-posts", authorization, async (req, res) => {
     });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server Error");
+    res.status(500).json("Server Error");
   }
 });
 
