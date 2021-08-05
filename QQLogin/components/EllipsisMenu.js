@@ -1,50 +1,80 @@
 import React, {useState, Component} from 'react';  
-import {Platform, StyleSheet, Text, View, Button, Modal} from 'react-native';  
+import {Dimensions, Platform, StyleSheet, Text, Alert} from 'react-native';  
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+  renderers,
+} from 'react-native-popup-menu';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
+const {SlideInMenu} = renderers;
 
 
-const EllipsisMenu = ({children}) => {
-    const [isVisible, setVisible] = useState(false);
+const EllipsisMenu = ({navigation}) => {
     return (  
-      <View style = {[styles.container]}>  
-        <Modal            
-          animationType = {"slide"}  
-          transparent = {true}  
-          visible = {isVisible}  
-          onRequestClose = {() =>{ console.log("Modal has been closed.") } }
-          style={{flex: 0.5}}>  
-          {/*All views of Modal*/}  
-          <View style = {styles.modal}>
-            <Text style = {styles.text}>Modal is open!</Text>  
-            <Button title="Click To Close Modal" onPress = {() => {  
-                setVisible(!isVisible)}}/> 
-          </View>  
-        </Modal>  
-        {/*Button will change state to true and view will re-render*/}  
-        <Button   
-           title="Click To Open Modal"   
-           onPress = {() => {setVisible(true)}}  
-        />  
-        {children}
-      </View>  
+    <Menu renderer={SlideInMenu}>
+
+      {/* Slide-in Menu from the bottom is triggered by the Ellipsis (...) button */}
+      <MenuTrigger>
+        <MaterialCommunityIcons name="dots-horizontal" color='#BDBDBD' size={height * 0.035}/>
+      </MenuTrigger>
+
+      {/* Three menu options: Send Message, Flag as inappropriate, Block Posts from User */}
+      <MenuOptions style={{paddingBottom: 25, paddingTop: 8}}>
+
+        {/* Send Message */}
+        <MenuOption 
+          style={{paddingVertical: 10}}
+          onSelect={() => {
+            Alert.alert(
+              "Send Message to User?",
+              "Would you like to send a message to this user?",
+              [
+                {text: 'Yes', onPress: () => console.log("User Pressed Yes")},
+                {text: 'No', onPress: () => console.log("User Pressed No")},
+              ]
+            );
+          }}>
+          <Text style={styles.text}>Send Message</Text>
+        </MenuOption>
+
+        {/* Flag as Inappropriate */}
+        <MenuOption onSelect={() => navigation.navigate('Flag Post')} style={{paddingVertical: 10}}>
+          <Text style={styles.text}>Flag as inappropriate</Text>
+        </MenuOption>
+
+        {/* Block Posts from User */}
+        <MenuOption 
+        style={{paddingVertical: 10}}
+        onSelect={() => {
+          Alert.alert(
+              "Block Posts from User?",
+              "Would you like to block posts from this user?",
+              [
+                {text: 'Yes', onPress: () => console.log("User Pressed Yes")},
+                {text: 'No', onPress: () => console.log("User Pressed No")},
+              ]
+          );
+        }}>
+          <Text style={styles.text}>Block posts from this user</Text>
+        </MenuOption>
+      </MenuOptions>
+    </Menu> 
     );  
 }
-//export default class EllipsisMenu extends Component {  
-//   state = {  
-//     isVisible: false, //state of modal default false  
-//   }  
-//   render() {  
-    
-//   }  
-// }  
+
   
+const {width, height} = Dimensions.get('screen');
+
 const styles = StyleSheet.create({  
   container: {
     flex: 1,
     alignItems: 'center',  
     justifyContent: 'center',  
-    backgroundColor: 'green',  
+    backgroundColor: 'white',  
   },  
   modal: {  
     justifyContent: 'center',  
@@ -60,8 +90,9 @@ const styles = StyleSheet.create({
     marginLeft: 40,  
    },  
    text: {  
-      color: '#3f2949',  
-      marginTop: 10  
+      marginLeft: 30, 
+      color: 'black', 
+      fontSize: height * 0.019
    }  
 });
 

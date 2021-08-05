@@ -170,7 +170,7 @@ const FlagPost = ({ navigation }) => {
         </TextLink>
         
         {/* Flag as Inappropriate Title, with the Flag button across from it */}
-        <View style={{flexDirection: 'row', marginTop: 50, width: '100%', alignContent: 'space-between', paddingBottom: 15}}>
+        <View style={{flexDirection: 'row', marginTop: 45, width: '100%', alignContent: 'space-between', paddingBottom: 20}}>
             <PageTitleFlag style={{marginLeft: 15, fontSize: 22}}>Flag as inappropriate?</PageTitleFlag>
             <TouchableOpacity onPress={onPressButton} style={{marginLeft: 115}}>
                 <TextPostContent>Flag</TextPostContent>

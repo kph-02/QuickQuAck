@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
@@ -45,6 +46,8 @@ import {
 import { Button, View } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import ListItemSwipeable from 'react-native-elements/dist/list/ListItemSwipeable';
+
+import EllipsisMenu from '../components/EllipsisMenu.js';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
@@ -90,17 +93,19 @@ const comments = [
 
 
 /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
-const Item = ({ item, onPress, backgroundColor, textColor }) => (
-  <View style={[styles.item, backgroundColor]}>
+const Item = ({ item, onPress, backgroundColor, textColor }) => {
+  const navigation = useNavigation();
+  return(
+    <View style={[styles.item, backgroundColor]}>
     <View style={{marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent:'space-between'}}>
 
       {/* (Anonymous) name of the commenter */}
       <Text style={[styles.name]}>{item.user}</Text>
 
       {/* The ... button for each comment */}
-      <TouchableOpacity title="Options" onPress={() => console.log("Clicked on Options")}>
-        <MaterialCommunityIcons name="dots-horizontal" color='#BDBDBD' size={height * 0.035}/>
-      </TouchableOpacity>
+      <View>
+        <EllipsisMenu navigation={navigation}/>
+      </View>
     </View>
 
     {/* The text for the comment */}
@@ -115,7 +120,8 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       </TouchableOpacity>
     </View>
   </View>
-);
+  );
+};
 
 
 const PostView = ({ navigation }) => {
@@ -215,14 +221,9 @@ const PostView = ({ navigation }) => {
 
         
         {/* The ... button above the original post's text */}
-        <TouchableOpacity 
-          title="Options" 
-          // onPress={() => console.log("Clicked on Options")}
-          onPress={() => navigation.navigate('Flag Post')}
-          style={{alignSelf: 'flex-end', marginRight: 20}}
-        >
-            <MaterialCommunityIcons name="dots-horizontal" color='#BDBDBD' size={height * 0.035}/>
-        </TouchableOpacity>
+        <View style={{alignSelf: 'flex-end', marginRight: 20}}>
+            <EllipsisMenu navigation={navigation}/>
+        </View>
 
         {/* The Original Post's Text */}
         <View style={styles.postBox}>
