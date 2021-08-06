@@ -44,6 +44,7 @@ import {
 import { Button, View, Modal, StyleSheet } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import { Picker } from '@react-native-picker/picker';
+import MultiSelect from 'react-native-multiple-select';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
@@ -124,6 +125,28 @@ const CreatePost = ({ navigation }) => {
     }
   };
 
+  const items = [
+    //list of items for the select list
+    { id: 'Revelle', name: 'Revelle' },
+    { id: 'Muir', name: 'Muir' },
+    { id: 'Marshall', name: 'Marshall' },
+    { id: 'Warren', name: 'Warren' },
+    { id: 'ERC', name: 'ERC' },
+    { id: 'Sixth', name: 'Sixth' },
+    { id: 'Seventh', name: 'Seventh' },
+    { id: 'Question', name: 'Question' },
+    { id: 'Poll', name: 'Poll' },
+    { id: 'Food', name: 'Food' },
+    { id: 'Social', name: 'Social' },
+  ];
+
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  const onSelectedItemsChange = (selectedItems) => {
+    // Set Selected Items
+    setSelectedItems(selectedItems);
+  };
+
   return (
     <Modal
       transparent={true}
@@ -172,29 +195,16 @@ const CreatePost = ({ navigation }) => {
         </InnerPostContainer>
 
         <TagDropdown>
-          <Picker
-            testID="tagdropdown"
-            nativeID="tagdropdown"
-            mode="dialog"
-            prompt="Select a tag"
-            name="tagdropdown"
-            dropdownIconColor={darkgray}
-            selectedValue={postTag}
-            onValueChange={(e) => onChange('postTag', e)}
-          >
-            {/* If first value changes, make sure to change inputs initialization as well */}
-            <Picker.Item color={darkgray} label="Revelle" value="Revelle" />
-            <Picker.Item color={darkgray} label="Muir" value="Muir" />
-            <Picker.Item color={darkgray} label="Marshall" value="Marshall" />
-            <Picker.Item color={darkgray} label="Warren" value="Warren" />
-            <Picker.Item color={darkgray} label="ERC" value="ERC" />
-            <Picker.Item color={darkgray} label="Sixth" value="Sixth" />
-            <Picker.Item color={darkgray} label="Seventh" value="Seventh" />
-            <Picker.Item color={darkgray} label="Question" value="Question" />
-            <Picker.Item color={darkgray} label="Poll" value="Poll" />
-            <Picker.Item color={darkgray} label="Food" value="Food" />
-            <Picker.Item color={darkgray} label="Social" value="Social" />
-          </Picker>
+          <MultiSelect
+            hideSubmitButton
+            items={items}
+            uniqueKey="name"
+            selectedItems={postTag}
+            onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)}
+            selectText="Pick a tag"
+            searchInputPlaceholderText="Select tags"
+            onToggleList = {console.log(moo)}
+          ></MultiSelect>
         </TagDropdown>
       </StyledContainer>
     </Modal>
