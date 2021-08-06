@@ -11,7 +11,7 @@ import Signup from '../screens/Signup';
 import Login from '../screens/Login';
 import { createStackNavigator } from '@react-navigation/stack';
 import FeedViews from '../screens/FeedViews';
-
+import Messages from '../screens/Messages';
 
 // const FeedStack = createStackNavigator();
 // function FeedStackScreen() {
@@ -71,7 +71,7 @@ export default function TabNav() {
                   ),
               }}
         />
-        <Tab.Screen name="Messages" component={MessagesScreen} 
+        <Tab.Screen name="Messages" component={Messages} 
             options={{
                   tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons name="forum-outline" color={color} size={26} />

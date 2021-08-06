@@ -16,6 +16,7 @@ import PostView from './../screens/PostView';
 import FeedViews from '../screens/FeedViews';
 import FlagPost from '../screens/FlagPost';
 import EllipsisMenu from '../components/EllipsisMenu';
+import ChatRoom from '../screens/ChatRoom';
 
 const Stack = createStackNavigator();
 
@@ -37,6 +38,7 @@ const RootStack = () => {
                 <Stack.Screen name="Feed Views" component={FeedViews} />
                 <Stack.Screen name="Flag Post" component={FlagPost} />
                 <Stack.Screen name="Menu" component={EllipsisMenu} />
+                <Stack.Screen name="Chat" component={ChatRoom} />
         </Stack.Navigator>
        
     )
