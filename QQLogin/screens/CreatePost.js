@@ -80,8 +80,12 @@ const CreatePost = ({ navigation }) => {
   const onPressButton = async (e) => {
     e.preventDefault();
 
-    sendToDB(inputs);
-    navigation.navigate('TabNav', { Screen: 'Feed' });
+    if (inputs.postText) {
+      sendToDB(inputs);
+      navigation.navigate('TabNav', { Screen: 'Feed' });
+    } else {
+      alert('Can not submit an empty post!');
+    }
   };
 
   //Getting JWT from local storage, must exist otherwise user can't be on this page

@@ -127,6 +127,8 @@ router.put("/update-post", authorization, async (req, res) => {
         "UPDATE post SET num_comments = $1 where post_id = $2",
         [num_comments, post_id]
       );
+
+      console.log("value: " + num_comments);
     }
 
     res.status(201).json({

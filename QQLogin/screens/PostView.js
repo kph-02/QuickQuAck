@@ -104,43 +104,44 @@ const commentExamples = [
 /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
 const Item = ({ item, onPress, backgroundColor, textColor }) => {
   const navigation = useNavigation();
-  return(
+  return (
     <View style={[styles.item, backgroundColor]}>
-    <View style={{marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent:'space-between'}}>
+      <View
+        style={{ marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent: 'space-between' }}
+      >
+        {/* (Anonymous) name of the commenter */}
+        <Text style={[styles.name]}>{item.user_id}</Text>
 
-      {/* (Anonymous) name of the commenter */}
-      <Text style={[styles.name]}>{item.user_id}</Text>
+        {/* The ... button for each comment */}
+        <View>
+          <EllipsisMenu navigation={navigation} />
+        </View>
+      </View>
 
-      {/* The ... button for each comment */}
-      <View>
-        <EllipsisMenu navigation={navigation}/>
+      {/* The text for the comment */}
+      <Text style={[styles.commentText, textColor]}>{item.text}</Text>
+
+      {/* The row of when the comment was posted, along with the number of upvotes */}
+      <View
+        style={{
+          flexDirection: 'row',
+          marginTop: 10,
+          alignItems: 'center',
+          marginLeft: 20,
+          alignContent: 'space-around',
+        }}
+      >
+        <Text style={[styles.name]}>{item.time_posted} ago</Text>
+        <TouchableOpacity
+          title="Upvote"
+          onPress={() => console.log('Upvoted!')}
+          style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
+        >
+          <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
+          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.likes}</Text>
+        </TouchableOpacity>
       </View>
     </View>
-
-    {/* The text for the comment */}
-    <Text style={[styles.commentText, textColor]}>{item.text}</Text>
-
-    {/* The row of when the comment was posted, along with the number of upvotes */}
-    <View
-      style={{
-        flexDirection: 'row',
-        marginTop: 10,
-        alignItems: 'center',
-        marginLeft: 20,
-        alignContent: 'space-around',
-      }}
-    >
-      <Text style={[styles.name]}>{item.time_posted} ago</Text>
-      <TouchableOpacity
-        title="Upvote"
-        onPress={() => console.log('Upvoted!')}
-        style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
-      >
-        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
-        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.likes}</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
   );
 };
 
@@ -267,7 +268,7 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
-  //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
+  //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
     getFromDB();
     console.log('Comments Refreshed');
@@ -282,7 +283,7 @@ const PostView = ({ route, navigation }) => {
 
   const updateNumComments = () => {
     const body = {
-      postId: post.post_id,
+      post_id: post.post_id,
       num_comments: comments.length,
     };
 
@@ -304,9 +305,9 @@ const PostView = ({ route, navigation }) => {
       <StatusBar style="black" />
 
       {/* The ... button above the original post's text */}
-        <View style={{alignSelf: 'flex-end', marginRight: 20}}>
-            <EllipsisMenu navigation={navigation}/>
-        </View>
+      <View style={{ alignSelf: 'flex-end', marginRight: 20 }}>
+        <EllipsisMenu navigation={navigation} />
+      </View>
 
       {/* The Original Post's Text */}
       <View style={styles.postBox}>
