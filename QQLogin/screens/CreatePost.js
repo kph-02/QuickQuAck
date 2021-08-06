@@ -59,9 +59,7 @@ const CreatePost = ({ navigation }) => {
   //Getting user input
   const [inputs, setInputs] = useState({
     //Values needed to create post (../server/routes/feed.js)
-    //postTitle: '',
     postText: '',
-    //author_id: '',
     postTag: 'Revelle' /*Initialize as first value in tags drop-down*/,
     num_comments: 0 /*0 comments to begin with, updated when new comments added */,
   });
@@ -69,18 +67,18 @@ const CreatePost = ({ navigation }) => {
   var JWTtoken = '';
 
   //Stores values to update input fields from user
-  //const { postTitle, postText, author_id, postTag } = inputs;
   const { postText, postTag } = inputs;
 
-  //Update inputs when user enters new ones, name is identifier, value as a string
+  //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
   const onChange = (name, value) => {
     setInputs({ ...inputs, [name]: value });
   };
 
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); //prevent refresh
 
+    //Check if the post has content, if not, prevent submission and notify
     if (inputs.postText) {
       sendToDB(inputs);
       navigation.navigate('TabNav', { Screen: 'Feed' });
@@ -101,16 +99,15 @@ const CreatePost = ({ navigation }) => {
     }
   };
 
-  //communicate registration information with the database
+  //Send post information created by user to the database
   const sendToDB = async (body) => {
-    await getJWT();
-    //body.author_id = JWTtoken; //Temp set to JWTtoken, change later maybe?
+    await getJWT(); //get Token
 
     // console.log('Inputs: ' + JSON.stringify(inputs));
 
     try {
       // console.log('Sent Token:      ' + JWTtoken);
-      // Update server with user's registration information
+      // Send post info to DB
       const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
         method: 'POST',
         headers: { token: JWTtoken, 'content-type': 'application/json' },
@@ -119,7 +116,7 @@ const CreatePost = ({ navigation }) => {
 
       const parseRes = await response.json();
 
-      console.log(parseRes);
+      // console.log(parseRes);
     } catch (error) {
       console.error(error.message);
     }
@@ -187,7 +184,7 @@ const CreatePost = ({ navigation }) => {
               name="postText"
               style={{}}
               placeholderTextColor={darkgray}
-              onChangeText={(e) => onChange('postText', e)}
+              onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
               value={postText}
               selectionColor="#FFCC15"
             />
@@ -195,16 +192,18 @@ const CreatePost = ({ navigation }) => {
         </InnerPostContainer>
 
         <TagDropdown>
-          <MultiSelect
-            hideSubmitButton
-            items={items}
-            uniqueKey="name"
-            selectedItems={postTag}
-            onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)}
-            selectText="Pick a tag"
-            searchInputPlaceholderText="Select tags"
-            onToggleList = {console.log(moo)}
-          ></MultiSelect>
+          {
+            <MultiSelect
+              hideSubmitButton
+              items={items}
+              uniqueKey="name"
+              selectedItems={postTag}
+              onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
+              selectedItems={selectedItems}
+              onSelectedItemsChange={onSelectedItemsChange}
+              // onToggleList = {console.log(moo)}
+            ></MultiSelect>
+          }
         </TagDropdown>
       </StyledContainer>
     </Modal>

@@ -148,9 +148,9 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => {
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
-  const { post } = route.params;
-  const [comments, SetComments] = useState([]);
-  const [newComments, refreshNewComments] = useState(false);
+  const { post } = route.params; //post data
+  const [comments, SetComments] = useState([]); //stores all comments for the post
+  const [newComments, refreshNewComments] = useState(false); //determines when to get new comments from db
 
   const getJWT = async () => {
     try {
@@ -162,8 +162,14 @@ const PostView = ({ route, navigation }) => {
       console.error(error.message);
     }
   };
-  //communicate registration information with the database
 
+  /*Send information to the DB
+    operation: What operation is being done: 
+      comment: creating a comment
+      update: updating the post
+      delete: deleting the post
+    body: information to send to the DB
+  */
   const sendToDB = async (operation, body) => {
     await getJWT();
 
@@ -181,7 +187,7 @@ const PostView = ({ route, navigation }) => {
         const parseRes = await response.json();
 
         console.log('COMMENT: ' + JSON.stringify(parseRes));
-        refreshNewComments(!newComments);
+        refreshNewComments(!newComments); //update the page with the new comment
       } catch (error) {
         console.error(error.message);
       }
@@ -199,6 +205,8 @@ const PostView = ({ route, navigation }) => {
         const parseRes = await response.json();
 
         console.log('UPDATE: ' + parseRes.status);
+
+        //NEED TO UPDATE CURRENT VIEW
       } catch (error) {
         console.error(error.message);
       }
@@ -216,6 +224,8 @@ const PostView = ({ route, navigation }) => {
         const parseRes = await response.json();
 
         console.log('DELETE' + parseRes);
+
+        navigation.navigate('Feed');
       } catch (error) {
         console.error(error.message);
       }
@@ -246,7 +256,7 @@ const PostView = ({ route, navigation }) => {
   //Getting comments from the database to show for post
   const getFromDB = async () => {
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
-    const query = 'post_id=' + post.post_id;
+    const query = 'post_id=' + post.post_id; //sets up query information
     try {
       // Update server with user's registration information
       const response = await fetch('http://' + serverIp + ':5000/feed/post-comments?' + query, {
@@ -258,6 +268,7 @@ const PostView = ({ route, navigation }) => {
       const parseRes = await response.json();
 
       //Updates postData to have post information using useState
+      //temporary if statement just so second view might work, will delete soon
       if (parseRes.data) {
         SetComments(parseRes.data.comment);
       } else {
@@ -281,6 +292,7 @@ const PostView = ({ route, navigation }) => {
     return <Item item={item} backgroundColor={{ backgroundColor }} textColor={{ color }} />;
   };
 
+  //Update the number of comments on a post in the database
   const updateNumComments = () => {
     const body = {
       post_id: post.post_id,

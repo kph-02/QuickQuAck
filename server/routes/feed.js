@@ -35,12 +35,32 @@ router.post("/create-post", authorization, async (req, res) => {
       "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
       [postID, postTag]
     );
-    
-    const nameAdjectives = ["Red","Orange","Yellow","Green","Blue","Purple",
-    "Pink","Gray","Turquoise","Brown"];
-    const nameAnimals = ["Dog","Cat","Raccoon","Giraffe","Elephant","Panda",
-    "Koala","Rabbit","Turtle","Fox"];
-    
+
+    const nameAdjectives = [
+      "Red",
+      "Orange",
+      "Yellow",
+      "Green",
+      "Blue",
+      "Purple",
+      "Pink",
+      "Gray",
+      "Turquoise",
+      "Brown",
+    ];
+    const nameAnimals = [
+      "Dog",
+      "Cat",
+      "Raccoon",
+      "Giraffe",
+      "Elephant",
+      "Panda",
+      "Koala",
+      "Rabbit",
+      "Turtle",
+      "Fox",
+    ];
+
     const adjIndex = parseInt(Math.random() * 10);
     const animalIndex = parseInt(Math.random() * 10);
 
@@ -50,7 +70,7 @@ router.post("/create-post", authorization, async (req, res) => {
 
     const createAnonName = await pool.query(
       "INSERT INTO anon_names (anon_name_id) VALUES ($1) ON CONFLICT DO NOTHING;",
-      [anonName]      
+      [anonName]
     );
 
     const postName = await pool.query(

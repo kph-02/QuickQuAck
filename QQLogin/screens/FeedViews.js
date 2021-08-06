@@ -67,12 +67,10 @@ const allposts = [
 ];
 
 //Limits the number of lines and characters that can be shown on each of the post previews on the feed.
-const AdjustTextPreview = ({style, text}) => {
+const AdjustTextPreview = ({ style, text }) => {
   return (
     <Text style={style} numberOfLines={2}>
-      {text.length <= 88
-        ? `${text}`
-        : `${text.substring(0, 85)}...`}
+      {text.length <= 88 ? `${text}` : `${text.substring(0, 85)}...`}
     </Text>
   );
 };
@@ -81,7 +79,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     {/* View for the text preview of each post as shown on the feed */}
     <View style={{ justifyContent: 'center', marginLeft: 25, marginRight: 25 }}>
-      <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.post_text}/>
+      <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.post_text} />
       {/* <Text style={[styles.bodyText, textColor]}>{item.post_text}</Text> */}
     </View>
     {/* The Data of each Post */}
@@ -109,23 +107,27 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
 );
 
 const FirstRoute = () => {
-  //Used to store post data from the Database
-  const [postData, setPostData] = useState([]); //useStates can only be defined within functions
-  const [postAge, setPostAge] = useState([]);
-  const [selectedId, setSelectedId] = useState(null);
-  const [refresh, setRefresh] = useState(false); //handle refreshing logic
-  const [update, setUpdate] = useState(false);
+  //useStates can only be defined within functions
+  const [postData, setPostData] = useState([]); //Store post data from the Database
+  const [postAge, setPostAge] = useState([]); //Stores the age of the post
+  const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
+  const [refresh, setRefresh] = useState(false); //Handle refreshing logic
+  const [update, setUpdate] = useState(false); //Changing will feed to update
   const navigation = useNavigation();
 
-  //renderItem function
+  //renderItem function for each item passed through
   const renderItem = ({ item }) => {
     const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
     const color = item.post_id === selectedId ? 'white' : 'black';
     return (
       <Item
+        //destructure the item
         item={item}
+        //Functionality for when a post is pressed
         onPress={() => {
           setSelectedId(item.post_id);
+
+          //navigate to post view page, sends through post information as parameter
           navigation.navigate('Post View', { post: item });
         }}
         backgroundColor={{ backgroundColor }}
@@ -153,7 +155,7 @@ const FirstRoute = () => {
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
 
     try {
-      // Update server with user's registration information
+      // Gets all of the post information from the database for the feed
       const response = await fetch('http://' + serverIp + ':5000/feed/all-posts', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
@@ -162,8 +164,18 @@ const FirstRoute = () => {
       //The response includes post information, need in json format
       const parseRes = await response.json();
 
-      //Updates postData to have post information using useState
+      console.log(JSON.stringify(parseRes));
+
       setPostData(parseRes.data.post);
+
+      /*
+       *"post":[
+       * {"post_id":,
+       * "user_id":,
+       * "post_text":,
+       * "num_comments":,
+       * "time_posted":
+       * */
       setPostAge(parseRes.data.postAge); //Post Age looks like "HH:MM:SS.mmmmmm"
 
       /* TODO: This could be done to turn into MM for screen
@@ -185,7 +197,6 @@ const FirstRoute = () => {
         console.error(error.message);
       }
       */
-
     } catch (error) {
       console.error(error.message);
     }
