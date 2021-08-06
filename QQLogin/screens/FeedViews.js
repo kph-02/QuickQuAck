@@ -102,7 +102,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>Blue Raccoon</Text>
       </View>
       <View style={{ marginLeft: 10 }}>
-        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{//TODO: ADD AGE VALUE}m ago</Text>
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{}8m ago</Text>
       </View>
     </View>
   </TouchableOpacity>
