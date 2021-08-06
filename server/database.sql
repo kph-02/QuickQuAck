@@ -28,6 +28,7 @@ CREATE TABLE post (
     post_id BIGSERIAL,
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
+    num_comments INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
@@ -90,4 +91,20 @@ CREATE TABLE user_tags (
     FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+--Correct?
+CREATE TABLE anon_names (
+    anon_name_id VARCHAR(25) NOT NULL,
+    PRIMARY KEY(anon_name_id)
+);
+
+
+CREATE TABLE post_names (
+    user_id uuid NOT NULL,
+    anon_name_id VARCHAR(25) NOT NULL,
+    post_id INTEGER NOT NULL,
+    PRIMARY KEY (user_id, anon_name_id, post_id),
+    FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(anon_name_id) REFERENCES anon_names(anon_name_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
 

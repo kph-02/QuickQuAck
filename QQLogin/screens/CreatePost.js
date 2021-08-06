@@ -62,7 +62,8 @@ const CreatePost = ({ navigation }) => {
     //postTitle: '',
     postText: '',
     //author_id: '',
-    postTag: ["Revelle"] /*Initialize as first value in tags drop-down*/,
+    postTag: 'Revelle' /*Initialize as first value in tags drop-down*/,
+    num_comments: 0 /*0 comments to begin with, updated when new comments added */,
   });
 
   var JWTtoken = '';
@@ -80,10 +81,12 @@ const CreatePost = ({ navigation }) => {
   const onPressButton = async (e) => {
     e.preventDefault();
 
-    sendToDB(inputs);
-    console.log("moop")
-    navigation.navigate('TabNav', { Screen: 'Feed' });
-
+    if (inputs.postText) {
+      sendToDB(inputs);
+      navigation.navigate('TabNav', { Screen: 'Feed' });
+    } else {
+      alert('Can not submit an empty post!');
+    }
   };
 
   //Getting JWT from local storage, must exist otherwise user can't be on this page

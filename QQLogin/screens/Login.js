@@ -118,6 +118,10 @@ const Login = ({ navigation }) => {
               password: values.password,
             };
 
+            //Reset text fields
+            values.email = '';
+            values.password = '';
+
             sendToDB(body);
           }}
         >

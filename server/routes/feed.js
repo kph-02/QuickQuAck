@@ -19,14 +19,14 @@ Update Comment(PUT)
 router.post("/create-post", authorization, async (req, res) => {
   try {
     //Reading information contained in post
-    const { postText, postTag } = req.body;
+    const { postText, postTag, num_comments } = req.body;
     const author_id = req.user;
     //Name of the dropdown of the post tag tagdropdown
     //var postTag = req.body.tagdropdown;
 
     const newPost = await pool.query(
-      "INSERT INTO post (post_text, user_id) VALUES ($1, $2) RETURNING *;",
-      [postText, author_id]
+      "INSERT INTO post (post_text, user_id, num_comments) VALUES ($1, $2, $3) RETURNING *;",
+      [postText, author_id, num_comments]
     );
 
     const postID = newPost.rows[0].post_id;
@@ -35,12 +35,35 @@ router.post("/create-post", authorization, async (req, res) => {
       "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
       [postID, postTag]
     );
+    
+    const nameAdjectives = ["Red","Orange","Yellow","Green","Blue","Purple",
+    "Pink","Gray","Turquoise","Brown"];
+    const nameAnimals = ["Dog","Cat","Raccoon","Giraffe","Elephant","Panda",
+    "Koala","Rabbit","Turtle","Fox"];
+    
+    const adjIndex = parseInt(Math.random() * 10);
+    const animalIndex = parseInt(Math.random() * 10);
+
+    let anonAdj = nameAdjectives[adjIndex];
+    let anonAnimal = nameAnimals[animalIndex];
+    const anonName = anonAdj + " " + anonAnimal;
+
+    const createAnonName = await pool.query(
+      "INSERT INTO anon_names (anon_name_id) VALUES ($1) ON CONFLICT DO NOTHING;",
+      [anonName]      
+    );
+
+    const postName = await pool.query(
+      "INSERT INTO post_names (user_id, anon_name_id, post_id) VALUES ($1, $2, $3) RETURNING *;",
+      [author_id, anonName, postID]
+    );
 
     res.status(201).json({
       status: "Post Success",
       data: {
         post: newPost.rows[0],
         tags: postTags.rows[0],
+        anonName: postName.rows[0],
       },
     });
   } catch (err) {
@@ -111,11 +134,26 @@ router.get("/filtered-feed2", authorization, async (req, res) => {
 // update a post
 router.put("/update-post", authorization, async (req, res) => {
   try {
-    const { postId, postText } = req.body;
-    const updatePost = await pool.query(
-      "UPDATE post SET post_text = $1 where post_id = $2",
-      [postText, postId]
-    );
+    const { post_id, postText, num_comments } = req.body;
+
+    //Only update if postText is not empty
+    if (postText) {
+      const updatePost = await pool.query(
+        "UPDATE post SET post_text = $1 where post_id = $2",
+        [postText, post_id]
+      );
+    }
+
+    //Only update if num_comments is not empty
+    if (num_comments) {
+      const updatePost = await pool.query(
+        "UPDATE post SET num_comments = $1 where post_id = $2",
+        [num_comments, post_id]
+      );
+
+      console.log("value: " + num_comments);
+    }
+
     res.status(201).json({
       status: "Update Success",
     });
