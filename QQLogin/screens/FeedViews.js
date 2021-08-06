@@ -85,31 +85,56 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
     {/* The Data of each Post */}
     <View style={[styles.postTouchables, { backgroundColor: 'white' }]}>
       <View style={[styles.infoRow, { marginRight: 5 }]}>
+        {/*number of people who've viewed the post*/}
         <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
       </View>
       <View style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}>
+        {/*number of upvotes*/}
         <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>21</Text>
       </View>
       <View style={styles.infoRow}>
+        {/*number of comments*/}
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
       </View>
       <View style={[styles.infoRow, { marginLeft: 10 }]}>
-        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>Blue Raccoon</Text>
+        {/*Anonymous name of user*/}
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.anon_name}</Text>
       </View>
       <View style={{ marginLeft: 10 }}>
-        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{}8m ago</Text>
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
       </View>
     </View>
   </TouchableOpacity>
 );
 
+//format the time of the post from the database to display it to the screen
+const formatTime = (post_age) => {
+  let postAgeDisplay = '';
+
+  //check if it exists b/c sometimes called before objects rendered so is undefined
+  if (post_age) {
+    if (post_age.hours) {
+      postAgeDisplay += post_age.hours + 'h ';
+    }
+    if (post_age.minutes) {
+      postAgeDisplay += post_age.minutes + 'm ';
+    }
+    if (post_age.seconds) {
+      postAgeDisplay += post_age.seconds + 's ';
+    }
+
+    postAgeDisplay += 'ago';
+  }
+
+  return postAgeDisplay;
+};
+
 const FirstRoute = () => {
   //useStates can only be defined within functions
   const [postData, setPostData] = useState([]); //Store post data from the Database
-  const [postAge, setPostAge] = useState([]); //Stores the age of the post
   const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
   const [update, setUpdate] = useState(false); //Changing will feed to update
@@ -164,10 +189,6 @@ const FirstRoute = () => {
       //The response includes post information, need in json format
       const parseRes = await response.json();
 
-      console.log(JSON.stringify(parseRes));
-
-      setPostData(parseRes.data.post);
-
       /*
        *"post":[
        * {"post_id":,
@@ -175,28 +196,17 @@ const FirstRoute = () => {
        * "post_text":,
        * "num_comments":,
        * "time_posted":
+       *
+       * "anon_name:""
+       *
+       * "post_age":[
+       * hours:
+       * minutes:
+       * seconds:
+       * milliseconds
+       * ]
        * */
-      setPostAge(parseRes.data.postAge); //Post Age looks like "HH:MM:SS.mmmmmm"
-
-      /* TODO: This could be done to turn into MM for screen
-      postAge = postAge.toString();
-      if (postAge.substring(0,1) == "00") {
-        postAge = postAge.substring(3,4);
-        if (postAge.charAt(0) == 0) {
-          postAge = postAge.charAt(1);
-        }
-        postAgetext = postAge + "m";
-      } else {
-        postAge = postAge.substring(0,1);
-        if (postAge.charAt(0) == 0) {
-          postAge = postAge.charAt(1);
-        }
-        postAgetext = postAge + "h";
-      }
-      if ((postAgetext.charAt(postAge.length - 1) != 'h') || (postAgetext.charAt(postAge.length - 1) != 'm')) {
-        console.error(error.message);
-      }
-      */
+      setPostData(parseRes.data.post);
     } catch (error) {
       console.error(error.message);
     }
@@ -229,7 +239,6 @@ const FirstRoute = () => {
         numColumns={1}
         horizontal={false}
         data={postData} /*postData to display*/
-        age={postAge} //TODO: Is this Right?
         keyExtractor={(item) => item.post_id}
         extraData={selectedId}
         renderItem={renderItem}
