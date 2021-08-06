@@ -108,23 +108,23 @@ const Welcome = ({ navigation }) => {
 
   const [selectedId, setSelectedId] = useState(null);
 
-  //renderItem function
-  const renderItem = ({ item }) => {
-    const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const color = item.post_id === selectedId ? 'white' : 'black';
+  // renderItem function, not needed rn, too scared to delete it
+  // const renderItem = ({ item }) => {
+  //   const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
+  //   const color = item.post_id === selectedId ? 'white' : 'black';
 
-    return (
-      <Item
-        item={item}
-        onPress={() => {
-          setSelectedId(item.id);
-          navigation.navigate('Post View');
-        }}
-        backgroundColor={{ backgroundColor }}
-        textColor={{ color }}
-      />
-    );
-  };
+  //   return (
+  //     <Item
+  //       item={item}
+  //       onPress={() => {
+  //         setSelectedId(item.id);
+  //         navigation.navigate('Post View');
+  //       }}
+  //       backgroundColor={{ backgroundColor }}
+  //       textColor={{ color }}
+  //     />
+  //   );
+  // };
 
   return (
     <StyledFeedContainer>
