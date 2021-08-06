@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Touchable,
+  KeyboardAvoidingView,
+} from 'react-native';
 import { MaterialCommunityIcons, EvilIcons } from '@expo/vector-icons';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
 
-//used for testing, hardcoded token value
+//Store Authentication Token
 var JWTtoken = '';
 
 //formik
@@ -46,93 +57,100 @@ import { Button, View, TextInput } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import ListItemSwipeable from 'react-native-elements/dist/list/ListItemSwipeable';
 
+import EllipsisMenu from '../components/EllipsisMenu.js';
+
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 /* Hardcoded comments */
-const comments = [
+const commentExamples = [
   {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    user: 'Green Turtle',
-    body: 'David Guetta is playing songs from his new album!',
+    comment_id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+    user_id: 'Green Turtle',
+    text: 'David Guetta is playing songs from his new album!',
     likes: '10',
     time: '1hr',
   },
   {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Purple Armadillo',
-    body: 'I heard Mr. Worldwide is after this act...',
+    comment_id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user_id: 'Purple Armadillo',
+    text: 'I heard Mr. Worldwide is after this act...',
     likes: '7',
     time: '30m',
   },
   {
-    id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Yellow Orangutan',
-    body: 'This song is pretty good, what is it?',
+    comment_id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user_id: 'Yellow Orangutan',
+    text: 'This song is pretty good, what is it?',
     likes: '2',
     time: '22m',
   },
   {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    user: 'Blue Donkey',
-    body: "I think this is 'Low' by Flo Rida",
+    comment_id: '58694a0f-3da1-471f-bd96-145571e29d72',
+    user_id: 'Blue Donkey',
+    text: "I think this is 'Low' by Flo Rida",
     likes: '0',
     time: '15m',
   },
   {
-    id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Red Zebra',
-    body: "Blue Donkey must be trolling, this is 'Party Rock Anthem' by LMFAO",
+    comment_id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user_id: 'Red Zebra',
+    text: "Blue Donkey must be trolling, this is 'Party Rock Anthem' by LMFAO",
     likes: '5',
     time: '13m',
   },
 ];
 
 /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
-const Item = ({ item, onPress, backgroundColor, textColor }) => (
-  <View style={[styles.item, backgroundColor]}>
-    <View
-      style={{ marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent: 'space-between' }}
-    >
-      {/* (Anonymous) name of the commenter */}
-      <Text style={[styles.name]}>{item.user}</Text>
-
-      {/* The ... button for each comment */}
-      <TouchableOpacity title="Options" onPress={() => console.log('Clicked on Options')}>
-        <MaterialCommunityIcons name="dots-horizontal" color="#BDBDBD" size={height * 0.035} />
-      </TouchableOpacity>
-    </View>
-
-    {/* The text for the comment */}
-    <Text style={[styles.commentText, textColor]}>{item.body}</Text>
-
-    {/* The row of when the comment was posted, along with the number of upvotes */}
-    <View
-      style={{
-        flexDirection: 'row',
-        marginTop: 10,
-        alignItems: 'center',
-        marginLeft: 20,
-        alignContent: 'space-around',
-      }}
-    >
-      <Text style={[styles.name]}>{item.time} ago</Text>
-      <TouchableOpacity
-        title="Upvote"
-        onPress={() => console.log('Upvoted!')}
-        style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
+const Item = ({ item, onPress, backgroundColor, textColor }) => {
+  const navigation = useNavigation();
+  return (
+    <View style={[styles.item, backgroundColor]}>
+      <View
+        style={{ marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent: 'space-between' }}
       >
-        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
-        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.likes}</Text>
-      </TouchableOpacity>
+        {/* (Anonymous) name of the commenter */}
+        <Text style={[styles.name]}>{item.user_id}</Text>
+
+        {/* The ... button for each comment */}
+        <View>
+          <EllipsisMenu navigation={navigation} />
+        </View>
+      </View>
+
+      {/* The text for the comment */}
+      <Text style={[styles.commentText, textColor]}>{item.text}</Text>
+
+      {/* The row of when the comment was posted, along with the number of upvotes */}
+      <View
+        style={{
+          flexDirection: 'row',
+          marginTop: 10,
+          alignItems: 'center',
+          marginLeft: 20,
+          alignContent: 'space-around',
+        }}
+      >
+        <Text style={[styles.name]}>{item.time_posted} ago</Text>
+        <TouchableOpacity
+          title="Upvote"
+          onPress={() => console.log('Upvoted!')}
+          style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
+        >
+          <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
+          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.likes}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
   const { post } = route.params;
+  const [comments, SetComments] = useState([]);
+  const [newComments, refreshNewComments] = useState(false);
 
   const getJWT = async () => {
     try {
@@ -149,6 +167,8 @@ const PostView = ({ route, navigation }) => {
   const sendToDB = async (operation, body) => {
     await getJWT();
 
+    console.log(JSON.stringify(body));
+
     //Create a comment on the post
     if (operation === 'comment') {
       try {
@@ -156,12 +176,12 @@ const PostView = ({ route, navigation }) => {
           method: 'POST',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
-          user: 'Purple Elephant',
         });
 
         const parseRes = await response.json();
 
         console.log('COMMENT: ' + JSON.stringify(parseRes));
+        refreshNewComments(!newComments);
       } catch (error) {
         console.error(error.message);
       }
@@ -178,7 +198,7 @@ const PostView = ({ route, navigation }) => {
 
         const parseRes = await response.json();
 
-        console.log('UPDATE: ' + parseRes);
+        console.log('UPDATE: ' + parseRes.status);
       } catch (error) {
         console.error(error.message);
       }
@@ -205,35 +225,6 @@ const PostView = ({ route, navigation }) => {
   /* Controls the size of the font in the original post, so that it fits in the View */
   const AdjustLabel = ({ fontSize, text, style, numberOfLines }) => {
     const [currentFont, setCurrentFont] = useState(fontSize);
-    const [comment, SetComment] = useState([]);
-
-    //Getting comments from the database to show for post
-    const getFromDB = async (body) => {
-      await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
-
-      try {
-        // Update server with user's registration information
-        const response = await fetch('http://' + serverIp + ':5000/feed/all-comment' /*ROUTE NOT SETUP YET*/, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json', token: JWTtoken },
-          body: JSON.stringify(body),
-        });
-
-        //The response includes post information, need in json format
-        const parseRes = await response.json();
-
-        //Updates postData to have post information using useState
-        setComment(parseRes.data.comment);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-
-    //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
-    useEffect(() => {
-      const body = { post_id: post.post_id };
-      // getFromDB(body); DOESNT WORK RN B/C CANT ADD BODY TO GET REQUEST AND IDK WHAT TO DO
-    }, []);
 
     return (
       <Text
@@ -252,11 +243,51 @@ const PostView = ({ route, navigation }) => {
     );
   };
 
+  //Getting comments from the database to show for post
+  const getFromDB = async () => {
+    await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
+    const query = 'post_id=' + post.post_id;
+    try {
+      // Update server with user's registration information
+      const response = await fetch('http://' + serverIp + ':5000/feed/post-comments?' + query, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+
+      //Updates postData to have post information using useState
+      if (parseRes.data) {
+        SetComments(parseRes.data.comment);
+      } else {
+        SetComments(commentExamples);
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //Triggered everytime a new comment is submitted, gets comment from DB to display it
+  useEffect(() => {
+    getFromDB();
+    console.log('Comments Refreshed');
+  }, [newComments]);
+
   /* Controls the look of each "item", or comment in this context */
   const renderItem = ({ item }) => {
     const backgroundColor = '#FFFFFF';
     const color = 'black';
     return <Item item={item} backgroundColor={{ backgroundColor }} textColor={{ color }} />;
+  };
+
+  const updateNumComments = () => {
+    const body = {
+      post_id: post.post_id,
+      num_comments: comments.length,
+    };
+
+    sendToDB('update', body);
   };
 
   return (
@@ -265,20 +296,18 @@ const PostView = ({ route, navigation }) => {
       {/* Back Button */}
       <TouchableOpacity
         style={{ marginLeft: 10, width: 50, paddingLeft: 5 }}
-        onPress={() => navigation.navigate('Feed')}
+        onPress={() => {
+          navigation.navigate('Feed'), updateNumComments();
+        }}
       >
         <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
       </TouchableOpacity>
       <StatusBar style="black" />
 
       {/* The ... button above the original post's text */}
-      <TouchableOpacity
-        title="Options"
-        onPress={() => console.log('Clicked on Options')}
-        style={{ alignSelf: 'flex-end', marginRight: 20 }}
-      >
-        <MaterialCommunityIcons name="dots-horizontal" color="#BDBDBD" size={height * 0.035} />
-      </TouchableOpacity>
+      <View style={{ alignSelf: 'flex-end', marginRight: 20 }}>
+        <EllipsisMenu navigation={navigation} />
+      </View>
 
       {/* The Original Post's Text */}
       <View style={styles.postBox}>
@@ -304,7 +333,7 @@ const PostView = ({ route, navigation }) => {
         </TouchableOpacity>
         <View style={styles.infoRow}>
           <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{comments.length}</Text>
         </View>
         <View style={[styles.infoRow, { marginLeft: 10 }]}>
           <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>Blue Raccoon</Text>
@@ -320,7 +349,7 @@ const PostView = ({ route, navigation }) => {
           numColumns={1}
           horizontal={false}
           data={comments}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.comment_id}
           // extraData={id}
           renderItem={renderItem}
         />
@@ -335,17 +364,19 @@ const PostView = ({ route, navigation }) => {
         onSubmit={(values) => {
           //Setting up information to send to database
           body = {
-            commentText: 'Content: ' + values.commentText,
+            commentText: values.commentText,
             post_id: post.post_id,
           };
 
-          console.log(body);
-
           sendToDB('comment', body);
+          values.commentText = '';
         }}
       >
         {({ handleChange, handleBlur, handleSubmit, values }) => (
-          <View style={{ flex: 0.3, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.commentInputContainer}
+          >
             <TextInput
               label=""
               icon=""
@@ -356,24 +387,19 @@ const PostView = ({ route, navigation }) => {
               //onSubmitEditing={}
               value={values.commentText}
               selectionColor="#FFCC15"
-              style={{
-                flex: 0.98,
-                color: 'black',
-                backgroundColor: 'white',
-                borderTopWidth: 1,
-                borderColor: '#F6F6F6',
-              }}
+              multiline
+              style={styles.commentInputField}
               //keyboardType='default'
             />
             <EvilIcons
               name="arrow-up"
               size={35}
-              color="black"
+              color={yellow}
               justifyContent="center"
-              borderTopWidth={10}
               onPress={handleSubmit}
+              style={styles.commentInputSubmit}
             />
-          </View>
+          </KeyboardAvoidingView>
         )}
       </Formik>
       <Line />
@@ -522,6 +548,23 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     width: width * 0.18,
     height: width * 0.18,
+  },
+  commentInputContainer: {
+    flex: 0.3,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  commentInputField: {
+    flex: 0.98,
+    color: 'black',
+    backgroundColor: 'white',
+    borderTopWidth: 10,
+    borderColor: 'white',
+  },
+  commentInputSubmit: {
+    borderTopWidth: 10,
+    borderColor: 'white',
   },
 });
 

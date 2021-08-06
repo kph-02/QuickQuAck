@@ -28,6 +28,7 @@ CREATE TABLE post (
     post_id BIGSERIAL,
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
+    num_comments INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,

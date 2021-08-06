@@ -105,6 +105,12 @@ export const PageTitlePost = styled.Text`
   bottom: 50px;
 `;
 
+export const PageTitleFlag = styled.Text`
+  font-size: 20px;
+  font-weight: bold;
+  color: ${black};
+`;
+
 export const SubTitle = styled.Text`
   font-size: 18px;
   margin-bottom: 20px;
@@ -144,7 +150,6 @@ export const StyledPostInput = styled.TextInput`
 export const StyledPostArea1 = styled.View`
   width: 100%;
   align-self: center;
-  color: ${shrek};
   right: 15px;
   bottom: 140px;
 `;
