@@ -45,6 +45,7 @@ import { Button, View, Modal, StyleSheet } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import { Picker } from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
+import { TextInput } from 'react-native-gesture-handler';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
@@ -60,7 +61,7 @@ const CreatePost = ({ navigation }) => {
   const [inputs, setInputs] = useState({
     //Values needed to create post (../server/routes/feed.js)
     postText: '',
-    postTag: 'Revelle' /*Initialize as first value in tags drop-down*/,
+    postTag: [] /*Initialize as first value in tags drop-down*/,
     num_comments: 0 /*0 comments to begin with, updated when new comments added */,
   });
 
@@ -72,6 +73,7 @@ const CreatePost = ({ navigation }) => {
   //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
   const onChange = (name, value) => {
     setInputs({ ...inputs, [name]: value });
+    console.log(inputs);
   };
 
   //Executes when Post is pressed, sends post information to the database
@@ -115,7 +117,7 @@ const CreatePost = ({ navigation }) => {
       });
 
       const parseRes = await response.json();
-
+      // console.log(postTag);
       // console.log(parseRes);
     } catch (error) {
       console.error(error.message);
@@ -124,24 +126,28 @@ const CreatePost = ({ navigation }) => {
 
   const items = [
     //list of items for the select list
-    { id: 'Revelle', name: 'Revelle' },
-    { id: 'Muir', name: 'Muir' },
-    { id: 'Marshall', name: 'Marshall' },
-    { id: 'Warren', name: 'Warren' },
-    { id: 'ERC', name: 'ERC' },
-    { id: 'Sixth', name: 'Sixth' },
-    { id: 'Seventh', name: 'Seventh' },
-    { id: 'Question', name: 'Question' },
-    { id: 'Poll', name: 'Poll' },
-    { id: 'Food', name: 'Food' },
-    { id: 'Social', name: 'Social' },
+    { id: '{Revelle}', name: 'Revelle' },
+    { id: '{Muir}', name: 'Muir' },
+    { id: '{Marshall}', name: 'Marshall' },
+    { id: '{Warren}', name: 'Warren' },
+    { id: '{ERC}', name: 'ERC' },
+    { id: '{Sixth}', name: 'Sixth' },
+    { id: '{Seventh}', name: 'Seventh' },
+    { id: '{Question}', name: 'Question' },
+    { id: '{Poll}', name: 'Poll' },
+    { id: '{Food}', name: 'Food' },
+    { id: '{Social}', name: 'Social' },
   ];
 
   const [selectedItems, setSelectedItems] = useState([]);
 
   const onSelectedItemsChange = (selectedItems) => {
     // Set Selected Items
+    if (selectedItems.length > 3) {
+      return;
+    }
     setSelectedItems(selectedItems);
+    setInputs({ ...inputs, postTag: selectedItems });
   };
 
   return (
@@ -167,18 +173,8 @@ const CreatePost = ({ navigation }) => {
           </ExtraPostView>
           <PageTitlePost>New Post</PageTitlePost>
           <StyledPostArea1>
-            {/* <MyTextInput
-              placeholder="Post Title"
-              name="postTitle"
-              style={{}}
-              placeholderTextColor={darkgray}
-              onChangeText={(e) => onChange('postTitle', e)}
-              value={postTitle}
-              selectionColor="#FFCC15"
-            /> */}
-
             <Line />
-
+           
             <MyTextInput
               placeholder="Post Text"
               name="postText"
@@ -186,24 +182,33 @@ const CreatePost = ({ navigation }) => {
               placeholderTextColor={darkgray}
               onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
               value={postText}
-              selectionColor="#FFCC15"
+              selectionColor="#FFCC15" //implement a max length
+              maxLength={250}
+              multiline={true}
             />
+            
           </StyledPostArea1>
         </InnerPostContainer>
 
         <TagDropdown>
-          {
-            <MultiSelect
-              hideSubmitButton
-              items={items}
-              uniqueKey="name"
-              selectedItems={postTag}
-              onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
-              selectedItems={selectedItems}
-              onSelectedItemsChange={onSelectedItemsChange}
-              // onToggleList = {console.log(moo)}
-            ></MultiSelect>
-          }
+          <MultiSelect
+            hideSubmitButton
+            items={items}
+            uniqueKey="name"
+            // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
+            // onSelectedItemsChange={console.log(postTag)}
+            
+            selectedItems={selectedItems}
+            onSelectedItemsChange={onSelectedItemsChange}
+            // onToggleList = {console.log(moo)}
+            selectedItemIconColor={yellow}
+            selectedItemTextColor={black}
+            tagBorderColor={yellow}
+            tagTextColor={black}
+            textInputProps={{ editable: false }}
+            searchInputPlaceholderText=""
+            searchIcon={false}
+          ></MultiSelect>
         </TagDropdown>
       </StyledContainer>
     </Modal>

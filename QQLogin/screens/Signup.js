@@ -66,7 +66,7 @@ const Signup = ({ navigation }) => {
       //Sign-Up successful
       else {
         alert('Account Creation Successful!');
-        navigation.navigate('Login');
+        navigation.navigate('TagSelection');
       }
 
       // possibly add if/else statement to determine if setAuth should be true or false

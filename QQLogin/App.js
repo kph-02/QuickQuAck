@@ -12,6 +12,7 @@ import CreatePost from './screens/CreatePost';
 import PostView from './screens/PostView';
 import FlagPost from './screens/FlagPost';
 import EllipsisMenu from './components/EllipsisMenu';
+import TagSelection from './screens/TagSelection';
 
 // import { StackActions } from '@react-navigation/native';
 
@@ -33,6 +34,7 @@ export default function App() {
         <Stack.Screen name="Post View" component={PostView} />
         <Stack.Screen name="Flag Post" component={FlagPost} />
         <Stack.Screen name="Menu" component={EllipsisMenu} />
+        <Stack.Screen name="TagSelection" component={TagSelection} />
       </Stack.Navigator>
     </NavigationContainer>
   </MenuProvider>

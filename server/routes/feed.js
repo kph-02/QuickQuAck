@@ -31,10 +31,13 @@ router.post("/create-post", authorization, async (req, res) => {
 
     const postID = newPost.rows[0].post_id;
 
-    const postTags = await pool.query(
-      "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
-      [postID, postTag]
-    );
+    for (const i of postTag) {
+      console.log("Console says " + i);
+      const postTags = await pool.query(
+        "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
+        [postID, i]
+      );
+    }
 
     const nameAdjectives = [
       "Red",
@@ -78,6 +81,8 @@ router.post("/create-post", authorization, async (req, res) => {
       [author_id, anonName, postID]
     );
 
+    ///postTags is declared in a loop so it is not defined here
+
     res.status(201).json({
       status: "Post Success",
       data: {
@@ -86,6 +91,38 @@ router.post("/create-post", authorization, async (req, res) => {
         anonName: postName.rows[0],
       },
     });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
+
+router.post("/user-tag-selection", async (req, res) => {
+  try {
+    //Reading information contained in post
+    const { postTag } = req.body;
+    //hardcoded author_id cuz idk how to pull on it using req.user
+    const author_id = '5bae78ef-8641-4d9c-837d-b78fb4c158fb'
+
+
+    for (const i of postTag) {
+      console.log("Console says " + i);
+      const postTags = await pool.query(
+        "INSERT INTO user_tags (tag_id, user_id) VALUES ($2, $1) RETURNING *;",
+        [author_id, i]
+      );
+      console.log(i);
+
+    }
+
+    ///postTags is declared in a loop so it is not defined here
+    res.status(201).json({
+      status: "Tag's have been inserted",
+      data: {
+        tags: postTags.rows[0],
+      },
+    });
+
   } catch (err) {
     console.error(err.message);
     res.status(500).json("Server Error");
