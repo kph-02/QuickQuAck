@@ -38,10 +38,11 @@ router.post("/register", validInfo, async (req, res) => {
     //Used to return stored data for testing
     //res.json(newUser.rows[0]);
 
-    //generate jwt token
-    const token = jwtGenerator(newUser.rows[0].user_id);
+    const user_id = {
+      user_id: newUser.rows[0].user_id,
+    };
 
-    res.json({ token });
+    res.json(user_id);
   } catch (err) {
     console.error(err.message);
     res.status(500).json("Server Error");

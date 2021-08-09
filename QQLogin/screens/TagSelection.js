@@ -27,8 +27,22 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import MultiSelect from 'react-native-multiple-select';
 import { ScrollView } from 'react-native-gesture-handler';
 
+var userId = '';
+
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
+
+//Getting JWT from local storage, must exist otherwise user can't be on this page
+const getUserId = async () => {
+  try {
+    await AsyncStorage.getItem('user_id').then((user_id) => {
+      console.log('Retrieved User ID: ' + user_id);
+      userId = user_id;
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+};
 
 const TagSelection = ({ navigation }) => {
   // Use State hooks
@@ -119,6 +133,8 @@ const TagSelection = ({ navigation }) => {
     setInputs({ ...inputs, postTag: selectedItems });
   };
 
+  getUserId();
+
   return (
     <StyledContainer>
       <StatusBar style="black" />
@@ -127,25 +143,24 @@ const TagSelection = ({ navigation }) => {
         Select a few interest tags to get better, more personalized post recommendations on your feed
       </Text>
       <View>
-      <MultiSelect
-        hideSubmitButton
-        items={items}
-        uniqueKey="name"
-        // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
-        // onSelectedItemsChange={console.log(postTag)}
-        selectedItems={selectedItems}
-        onSelectedItemsChange={onSelectedItemsChange}
-        selectedItemIconColor={yellow}
-        selectedItemTextColor={black}
-        tagBorderColor={yellow}
-        tagTextColor={black}
-        textInputProps={{ editable: false }}
-        searchInputPlaceholderText=""
-        searchIcon={false}
-        fixedHeight = {true}
-        selectText = ''
-        
-      ></MultiSelect>
+        <MultiSelect
+          hideSubmitButton
+          items={items}
+          uniqueKey="name"
+          // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
+          // onSelectedItemsChange={console.log(postTag)}
+          selectedItems={selectedItems}
+          onSelectedItemsChange={onSelectedItemsChange}
+          selectedItemIconColor={yellow}
+          selectedItemTextColor={black}
+          tagBorderColor={yellow}
+          tagTextColor={black}
+          textInputProps={{ editable: false }}
+          searchInputPlaceholderText=""
+          searchIcon={false}
+          fixedHeight={true}
+          selectText=""
+        ></MultiSelect>
       </View>
       <StyledButton2 onPress={onPressButton}>
         <ButtonText>Save</ButtonText>
