@@ -32,7 +32,7 @@ CREATE TABLE post (
     post_text VARCHAR(250),
     num_comments INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    post_location geography(point),
+    -- post_location geography(point),
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT post_unique UNIQUE (post_id)

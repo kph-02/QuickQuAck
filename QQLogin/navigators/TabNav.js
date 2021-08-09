@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 //Screens
 import Welcome from '../screens/Welcome';
+import Profile from '../screens/Profile';
 import CreatePost from '../screens/CreatePost';
 import Signup from '../screens/Signup';
 import Login from '../screens/Login';
@@ -23,13 +24,13 @@ import FeedViews from '../screens/FeedViews';
 //   );
 // }
 
-function ProfileScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Sample Profile Screen!</Text>
-    </View>
-  );
-}
+// function ProfileScreen() {
+//   return (
+//     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+//       <Text>Sample Profile Screen!</Text>
+//     </View>
+//   );
+// }
 
 function MessagesScreen() {
   return (
@@ -64,7 +65,7 @@ export default function TabNav() {
               ),
           }}
         />
-        <Tab.Screen name="Profile" component={ProfileScreen} 
+        <Tab.Screen name="Profile" component={Profile} 
             options={{
                   tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons name="account-circle" color={color} size={26} />
