@@ -101,9 +101,10 @@ router.post("/user-tag-selection", async (req, res) => {
   try {
     //Reading information contained in post
     const { postTag } = req.body;
-    //hardcoded author_id cuz idk how to pull on it using req.user
-    const author_id = '5bae78ef-8641-4d9c-837d-b78fb4c158fb'
+    const { user_id } = req.body;
 
+    //hardcoded author_id cuz idk how to pull on it using req.user
+    const author_id = "5bae78ef-8641-4d9c-837d-b78fb4c158fb";
 
     for (const i of postTag) {
       console.log("Console says " + i);
@@ -112,7 +113,6 @@ router.post("/user-tag-selection", async (req, res) => {
         [author_id, i]
       );
       console.log(i);
-
     }
 
     ///postTags is declared in a loop so it is not defined here
@@ -122,7 +122,6 @@ router.post("/user-tag-selection", async (req, res) => {
         tags: postTags.rows[0],
       },
     });
-
   } catch (err) {
     console.error(err.message);
     res.status(500).json("Server Error");
