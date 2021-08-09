@@ -10,6 +10,8 @@ import Login from './../screens/Login';
 import Signup from './../screens/Signup';
 import Welcome from './../screens/Welcome';
 import Splash from './../screens/Splash';
+import Profile from '../screens/Profile';
+import Settings from '../screens/Settings';
 import CreatePost from '../screens/CreatePost';
 import CreatePoll from '../screens/CreatePoll';
 import TabNav from './TabNav';
@@ -34,6 +36,8 @@ const RootStack = () => {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Signup" component={Signup} />
       <Stack.Screen name="TabNav" component={TabNav} />
+      <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Create Post" component={CreatePost} />
       <Stack.Screen name="Create Poll" component={CreatePoll} />
       <Stack.Screen name="Post View" component={PostView} />
