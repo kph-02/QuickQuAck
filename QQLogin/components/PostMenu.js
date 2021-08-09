@@ -2,6 +2,10 @@ import React from 'react';
 import { Dimensions, StyleSheet, Text, Image, TouchableHighlight, View } from 'react-native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, renderers } from 'react-native-popup-menu';
 
+//colors
+const { primary, yellow, background, lightgray, darkgray, black } = Colors;
+import { Colors } from './../components/styles';
+
 const { SlideInMenu } = renderers;
 
 const PostMenu = ({ navigation }) => {
@@ -15,23 +19,29 @@ const PostMenu = ({ navigation }) => {
       {/* Two menu options: Text post and Poll post */}
       <MenuOptions>
         {/* Title */}
-        <MenuOption style={styles.title}>
-          <Text>Post to QuickQuAck</Text>
+        <MenuOption style={styles.titleContainer}>
+          <Text style={styles.text}>Post to QuickQuAck</Text>
         </MenuOption>
 
         <View style={styles.container}>
           {/* Text post */}
           <MenuOption
-            style={{ paddingVertical: 10 }}
+            style={styles.menuOptions}
             onSelect={() => {
               navigation.navigate('Create Post');
             }}
           >
-            <Text style={styles.text}>Text</Text>
+            <View style={styles.options}>
+              <Image source={require('./../assets/text_icon.png')}></Image>
+              <Text style={styles.text}>Text</Text>
+            </View>
           </MenuOption>
           {/* Poll post */}
-          <MenuOption style={{ paddingVertical: 10 }} onSelect={() => alert('W.I.P')}>
-            <Text style={styles.text}>Poll</Text>
+          <MenuOption style={styles.menuOptions} onSelect={() => alert('W.I.P')}>
+            <View style={styles.options}>
+              <Image source={require('./../assets/poll_icon.png')}></Image>
+              <Text style={styles.text}>Poll</Text>
+            </View>
           </MenuOption>
         </View>
       </MenuOptions>
@@ -42,11 +52,15 @@ const PostMenu = ({ navigation }) => {
 const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
-  title: {
+  titleContainer: {
     alignItems: 'center',
-    padding: 10,
-    borderBottomColor: 'black',
-    borderWidth: 1,
+    padding: 15,
+    borderColor: darkgray,
+    borderWidth: 0.5,
+  },
+  menuOptions: {
+    borderColor: darkgray,
+    borderWidth: 0.5,
   },
   container: {
     flex: 1,
@@ -55,12 +69,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'white',
   },
+  options: {
+    flexDirection: 'row',
+    padding: width / 6,
+  },
   text: {
-    padding: width / 5,
     color: 'black',
-    fontSize: height * 0.019,
-    borderWidth: 1,
-    borderColor: 'black',
+    fontSize: height * 0.025,
+    paddingHorizontal: 5,
+    fontWeight: 'bold',
   },
   touchableStyle: {
     position: 'absolute',
