@@ -36,7 +36,7 @@ const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 const getUserId = async () => {
   try {
     await AsyncStorage.getItem('user_id').then((user_id) => {
-      console.log('Retrieved User ID: ' + user_id);
+      // console.log('Retrieved User ID: ' + user_id);
       userId = user_id;
     });
   } catch (error) {
@@ -51,12 +51,13 @@ const TagSelection = ({ navigation }) => {
   const [inputs, setInputs] = useState({
     //Values needed to create post (../server/routes/feed.js)
     postTag: [] /*Initialize as first value in tags drop-down*/,
+    user_id: userId,
   });
 
   //   var JWTtoken = '';
 
   //Stores values to update input fields from user
-  const { postTag } = inputs;
+  const { postTag, user_id} = inputs;
 
   //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
   const onChange = (name, value) => {
@@ -66,7 +67,7 @@ const TagSelection = ({ navigation }) => {
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
     e.preventDefault(); //prevent refresh
-    console.log(postTag);
+    // console.log(postTag);
     //Check if the post has content, if not, prevent submission and notify
     if (inputs.postTag.length != 0) {
       sendToDB(inputs);
@@ -130,7 +131,7 @@ const TagSelection = ({ navigation }) => {
     // Set Selected Items
     // if (selectedItems.length > 3) {return}
     setSelectedItems(selectedItems);
-    setInputs({ ...inputs, postTag: selectedItems });
+    setInputs({ ...inputs, postTag: selectedItems, user_id : userId });
   };
 
   getUserId();
