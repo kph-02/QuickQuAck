@@ -13,7 +13,9 @@ import PostView from './screens/PostView';
 import FlagPost from './screens/FlagPost';
 import EllipsisMenu from './components/EllipsisMenu';
 import TagSelection from './screens/TagSelection';
-
+import Welcome from './screens/Welcome';
+import Map from './screens/Map';
+import Signup from './screens/Signup';
 // import { StackActions } from '@react-navigation/native';
 
 const Stack = createStackNavigator();
@@ -35,6 +37,7 @@ export default function App() {
         <Stack.Screen name="Flag Post" component={FlagPost} />
         <Stack.Screen name="Menu" component={EllipsisMenu} />
         <Stack.Screen name="TagSelection" component={TagSelection} />
+        <Stack.Screen name="Map" component={Map} />
       </Stack.Navigator>
     </NavigationContainer>
   </MenuProvider>

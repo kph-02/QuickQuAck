@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
@@ -108,6 +108,29 @@ const Welcome = ({ navigation }) => {
 
   const [selectedId, setSelectedId] = useState(null);
 
+  const items = [
+    //list of items for the select list
+    { id: '{Revelle}', name: 'Revelle' },
+    { id: '{Muir}', name: 'Muir' },
+    { id: '{Marshall}', name: 'Marshall' },
+    { id: '{Warren}', name: 'Warren' },
+    { id: '{ERC}', name: 'ERC' },
+    { id: '{Sixth}', name: 'Sixth' },
+    { id: '{Seventh}', name: 'Seventh' },
+    { id: '{Question}', name: 'Question' },
+    { id: '{Poll}', name: 'Poll' },
+    { id: '{Food}', name: 'Food' },
+    { id: '{Social}', name: 'Social' },
+  ];
+
+  const onSelectedItemsChange = (selectedItems) => {
+    // Set Selected Items
+    // if (selectedItems.length > 3) {return}
+    setSelectedItems(selectedItems);
+    setInputs({ ...inputs, postTag: selectedItems });
+  };
+
+  const [selectedItems, setSelectedItems] = useState([]);
   // renderItem function, not needed rn, too scared to delete it
   // const renderItem = ({ item }) => {
   //   const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
@@ -128,8 +151,16 @@ const Welcome = ({ navigation }) => {
 
   return (
     <StyledFeedContainer>
+      {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
       <StatusBar style="black" />
       <InnerContainer>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Map')}
+         style = {styles.mapTouchableStyle}
+        >
+        <Image source={require('./../assets/map.png')} style={styles.mapIcon} />
+       
+        </TouchableOpacity>
         {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
          */}
         {/* <PageTitle>Feed</PageTitle> */}
@@ -199,6 +230,22 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     width: width * 0.18,
     height: width * 0.18,
+  },
+  mapIcon: {
+    resizeMode: 'contain',
+    width: 30,
+    height: 30,
+    position: 'absolute',
+  },
+  mapTouchableStyle: {
+    flex: 1,
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    right: 40,
+    top: 12,
+    resizeMode : 'contain',
+    // backgroundColor: '#B0C400',
   },
 });
 

@@ -93,7 +93,6 @@ export const PageTitleSplash = styled.Text`
   width: 150%;
   margin-vertical: 35%;
   margin-bottom: 10px;
-
 `;
 
 export const PageTitlePost = styled.Text`
@@ -242,10 +241,8 @@ export const ExtraView = styled.View`
   padding: 10px;
 `;
 export const ExtraBackView = styled.View`
-  
   right: 140px;
   top: 40px;
-
 `;
 
 export const ExtraPostView = styled.View`
@@ -307,6 +304,11 @@ const RoundedTouchableOpacityLogIn = styled.TouchableOpacity`
   margin-top: 16px;
 `;
 
+const MapIcon = styled.TouchableOpacity`
+  alignSelf: 'flex-end',
+  marginTop: -5,
+  position: 'absolute',
+`;
 export const SignInButton = ({ onPress }) => (
   <RoundedTouchableOpacitySignIn onPress={onPress}>
     <ButtonText>Sign Up</ButtonText>
