@@ -20,7 +20,7 @@ import { serverIp } from './Login.js';
 
 //Store Authentication Token
 var JWTtoken = '';
-
+var userId = '';
 //formik
 import { Formik, Field, Form } from 'formik';
 
@@ -163,6 +163,17 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
+  const getUserID = async () => {
+    try {
+      await AsyncStorage.getItem('user_id').then((user_id) => {
+        //console.log('Retrieved Token: ' + token);
+        userId = user_id;
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   /*Send information to the DB
     operation: What operation is being done: 
       comment: creating a comment
@@ -282,6 +293,7 @@ const PostView = ({ route, navigation }) => {
   //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
     getFromDB();
+    getUserID();
     console.log('Comments Refreshed');
   }, [newComments]);
 
@@ -415,67 +427,6 @@ const PostView = ({ route, navigation }) => {
         )}
       </Formik>
       <Line />
-
-      {/* What Ajay originally had in PostView: */}
-      {/* <View style={{flex: 0.2, backgroundColor: 'lightcyan', justifyContent: 'center'}}>
-          <Text style={styles.commentText}>Slight margin bottom adder thing</Text>
-        </View> */}
-      {/* <SubTitle></SubTitle>
-          <Formik
-            initialValues={{
-              postText: '',
-              postId: '',
-            }}
-            onSubmit={(values) => {
-              //Setting up information to send to database
-              body = {
-                postText: values.postText,
-                postId: values.postId,
-              };
-
-              sendToDB(body);
-              navigation.navigate('CreatePost');
-            }}
-          >
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
-              <StyledFormArea>
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Text"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postText')}
-                  onBlur={handleBlur('postText')}
-                  value={values.postText}
-                  selectionColor="#FFCC15"
-                />
-
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Id"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postId')}
-                  onBlur={handleBlur('postId')}
-                  value={values.postId}
-                  selectionColor="#FFCC15"
-                />
-
-                <StyledButton onPress={((event) => setOpt(event, UPDATE), handleSubmit)}>
-                  <ButtonText>Update Post</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Feed')}>
-                  <ButtonText>Back</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={((event) => setOpt(event, DELETE), handleSubmit)}>
-                  <ButtonText>Delete Post</ButtonText>
-                </StyledButton>
-                <Line />
-              </StyledFormArea>
-            )}
-          </Formik> */}
     </StyledViewPostContainer>
   );
 };

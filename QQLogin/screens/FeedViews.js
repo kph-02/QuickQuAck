@@ -217,8 +217,8 @@ const FirstRoute = () => {
   // whenever the page is loaded
   useFocusEffect(
     React.useCallback(() => {
-      getFromDB();
       console.log('Feed Refreshed');
+      getFromDB();
       setRefresh(false); //End refresh animation
       setSelectedId(null); //reset Selected Id
     }, [navigation, update]),

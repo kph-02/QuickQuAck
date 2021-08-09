@@ -50,7 +50,7 @@ import { TextInput } from 'react-native-gesture-handler';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-const CreatePost = ({ navigation }) => {
+const CreatePoll = ({ navigation }) => {
   // Use State hooks
   const [composePost, setComposePost] = useState(false);
   const [agree, setAgree] = useState(false);
@@ -60,7 +60,7 @@ const CreatePost = ({ navigation }) => {
   //Getting user input
   const [inputs, setInputs] = useState({
     //Values needed to create post (../server/routes/feed.js)
-    postText: '',
+    pollQuestion: '',
     postTag: [] /*Initialize as first value in tags drop-down*/,
     num_comments: 0 /*0 comments to begin with, updated when new comments added */,
   });
@@ -68,12 +68,12 @@ const CreatePost = ({ navigation }) => {
   var JWTtoken = '';
 
   //Stores values to update input fields from user
-  const { postText, postTag } = inputs;
+  const { pollQuestion, postTag } = inputs;
 
-  //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
+  //Update inputs when user enters new ones, name is identifier, value as a string (name='pollQuestion',value='')
   const onChange = (name, value) => {
     setInputs({ ...inputs, [name]: value });
-    // console.log(inputs);
+    //console.log(inputs);
   };
 
   //Executes when Post is pressed, sends post information to the database
@@ -81,8 +81,9 @@ const CreatePost = ({ navigation }) => {
     e.preventDefault(); //prevent refresh
 
     //Check if the post has content, if not, prevent submission and notify
-    if (inputs.postText) {
-      sendToDB(inputs);
+    if (inputs.pollQuestion) {
+      // sendToDB(inputs);
+      alert('Page not complete, so no post submitted');
       navigation.navigate('TabNav', { Screen: 'Feed' });
     } else {
       alert('Can not submit an empty post!');
@@ -171,17 +172,29 @@ const CreatePost = ({ navigation }) => {
               <TextPostContent>Post</TextPostContent>
             </TextLink>
           </ExtraPostView>
-          <PageTitlePost>New Post</PageTitlePost>
+          <PageTitlePost>New Poll</PageTitlePost>
           <StyledPostArea1>
             <Line />
 
             <MyTextInput
-              placeholder="Post Text"
-              name="postText"
+              placeholder="Poll Question"
+              name="pollQuestion"
               style={{}}
               placeholderTextColor={darkgray}
-              onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
-              value={postText}
+              onChangeText={(e) => onChange('pollQuestion', e)} //update inputs to match user input
+              value={pollQuestion}
+              selectionColor="#FFCC15" //implement a max length
+              maxLength={250}
+              multiline={true}
+            />
+
+            <MyTextInput
+              placeholder="Poll Question"
+              name="pollQuestion"
+              style={{}}
+              placeholderTextColor={darkgray}
+              onChangeText={(e) => onChange('pollQuestion', e)} //update inputs to match user input
+              value={pollQuestion}
               selectionColor="#FFCC15" //implement a max length
               maxLength={250}
               multiline={true}
@@ -232,4 +245,4 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
   );
 };
 
-export default CreatePost;
+export default CreatePoll;

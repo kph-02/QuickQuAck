@@ -37,7 +37,7 @@ const PostMenu = ({ navigation }) => {
             </View>
           </MenuOption>
           {/* Poll post */}
-          <MenuOption style={styles.menuOptions} onSelect={() => alert('W.I.P')}>
+          <MenuOption style={styles.menuOptions} onSelect={() => navigation.navigate('Create Poll')}>
             <View style={styles.options}>
               <Image source={require('./../assets/poll_icon.png')}></Image>
               <Text style={styles.text}>Poll</Text>
