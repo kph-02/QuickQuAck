@@ -39,7 +39,7 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 import CreatePost from '../screens/CreatePost';
 import FeedViews from './FeedViews';
-
+import PostMenu from '../components/PostMenu.js';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
@@ -183,13 +183,15 @@ const Welcome = ({ navigation }) => {
 
       <FeedViews navigation={navigation} />
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         activeOpacity={0.5}
         onPress={() => navigation.navigate('Create Post')}
         style={styles.touchableStyle}
       >
         <Image source={require('./../assets/create_post_button.png')} style={styles.floatingButtonStyle} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+
+      <PostMenu navigation={navigation} />
     </StyledFeedContainer>
   );
 };
