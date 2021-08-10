@@ -183,9 +183,6 @@ const PostView = ({ route, navigation }) => {
   */
   const sendToDB = async (operation, body) => {
     await getJWT();
-
-    console.log(JSON.stringify(body));
-
     //Create a comment on the post
     if (operation === 'comment') {
       try {
@@ -312,7 +309,6 @@ const PostView = ({ route, navigation }) => {
     };
 
     sendToDB('update', body);
-    console.log(userId);
   };
 
   //When user clicks on icon to update post

@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
-
+import Poll from '../components/Poll.js';
 //formik
 import { Formik } from 'formik';
 
@@ -89,7 +89,11 @@ const CreatePost = ({ route, navigation }) => {
         alert('Post Updated!');
       } else {
         navigation.pop();
-        alert('Post Created');
+        if (postType.post_type === 'Text') {
+          alert('Post Created');
+        } else {
+          alert('Post not created, poll not setup yet');
+        }
       }
     } else {
       alert('Can not submit an empty post!');
@@ -145,7 +149,8 @@ const CreatePost = ({ route, navigation }) => {
         });
 
         const parseRes = await response.json();
-        console.log(parseRes);
+
+        //console.log('UPDATE: ' + JSON.stringify(parseRes));
       } catch (error) {
         console.error(error.message);
       }
@@ -210,7 +215,7 @@ const CreatePost = ({ route, navigation }) => {
             <Line />
 
             <MyTextInput
-              placeholder="Post Text"
+              placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll title'}
               name="postText"
               style={{}}
               placeholderTextColor={darkgray}
@@ -220,6 +225,8 @@ const CreatePost = ({ route, navigation }) => {
               maxLength={250}
               multiline={true}
             />
+
+            <Poll Type={postType.post_type} />
           </StyledPostArea1>
         </InnerPostContainer>
 

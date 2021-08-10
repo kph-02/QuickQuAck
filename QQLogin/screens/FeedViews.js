@@ -217,7 +217,7 @@ const FirstRoute = () => {
   // whenever the page is loaded
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Feed Refreshed');
+      console.log('All Feed Refreshed');
       getFromDB();
       setRefresh(false); //End refresh animation
       setSelectedId(null); //reset Selected Id
@@ -335,7 +335,7 @@ const SecondRoute = () => {
   // whenever the page is loaded
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Feed Refreshed');
+      console.log('Home Feed Refreshed');
       getFromDB();
       setRefresh(false); //End refresh animation
       setSelectedId(null); //reset Selected Id
