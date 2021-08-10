@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -121,9 +121,8 @@ const formatTime = (post_age) => {
     }
     if (post_age.minutes) {
       postAgeDisplay += post_age.minutes + 'm ';
-    }
-    if (post_age.seconds) {
-      postAgeDisplay += post_age.seconds + 's ';
+    } else {
+      postAgeDisplay += '1m ';
     }
 
     postAgeDisplay += 'ago';
@@ -361,6 +360,8 @@ const SecondRoute = () => {
         keyExtractor={(item) => item.post_id}
         extraData={selectedId}
         renderItem={renderItem}
+        refreshing={refresh} //true: shows spinning animation to show loading
+        onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
       />
     </View>
     // </StyledFeedContainer>

@@ -1,7 +1,7 @@
-import React, { useState, Component } from 'react';
+import React, { useState, Component, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useNavigation } from '@react-navigation/native';
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
 
@@ -50,13 +50,13 @@ import { TextInput } from 'react-native-gesture-handler';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-const CreatePost = ({ navigation }) => {
+const CreatePost = ({ route, navigation }) => {
   // Use State hooks
   const [composePost, setComposePost] = useState(false);
   const [agree, setAgree] = useState(false);
   const [selectedValue, setSelectedValue] = useState(true);
   const [modalOpen, setModalOpen] = useState(true);
-
+  const { postType } = route.params;
   //Getting user input
   const [inputs, setInputs] = useState({
     //Values needed to create post (../server/routes/feed.js)
@@ -82,8 +82,15 @@ const CreatePost = ({ navigation }) => {
 
     //Check if the post has content, if not, prevent submission and notify
     if (inputs.postText) {
-      sendToDB(inputs);
-      navigation.navigate('TabNav', { Screen: 'Feed' });
+      sendToDB(postType.post_type, inputs);
+
+      if (postType.post_type === 'Update') {
+        navigation.navigate('TabNav', { Screen: 'Feed' });
+        alert('Post Updated!');
+      } else {
+        navigation.pop();
+        alert('Post Created');
+      }
     } else {
       alert('Can not submit an empty post!');
     }
@@ -102,25 +109,46 @@ const CreatePost = ({ navigation }) => {
   };
 
   //Send post information created by user to the database
-  const sendToDB = async (body) => {
+  const sendToDB = async (type, body) => {
     await getJWT(); //get Token
 
-    // console.log('Inputs: ' + JSON.stringify(inputs));
+    if (type === 'Text') {
+      try {
+        // console.log('Sent Token:      ' + JWTtoken);
+        // Send post info to DB
+        const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
+          method: 'POST',
+          headers: { token: JWTtoken, 'content-type': 'application/json' },
+          body: JSON.stringify(body),
+        });
 
-    try {
-      // console.log('Sent Token:      ' + JWTtoken);
-      // Send post info to DB
-      const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
-        method: 'POST',
-        headers: { token: JWTtoken, 'content-type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+        const parseRes = await response.json();
+        // console.log(postTag);
+        // console.log(parseRes);
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
 
-      const parseRes = await response.json();
-      // console.log(postTag);
-      // console.log(parseRes);
-    } catch (error) {
-      console.error(error.message);
+    if (type === 'Update') {
+      const updateBody = {
+        postText: body.postText,
+        post_id: postType.post_id,
+      };
+      try {
+        // console.log('Sent Token:      ' + JWTtoken);
+        // Send post info to DB
+        const response = await fetch('http://' + serverIp + ':5000/feed/update-post', {
+          method: 'PUT',
+          headers: { token: JWTtoken, 'content-type': 'application/json' },
+          body: JSON.stringify(updateBody),
+        });
+
+        const parseRes = await response.json();
+        console.log(parseRes);
+      } catch (error) {
+        console.error(error.message);
+      }
     }
   };
 
@@ -150,6 +178,12 @@ const CreatePost = ({ navigation }) => {
     setInputs({ ...inputs, postTag: selectedItems });
   };
 
+  useEffect(() => {
+    if (postType.post_type === 'Update') {
+      onChange('postText', postType.post_text);
+    }
+  }, []);
+
   return (
     <Modal
       transparent={true}
@@ -168,10 +202,10 @@ const CreatePost = ({ navigation }) => {
           </ExtraBackView>
           <ExtraPostView>
             <TextLink onPress={onPressButton} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}>
-              <TextPostContent>Post</TextPostContent>
+              <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
             </TextLink>
           </ExtraPostView>
-          <PageTitlePost>New Post</PageTitlePost>
+          <PageTitlePost>{postType.post_type === 'Update' ? 'Update Post' : 'New Post'}</PageTitlePost>
           <StyledPostArea1>
             <Line />
 
