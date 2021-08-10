@@ -45,13 +45,8 @@ CREATE TABLE comment (
     text VARCHAR(100) NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (comment_id),
-<<<<<<< HEAD
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
-=======
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
->>>>>>> c726fcef591c5dc476a5e747ff2b40812b40efb5
 );
 
 /*CREATE TYPE voting AS ENUM (
@@ -99,13 +94,8 @@ CREATE TABLE tags (
 CREATE TABLE post_tags (
     tag_id VARCHAR(10) NOT NULL,
     post_id INTEGER NOT NULL,
-<<<<<<< HEAD
     CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
     FOREIGN KEY(post_id) REFERENCES post(post_id),
-=======
-    FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE,
->>>>>>> c726fcef591c5dc476a5e747ff2b40812b40efb5
     PRIMARY KEY (post_id, tag_id)
 );
 
