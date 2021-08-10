@@ -32,7 +32,7 @@ var userId = '';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-//Getting JWT from local storage, must exist otherwise user can't be on this page
+//Getting userID from local storage, must exist otherwise user can't be on this page
 const getUserId = async () => {
   try {
     await AsyncStorage.getItem('user_id').then((user_id) => {

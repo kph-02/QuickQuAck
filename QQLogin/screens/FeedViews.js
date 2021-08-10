@@ -11,7 +11,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
 
 var JWTtoken = ''; //Store JWT for authentication
-
 // const homeposts = [
 //   {
 //     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
@@ -176,6 +175,7 @@ const FirstRoute = () => {
     }
   };
 
+
   //Communicating with the database to get all the posts
   const getFromDB = async () => {
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
@@ -230,7 +230,7 @@ const FirstRoute = () => {
     setRefresh(true); //update animation
     setUpdate(!update); //Change variable to trigger useEffect to pull posts from database
   };
-
+  
   return (
     // <StyledFeedContainer>
     //     <StatusBar style="black" />

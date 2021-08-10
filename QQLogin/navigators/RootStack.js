@@ -36,7 +36,7 @@ const RootStack = () => {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Signup" component={Signup} />
       <Stack.Screen name="TabNav" component={TabNav} />
-      <Stack.Screen name="Profile" component={Profile} />
+      {/* <Stack.Screen name="Profile" component={Profile} /> */}
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Create Post" component={CreatePost} />
       <Stack.Screen name="Create Poll" component={CreatePoll} />
