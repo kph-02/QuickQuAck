@@ -31,10 +31,13 @@ router.post("/create-post", authorization, async (req, res) => {
 
     const postID = newPost.rows[0].post_id;
 
-    const postTags = await pool.query(
-      "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
-      [postID, postTag]
-    );
+    for (const i of postTag) {
+      console.log("Console says " + i);
+      const postTags = await pool.query(
+        "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
+        [postID, i]
+      );
+    }
 
     const nameAdjectives = [
       "Red",
@@ -78,6 +81,8 @@ router.post("/create-post", authorization, async (req, res) => {
       [author_id, anonName, postID]
     );
 
+    ///postTags is declared in a loop so it is not defined here
+
     res.status(201).json({
       status: "Post Success",
       data: {
@@ -92,64 +97,75 @@ router.post("/create-post", authorization, async (req, res) => {
   }
 });
 
+router.post("/user-tag-selection", async (req, res) => {
+  try {
+    //Reading information contained in post
+    const { postTag } = req.body;
+    const { user_id } = req.body;
+
+    //hardcoded author_id cuz idk how to pull on it using req.user
+    // const author_id = "5bae78ef-8641-4d9c-837d-b78fb4c158fb";
+
+    for (const i of postTag) {
+      console.log("Console says " + i);
+      const postTags = await pool.query(
+        "INSERT INTO user_tags (tag_id, user_id) VALUES ($2, $1) RETURNING *;",
+        [user_id, i]
+      );
+      console.log(i);
+    }
+
+    ///postTags is declared in a loop so it is not defined here
+    res.status(201).json({
+      status: "Tag's have been inserted",
+      data: {
+        tags: postTags.rows[0],
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
+
 // This renders a page of posts based upon filtering of tags selected during user creation sorted in ascending order of time posted
 
+//this is kinda buddy
 router.get("/home-feed", authorization, async (req, res) => {
   try {
-    var tag = req.body.tagpicker;
     // add a date time filter so its only last 24 hrs
     const filteredFeed = await pool.query(
-      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, ut.tag_id FROM post AS p JOIN user_tags as ut ON ut.user_id = p.user_id JOIN tags AS t on t.tag_id = ut.tag_id WHERE (t.tag_id = '${tag}') ORDER BY time_posted DESC;"
+      "SELECT DISTINCT ON (pt.post_id) pt.post_id, p.user_id, p.post_text, p.time_posted, ut.tag_id FROM post AS p JOIN user_tags as ut ON ut.user_id = p.user_id JOIN post_tags AS pt on pt.tag_id = ut.tag_id WHERE (pt.tag_id = 'Muir') ORDER BY pt.post_id ASC, p.time_posted DESC;"
     );
-    res.status(200).json({
-      status: "feed filtered",
+    res.status(201).json({
+      data: {
+        post: filteredFeed.rows,
+      },
     });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server Error");
+    res.status(500).json("Server Error");
   }
 });
 
-router.get("/filtered-feed", authorization, async (req, res) => {
-  try {
-    //This will select from the 'tagpicker' dropdown within the post functionality
+// router.get("/filtered-feed", authorization, async (req, res) => {
+//   try {
+//     //This will select from the 'tagpicker' dropdown within the post functionality
 
-    var tag = req.body.tagpicker;
+//     var tag = req.body.tagpicker;
 
-    let sql =
-      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, pt.tag_id FROM post AS p JOIN post_tags as pt ON pt.post_id = p.post_id JOIN tags AS t on t.tag_id = pt.tag_id WHERE (t.tag_id = ${tag}) ORDER BY time_posted DESC;";
+//     let sql =
+//       "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, pt.tag_id FROM post AS p JOIN post_tags as pt ON pt.post_id = p.post_id JOIN tags AS t on t.tag_id = pt.tag_id WHERE (t.tag_id = ${tag}) ORDER BY time_posted DESC;";
 
-    const filteredFeed = await pool.query(sql);
-    res.status(200).json({
-      status: "feed filtered",
-    });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
-
-// This renders a page of posts based upon filtering of two specific tags sorted by tag group in ascending order of time posted
-
-router.get("/filtered-feed2", authorization, async (req, res) => {
-  try {
-    //This will select from the 'tagpicker' dropdown within the post functionality
-
-    var tag = req.body.tagpicker;
-    var tag2 = req.body.tagpicker2;
-
-    let sql =
-      "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, pt.tag_id FROM post AS p JOIN post_tags as pt ON pt.post_id = p.post_id JOIN tags AS t on t.tag_id = pt.tag_id WHERE (t.tag_id = ${tag} OR t.tag_id = ${tag2}) ORDER BY time_posted DESC;";
-
-    const filteredFeed = await pool.query(sql);
-    res.status(200).json({
-      status: "feed filtered",
-    });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+//     const filteredFeed = await pool.query(sql);
+//     res.status(200).json({
+//       status: "feed filtered",
+//     });
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send("Server Error");
+//   }
+// });
 
 // update a post
 router.put("/update-post", authorization, async (req, res) => {
@@ -178,7 +194,7 @@ router.put("/update-post", authorization, async (req, res) => {
       status: "Update Success",
     });
   } catch (err) {
-    res.status(500).send("Server error");
+    res.status(500).json("Server error");
   }
 });
 

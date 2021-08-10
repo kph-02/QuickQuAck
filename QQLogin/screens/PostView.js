@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import {
   Dimensions,
   StyleSheet,
@@ -20,7 +20,7 @@ import { serverIp } from './Login.js';
 
 //Store Authentication Token
 var JWTtoken = '';
-
+var userId = '';
 //formik
 import { Formik, Field, Form } from 'formik';
 
@@ -163,6 +163,17 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
+  const getUserID = async () => {
+    try {
+      await AsyncStorage.getItem('user_id').then((user_id) => {
+        //console.log('Retrieved Token: ' + token);
+        userId = user_id;
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   /*Send information to the DB
     operation: What operation is being done: 
       comment: creating a comment
@@ -172,9 +183,6 @@ const PostView = ({ route, navigation }) => {
   */
   const sendToDB = async (operation, body) => {
     await getJWT();
-
-    console.log(JSON.stringify(body));
-
     //Create a comment on the post
     if (operation === 'comment') {
       try {
@@ -204,7 +212,7 @@ const PostView = ({ route, navigation }) => {
 
         const parseRes = await response.json();
 
-        console.log('UPDATE: ' + parseRes.status);
+        console.log('UPDATE: ' + JSON.stringify(parseRes));
 
         //NEED TO UPDATE CURRENT VIEW
       } catch (error) {
@@ -223,7 +231,7 @@ const PostView = ({ route, navigation }) => {
 
         const parseRes = await response.json();
 
-        console.log('DELETE' + parseRes);
+        console.log('DELETE: ' + JSON.stringify(parseRes));
 
         navigation.navigate('Feed');
       } catch (error) {
@@ -282,6 +290,7 @@ const PostView = ({ route, navigation }) => {
   //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
     getFromDB();
+    getUserID();
     console.log('Comments Refreshed');
   }, [newComments]);
 
@@ -302,6 +311,33 @@ const PostView = ({ route, navigation }) => {
     sendToDB('update', body);
   };
 
+  //When user clicks on icon to update post
+  const updatePost = () => {
+    const postType = {
+      post_type: 'Update',
+      post_text: post.post_text,
+      post_id: post.post_id,
+    };
+    console.log(updatePost);
+    navigation.navigate('Create Post', { postType });
+  };
+
+  //When user clicks on icon to delete post
+  const deletePost = () => {
+    Alert.alert('Delete Post?', 'Would you like to delete this post?', [
+      //Delete post from DB
+      {
+        text: 'Yes',
+        onPress: () => {
+          sendToDB('delete', { postId: post.post_id });
+          navigation.pop();
+          alert('Post Deleted');
+        },
+      },
+      { text: 'No' },
+    ]);
+  };
+
   return (
     /* Style for the entire screen, controls how children are aligned */
     <StyledViewPostContainer>
@@ -317,7 +353,26 @@ const PostView = ({ route, navigation }) => {
       <StatusBar style="black" />
 
       {/* The ... button above the original post's text */}
-      <View style={{ alignSelf: 'flex-end', marginRight: 20 }}>
+      <View style={{ alignSelf: 'flex-end', marginRight: 20, flexDirection: 'row' }}>
+        {/* If user is original poster, options to edit and delete will appear */}
+        {(() => {
+          if (userId === post.user_id) {
+            return (
+              <TouchableOpacity onPress={updatePost}>
+                <Image source={require('./../assets/edit_post_icon.png')} style={styles.editPost} />
+              </TouchableOpacity>
+            );
+          }
+        })()}
+        {(() => {
+          if (userId === post.user_id) {
+            return (
+              <TouchableOpacity onPress={deletePost}>
+                <Image source={require('./../assets/trash_icon.png')} style={styles.trashPost} />
+              </TouchableOpacity>
+            );
+          }
+        })()}
         <EllipsisMenu navigation={navigation} />
       </View>
 
@@ -415,67 +470,6 @@ const PostView = ({ route, navigation }) => {
         )}
       </Formik>
       <Line />
-
-      {/* What Ajay originally had in PostView: */}
-      {/* <View style={{flex: 0.2, backgroundColor: 'lightcyan', justifyContent: 'center'}}>
-          <Text style={styles.commentText}>Slight margin bottom adder thing</Text>
-        </View> */}
-      {/* <SubTitle></SubTitle>
-          <Formik
-            initialValues={{
-              postText: '',
-              postId: '',
-            }}
-            onSubmit={(values) => {
-              //Setting up information to send to database
-              body = {
-                postText: values.postText,
-                postId: values.postId,
-              };
-
-              sendToDB(body);
-              navigation.navigate('CreatePost');
-            }}
-          >
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
-              <StyledFormArea>
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Text"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postText')}
-                  onBlur={handleBlur('postText')}
-                  value={values.postText}
-                  selectionColor="#FFCC15"
-                />
-
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Id"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postId')}
-                  onBlur={handleBlur('postId')}
-                  value={values.postId}
-                  selectionColor="#FFCC15"
-                />
-
-                <StyledButton onPress={((event) => setOpt(event, UPDATE), handleSubmit)}>
-                  <ButtonText>Update Post</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Feed')}>
-                  <ButtonText>Back</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={((event) => setOpt(event, DELETE), handleSubmit)}>
-                  <ButtonText>Delete Post</ButtonText>
-                </StyledButton>
-                <Line />
-              </StyledFormArea>
-            )}
-          </Formik> */}
     </StyledViewPostContainer>
   );
 };
@@ -577,6 +571,16 @@ const styles = StyleSheet.create({
   commentInputSubmit: {
     borderTopWidth: 10,
     borderColor: 'white',
+  },
+  editPost: {
+    width: width * 0.07,
+    height: width * 0.07,
+    paddingHorizontal: 15,
+  },
+  trashPost: {
+    width: width * 0.07,
+    height: width * 0.07,
+    paddingHorizontal: 15,
   },
 });
 

@@ -5,7 +5,9 @@ CREATE DATABASE Posts;
 CREATE DATABASE Chats;*/
 
 /* Install/Setup UUID as needed: (command below)*/
-/* create extension if not exists "uuid-ossp"; */
+
+create extension if not exists "uuid-ossp"; 
+create extension if not exists "postgis"; 
 
 CREATE TABLE users (
     user_id uuid NOT NULL PRIMARY KEY DEFAULT
@@ -30,6 +32,7 @@ CREATE TABLE post (
     post_text VARCHAR(250),
     num_comments INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- post_location geography(point),
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT post_unique UNIQUE (post_id)
@@ -43,7 +46,7 @@ CREATE TABLE comment (
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (comment_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (post_id) REFERENCES post(post_id)
+    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
 );
 
 CREATE TYPE voting AS ENUM (

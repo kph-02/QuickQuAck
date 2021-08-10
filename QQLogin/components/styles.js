@@ -93,7 +93,6 @@ export const PageTitleSplash = styled.Text`
   width: 150%;
   margin-vertical: 35%;
   margin-bottom: 10px;
-
 `;
 
 export const PageTitlePost = styled.Text`
@@ -141,9 +140,10 @@ export const StyledPostInput = styled.TextInput`
   padding: 15px;
   border-radius: 5px;
   font-size: 16px;
-  height: 60px;
+  height: 200px;
   margin-vertical: 3px;
   margin-bottom: 10px;
+  maxlength="8";
   color: ${black};
 `;
 
@@ -184,7 +184,6 @@ export const StyledButton = styled.TouchableOpacity`
   margin-vertical: 10px;
   height: 51px;
   border-radius: 100px;
-
   ${(props) =>
     props.google == true &&
     `
@@ -192,6 +191,19 @@ export const StyledButton = styled.TouchableOpacity`
         flex-direction: row;
         justify-content: center;
     `}
+`;
+
+export const StyledButton2 = styled.TouchableOpacity`
+  display: flex;
+  flex-direction: column;
+  padding: 16px 32px;
+  background-color: ${yellow};
+  justify-content: center;
+  align-items: center;
+  margin-vertical: 10px;
+  height: 51px;
+  border-radius: 100px;
+  top: 25px;
 `;
 
 export const ButtonText = styled.Text`
@@ -229,10 +241,8 @@ export const ExtraView = styled.View`
   padding: 10px;
 `;
 export const ExtraBackView = styled.View`
-  
   right: 140px;
   top: 40px;
-
 `;
 
 export const ExtraPostView = styled.View`
@@ -294,6 +304,11 @@ const RoundedTouchableOpacityLogIn = styled.TouchableOpacity`
   margin-top: 16px;
 `;
 
+const MapIcon = styled.TouchableOpacity`
+  alignSelf: 'flex-end',
+  marginTop: -5,
+  position: 'absolute',
+`;
 export const SignInButton = ({ onPress }) => (
   <RoundedTouchableOpacitySignIn onPress={onPress}>
     <ButtonText>Sign Up</ButtonText>

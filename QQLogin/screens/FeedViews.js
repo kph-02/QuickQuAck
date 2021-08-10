@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -121,9 +121,8 @@ const formatTime = (post_age) => {
     }
     if (post_age.minutes) {
       postAgeDisplay += post_age.minutes + 'm ';
-    }
-    if (post_age.seconds) {
-      postAgeDisplay += post_age.seconds + 's ';
+    } else {
+      postAgeDisplay += '1m ';
     }
 
     postAgeDisplay += 'ago';
@@ -132,9 +131,128 @@ const formatTime = (post_age) => {
   return postAgeDisplay;
 };
 
+// HOME feed (home posts)
 const FirstRoute = () => {
   //useStates can only be defined within functions
   const [postData, setPostData] = useState([]); //Store post data from the Database
+  const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
+  const [refresh, setRefresh] = useState(false); //Handle refreshing logic
+  const [update, setUpdate] = useState(false); //Changing will feed to update
+  const navigation = useNavigation();
+
+  //renderItem function for each item passed through
+  const renderItem = ({ item }) => {
+    const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
+    const color = item.post_id === selectedId ? 'white' : 'black';
+    return (
+      <Item
+        //destructure the item
+        item={item}
+        //Functionality for when a post is pressed
+        onPress={() => {
+          setSelectedId(item.post_id);
+
+          //navigate to post view page, sends through post information as parameter
+          navigation.navigate('Post View', { post: item });
+        }}
+        backgroundColor={{ backgroundColor }}
+        textColor={{ color }}
+      />
+    );
+  };
+
+  //Extracting the posts from the Database
+
+  //Getting JWT from local storage, must exist otherwise user can't be on this page
+  const getJWT = async () => {
+    try {
+      await AsyncStorage.getItem('token').then((token) => {
+        // console.log('Retrieved Token: ' + token);
+        JWTtoken = token;
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //Communicating with the database to get all the posts
+  const getFromDB = async () => {
+    await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
+
+    try {
+      // Gets all of the post information from the database for the feed
+      const response = await fetch('http://' + serverIp + ':5000/feed/home-feed', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+
+      /*
+       *"post":[
+       * {"post_id":,
+       * "user_id":,
+       * "post_text":,
+       * "num_comments":,
+       * "time_posted":
+       *
+       * "anon_name:""
+       *
+       * "post_age":[
+       * hours:
+       * minutes:
+       * seconds:
+       * milliseconds
+       * ]
+       * */
+      setPostData(parseRes.data.post);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //useFocusEffect triggers works like useEffect, but only when this screen is focused
+  // this lets us use navigation as the variable to track changes with, so feed updates
+  // whenever the page is loaded
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('All Feed Refreshed');
+      getFromDB();
+      setRefresh(false); //End refresh animation
+      setSelectedId(null); //reset Selected Id
+    }, [navigation, update]),
+  );
+
+  //Handle the logic for what to do when flatlist is refreshed
+  const handleRefresh = () => {
+    setRefresh(true); //update animation
+    setUpdate(!update); //Change variable to trigger useEffect to pull posts from database
+  };
+
+  return (
+    // <StyledFeedContainer>
+    //     <StatusBar style="black" />
+    //     <InnerContainer/>
+    <View style={{ backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
+      <FlatList
+        numColumns={1}
+        horizontal={false}
+        data={postData} /*postData to display*/
+        keyExtractor={(item) => item.post_id}
+        extraData={selectedId}
+        renderItem={renderItem}
+        refreshing={refresh} //true: shows spinning animation to show loading
+        onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
+      />
+    </View>
+    // </StyledFeedContainer>
+  );
+};
+
+// ALL feed (all posts)
+const SecondRoute = () => {
+  const [allData, setAllData] = useState([]); //Store post data from the Database
   const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
   const [update, setUpdate] = useState(false); //Changing will feed to update
@@ -206,7 +324,7 @@ const FirstRoute = () => {
        * milliseconds
        * ]
        * */
-      setPostData(parseRes.data.post);
+      setAllData(parseRes.data.post);
     } catch (error) {
       console.error(error.message);
     }
@@ -217,8 +335,8 @@ const FirstRoute = () => {
   // whenever the page is loaded
   useFocusEffect(
     React.useCallback(() => {
+      console.log('Home Feed Refreshed');
       getFromDB();
-      console.log('Feed Refreshed');
       setRefresh(false); //End refresh animation
       setSelectedId(null); //reset Selected Id
     }, [navigation, update]),
@@ -231,46 +349,6 @@ const FirstRoute = () => {
   };
 
   return (
-    // <StyledFeedContainer>
-    //     <StatusBar style="black" />
-    //     <InnerContainer/>
-    <View style={{ backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
-      <FlatList
-        numColumns={1}
-        horizontal={false}
-        data={postData} /*postData to display*/
-        keyExtractor={(item) => item.post_id}
-        extraData={selectedId}
-        renderItem={renderItem}
-        refreshing={refresh} //true: shows spinning animation to show loading
-        onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
-      />
-    </View>
-    // </StyledFeedContainer>
-  );
-};
-
-const SecondRoute = () => {
-  const [selectedId, setSelectedId] = useState(null);
-  const navigation = useNavigation();
-  //renderItem function
-  const renderItem = ({ item }) => {
-    const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const color = item.post_id === selectedId ? 'white' : 'black';
-    return (
-      <Item
-        item={item}
-        onPress={() => {
-          setSelectedId(item.post_id);
-          navigation.navigate('Post View', { post: item });
-        }}
-        backgroundColor={{ backgroundColor }}
-        textColor={{ color }}
-      />
-    );
-  };
-
-  return (
     // <StyledFeedContainer style={{backgroundColor: 'pink'}}>
     //     <StatusBar style="black" />
     //     <InnerContainer/>
@@ -278,10 +356,12 @@ const SecondRoute = () => {
       <FlatList
         numColumns={1}
         horizontal={false}
-        data={allposts}
+        data={allData}
         keyExtractor={(item) => item.post_id}
         extraData={selectedId}
         renderItem={renderItem}
+        refreshing={refresh} //true: shows spinning animation to show loading
+        onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
       />
     </View>
     // </StyledFeedContainer>
