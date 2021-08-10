@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 //Used for local storage to store JWTtoken
@@ -11,109 +11,148 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
 
 var JWTtoken = ''; //Store JWT for authentication
-
-const homeposts = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    user: 'Blue Raccoon',
-    likes: '2',
-    body: 'This is a sample post!',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Red Monkey',
-    likes: '12',
-    body: "Who's playing at Sun God today at 7pm?",
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    user: 'Purple Unicorn',
-    likes: '21',
-    body: 'Which dining hall has the best special today?',
-  },
-  {
-    id: '58894a0f-3da1-471f-bd96-145571e29d82',
-    user: 'Green Tortoise',
-    likes: '10',
-    body: 'Which dining hall has the best special today?',
-  },
-  {
-    id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Pink Seahorse',
-    likes: '16',
-    body: 'What games do you all play?',
-  },
-  {
-    id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Yellow Squirrel',
-    likes: '25',
-    body: "Test post lol",
-  },
-];
+// const homeposts = [
+//   {
+//     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+//     user: 'Blue Raccoon',
+//     likes: '2',
+//     body: 'This is a sample post!',
+//   },
+//   {
+//     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Red Monkey',
+//     likes: '12',
+//     body: "Who's playing at Sun God today at 7pm?",
+//   },
+//   {
+//     id: '58694a0f-3da1-471f-bd96-145571e29d72',
+//     user: 'Purple Unicorn',
+//     likes: '21',
+//     body: 'Which dining hall has the best special today?',
+//   },
+//   {
+//     id: '58894a0f-3da1-471f-bd96-145571e29d82',
+//     user: 'Green Tortoise',
+//     likes: '10',
+//     body: 'Which dining hall has the best special today?',
+//   },
+//   {
+//     id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Pink Seahorse',
+//     likes: '16',
+//     body: 'What games do you all play?',
+//   },
+//   {
+//     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Yellow Squirrel',
+//     likes: '25',
+//     body: 'Test post lol',
+//   },
+// ];
 
 const allposts = [
   {
-    id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Pink Seahorse',
+    post_id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user_id: 'Pink Seahorse',
     likes: '16',
     post_text: 'What games do you all play?',
   },
   {
-    id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Yellow Squirrel',
+    post_id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
+    user_id: 'Yellow Squirrel',
     likes: '25',
-    post_text: "Test post lol",
+    post_text: 'Test post lol',
   },
 ];
 
+//Limits the number of lines and characters that can be shown on each of the post previews on the feed.
+const AdjustTextPreview = ({ style, text }) => {
+  return (
+    <Text style={style} numberOfLines={2}>
+      {text.length <= 88 ? `${text}` : `${text.substring(0, 85)}...`}
+    </Text>
+  );
+};
+
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
+    {/* View for the text preview of each post as shown on the feed */}
     <View style={{ justifyContent: 'center', marginLeft: 25, marginRight: 25 }}>
-      <Text style={[styles.bodyText, textColor]}>{item.post_text}</Text>
+      <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.post_text} />
+      {/* <Text style={[styles.bodyText, textColor]}>{item.post_text}</Text> */}
     </View>
     {/* The Data of each Post */}
     <View style={[styles.postTouchables, { backgroundColor: 'white' }]}>
       <View style={[styles.infoRow, { marginRight: 5 }]}>
+        {/*number of people who've viewed the post*/}
         <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
       </View>
       <View style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}>
+        {/*number of upvotes*/}
         <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>21</Text>
       </View>
       <View style={styles.infoRow}>
+        {/*number of comments*/}
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
       </View>
       <View style={[styles.infoRow, { marginLeft: 10 }]}>
-        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>Blue Raccoon</Text>
+        {/*Anonymous name of user*/}
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.anon_name}</Text>
       </View>
       <View style={{ marginLeft: 10 }}>
-        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>8m ago</Text>
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
       </View>
     </View>
   </TouchableOpacity>
 );
 
-const FirstRoute = () => {
-  //Used to store post data from the Database
-  const [postData, setPostData] = useState([]); //useStates can only be defined within functions
+//format the time of the post from the database to display it to the screen
+const formatTime = (post_age) => {
+  let postAgeDisplay = '';
 
-  const [selectedId, setSelectedId] = useState(null);
-  const [refresh, setRefresh] = useState(false); //handle refreshing logic
-  const [update, setUpdate] = useState(false);
+  //check if it exists b/c sometimes called before objects rendered so is undefined
+  if (post_age) {
+    if (post_age.hours) {
+      postAgeDisplay += post_age.hours + 'h ';
+    }
+    if (post_age.minutes) {
+      postAgeDisplay += post_age.minutes + 'm ';
+    } else {
+      postAgeDisplay += '1m ';
+    }
+
+    postAgeDisplay += 'ago';
+  }
+
+  return postAgeDisplay;
+};
+
+// HOME feed (home posts)
+const FirstRoute = () => {
+  //useStates can only be defined within functions
+  const [postData, setPostData] = useState([]); //Store post data from the Database
+  const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
+  const [refresh, setRefresh] = useState(false); //Handle refreshing logic
+  const [update, setUpdate] = useState(false); //Changing will feed to update
   const navigation = useNavigation();
 
-  //renderItem function
+  //renderItem function for each item passed through
   const renderItem = ({ item }) => {
     const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
     const color = item.post_id === selectedId ? 'white' : 'black';
     return (
       <Item
+        //destructure the item
         item={item}
+        //Functionality for when a post is pressed
         onPress={() => {
           setSelectedId(item.post_id);
-          navigation.navigate('Post View');
+
+          //navigate to post view page, sends through post information as parameter
+          navigation.navigate('Post View', { post: item });
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
@@ -135,13 +174,14 @@ const FirstRoute = () => {
     }
   };
 
-  //Communicating with the database to authenticate login
+
+  //Communicating with the database to get all the posts
   const getFromDB = async () => {
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
 
     try {
-      // Update server with user's registration information
-      const response = await fetch('http://' + serverIp + ':5000/feed/all-posts', {
+      // Gets all of the post information from the database for the feed
+      const response = await fetch('http://' + serverIp + ':5000/feed/home-feed', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
       });
@@ -149,29 +189,47 @@ const FirstRoute = () => {
       //The response includes post information, need in json format
       const parseRes = await response.json();
 
-      //Updates postData to have post information using useState
+      /*
+       *"post":[
+       * {"post_id":,
+       * "user_id":,
+       * "post_text":,
+       * "num_comments":,
+       * "time_posted":
+       *
+       * "anon_name:""
+       *
+       * "post_age":[
+       * hours:
+       * minutes:
+       * seconds:
+       * milliseconds
+       * ]
+       * */
       setPostData(parseRes.data.post);
     } catch (error) {
       console.error(error.message);
     }
   };
 
-  //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
-  useEffect(() => {
-    getFromDB();
-    console.log('updated');
-    setRefresh(false); //End refresh animation
-  }, [
-    /* Can put values in here that, when updated, will run everything inside useEffect*/
-    update,
-  ]);
+  //useFocusEffect triggers works like useEffect, but only when this screen is focused
+  // this lets us use navigation as the variable to track changes with, so feed updates
+  // whenever the page is loaded
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('All Feed Refreshed');
+      getFromDB();
+      setRefresh(false); //End refresh animation
+      setSelectedId(null); //reset Selected Id
+    }, [navigation, update]),
+  );
 
   //Handle the logic for what to do when flatlist is refreshed
   const handleRefresh = () => {
     setRefresh(true); //update animation
     setUpdate(!update); //Change variable to trigger useEffect to pull posts from database
   };
-
+  
   return (
     // <StyledFeedContainer>
     //     <StatusBar style="black" />
@@ -192,24 +250,102 @@ const FirstRoute = () => {
   );
 };
 
+// ALL feed (all posts)
 const SecondRoute = () => {
-  const [selectedId, setSelectedId] = useState(null);
+  const [allData, setAllData] = useState([]); //Store post data from the Database
+  const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
+  const [refresh, setRefresh] = useState(false); //Handle refreshing logic
+  const [update, setUpdate] = useState(false); //Changing will feed to update
   const navigation = useNavigation();
-  //renderItem function
+
+  //renderItem function for each item passed through
   const renderItem = ({ item }) => {
-    const backgroundColor = item.id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const color = item.id === selectedId ? 'white' : 'black';
+    const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
+    const color = item.post_id === selectedId ? 'white' : 'black';
     return (
       <Item
+        //destructure the item
         item={item}
+        //Functionality for when a post is pressed
         onPress={() => {
-          setSelectedId(item.id);
-          navigation.navigate('Post View');
+          setSelectedId(item.post_id);
+
+          //navigate to post view page, sends through post information as parameter
+          navigation.navigate('Post View', { post: item });
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
       />
     );
+  };
+
+  //Extracting the posts from the Database
+
+  //Getting JWT from local storage, must exist otherwise user can't be on this page
+  const getJWT = async () => {
+    try {
+      await AsyncStorage.getItem('token').then((token) => {
+        // console.log('Retrieved Token: ' + token);
+        JWTtoken = token;
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //Communicating with the database to get all the posts
+  const getFromDB = async () => {
+    await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
+
+    try {
+      // Gets all of the post information from the database for the feed
+      const response = await fetch('http://' + serverIp + ':5000/feed/all-posts', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+
+      /*
+       *"post":[
+       * {"post_id":,
+       * "user_id":,
+       * "post_text":,
+       * "num_comments":,
+       * "time_posted":
+       *
+       * "anon_name:""
+       *
+       * "post_age":[
+       * hours:
+       * minutes:
+       * seconds:
+       * milliseconds
+       * ]
+       * */
+      setAllData(parseRes.data.post);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //useFocusEffect triggers works like useEffect, but only when this screen is focused
+  // this lets us use navigation as the variable to track changes with, so feed updates
+  // whenever the page is loaded
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('Home Feed Refreshed');
+      getFromDB();
+      setRefresh(false); //End refresh animation
+      setSelectedId(null); //reset Selected Id
+    }, [navigation, update]),
+  );
+
+  //Handle the logic for what to do when flatlist is refreshed
+  const handleRefresh = () => {
+    setRefresh(true); //update animation
+    setUpdate(!update); //Change variable to trigger useEffect to pull posts from database
   };
 
   return (
@@ -220,10 +356,12 @@ const SecondRoute = () => {
       <FlatList
         numColumns={1}
         horizontal={false}
-        data={allposts}
-        keyExtractor={(item) => item.id}
+        data={allData}
+        keyExtractor={(item) => item.post_id}
         extraData={selectedId}
         renderItem={renderItem}
+        refreshing={refresh} //true: shows spinning animation to show loading
+        onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
       />
     </View>
     // </StyledFeedContainer>
@@ -273,9 +411,6 @@ const styles = StyleSheet.create({
     // marginTop: StatusBar.currentHeight,
     flex: 4,
     justifyContent: 'flex-start',
-  },
-  scene: {
-    flex: 1,
   },
   pageTitle: {
     fontSize: 40,

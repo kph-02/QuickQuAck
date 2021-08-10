@@ -1,10 +1,10 @@
-import React, { useState, Component } from 'react';
+import React, { useState, Component, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useNavigation } from '@react-navigation/native';
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
-
+import Poll from '../components/Poll.js';
 //formik
 import { Formik } from 'formik';
 
@@ -44,43 +44,60 @@ import {
 import { Button, View, Modal, StyleSheet } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import { Picker } from '@react-native-picker/picker';
+import MultiSelect from 'react-native-multiple-select';
+import { TextInput } from 'react-native-gesture-handler';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-const CreatePost = ({ navigation }) => {
+const CreatePost = ({ route, navigation }) => {
   // Use State hooks
   const [composePost, setComposePost] = useState(false);
   const [agree, setAgree] = useState(false);
   const [selectedValue, setSelectedValue] = useState(true);
   const [modalOpen, setModalOpen] = useState(true);
-
+  const { postType } = route.params;
   //Getting user input
   const [inputs, setInputs] = useState({
     //Values needed to create post (../server/routes/feed.js)
-    //postTitle: '',
     postText: '',
-    //author_id: '',
-    postTag: 'Revelle' /*Initialize as first value in tags drop-down*/,
+    postTag: [] /*Initialize as first value in tags drop-down*/,
+    num_comments: 0 /*0 comments to begin with, updated when new comments added */,
   });
 
   var JWTtoken = '';
 
   //Stores values to update input fields from user
-  //const { postTitle, postText, author_id, postTag } = inputs;
   const { postText, postTag } = inputs;
 
-  //Update inputs when user enters new ones, name is identifier, value as a string
+  //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
   const onChange = (name, value) => {
     setInputs({ ...inputs, [name]: value });
+    // console.log(inputs);
   };
 
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); //prevent refresh
 
-    sendToDB(inputs);
-    navigation.navigate('TabNav', { Screen: 'Feed' });
+    //Check if the post has content, if not, prevent submission and notify
+    if (inputs.postText) {
+      sendToDB(postType.post_type, inputs);
+
+      if (postType.post_type === 'Update') {
+        navigation.navigate('TabNav', { Screen: 'Feed' });
+        alert('Post Updated!');
+      } else {
+        navigation.pop();
+        if (postType.post_type === 'Text') {
+          alert('Post Created');
+        } else {
+          alert('Post not created, poll not setup yet');
+        }
+      }
+    } else {
+      alert('Can not submit an empty post!');
+    }
   };
 
   //Getting JWT from local storage, must exist otherwise user can't be on this page
@@ -95,29 +112,82 @@ const CreatePost = ({ navigation }) => {
     }
   };
 
-  //communicate registration information with the database
-  const sendToDB = async (body) => {
-    await getJWT();
-    //body.author_id = JWTtoken; //Temp set to JWTtoken, change later maybe?
+  //Send post information created by user to the database
+  const sendToDB = async (type, body) => {
+    await getJWT(); //get Token
 
-    // console.log('Inputs: ' + JSON.stringify(inputs));
+    if (type === 'Text') {
+      try {
+        // console.log('Sent Token:      ' + JWTtoken);
+        // Send post info to DB
+        const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
+          method: 'POST',
+          headers: { token: JWTtoken, 'content-type': 'application/json' },
+          body: JSON.stringify(body),
+        });
 
-    try {
-      // console.log('Sent Token:      ' + JWTtoken);
-      // Update server with user's registration information
-      const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
-        method: 'POST',
-        headers: { token: JWTtoken, 'content-type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+        const parseRes = await response.json();
+        // console.log(postTag);
+        // console.log(parseRes);
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
 
-      const parseRes = await response.json();
+    if (type === 'Update') {
+      const updateBody = {
+        postText: body.postText,
+        post_id: postType.post_id,
+      };
+      try {
+        // console.log('Sent Token:      ' + JWTtoken);
+        // Send post info to DB
+        const response = await fetch('http://' + serverIp + ':5000/feed/update-post', {
+          method: 'PUT',
+          headers: { token: JWTtoken, 'content-type': 'application/json' },
+          body: JSON.stringify(updateBody),
+        });
 
-      console.log(parseRes);
-    } catch (error) {
-      console.error(error.message);
+        const parseRes = await response.json();
+
+        //console.log('UPDATE: ' + JSON.stringify(parseRes));
+      } catch (error) {
+        console.error(error.message);
+      }
     }
   };
+
+  const items = [
+    //list of items for the select list
+    { id: '{Revelle}', name: 'Revelle' },
+    { id: '{Muir}', name: 'Muir' },
+    { id: '{Marshall}', name: 'Marshall' },
+    { id: '{Warren}', name: 'Warren' },
+    { id: '{ERC}', name: 'ERC' },
+    { id: '{Sixth}', name: 'Sixth' },
+    { id: '{Seventh}', name: 'Seventh' },
+    { id: '{Question}', name: 'Question' },
+    { id: '{Poll}', name: 'Poll' },
+    { id: '{Food}', name: 'Food' },
+    { id: '{Social}', name: 'Social' },
+  ];
+
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  const onSelectedItemsChange = (selectedItems) => {
+    // Set Selected Items
+    if (selectedItems.length > 3) {
+      return;
+    }
+    setSelectedItems(selectedItems);
+    setInputs({ ...inputs, postTag: selectedItems });
+  };
+
+  useEffect(() => {
+    if (postType.post_type === 'Update') {
+      onChange('postText', postType.post_text);
+    }
+  }, []);
 
   return (
     <Modal
@@ -137,59 +207,48 @@ const CreatePost = ({ navigation }) => {
           </ExtraBackView>
           <ExtraPostView>
             <TextLink onPress={onPressButton} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}>
-              <TextPostContent>Post</TextPostContent>
+              <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
             </TextLink>
           </ExtraPostView>
-          <PageTitlePost>New Post</PageTitlePost>
+          <PageTitlePost>{postType.post_type === 'Update' ? 'Update Post' : 'New Post'}</PageTitlePost>
           <StyledPostArea1>
-            {/* <MyTextInput
-              placeholder="Post Title"
-              name="postTitle"
-              style={{}}
-              placeholderTextColor={darkgray}
-              onChangeText={(e) => onChange('postTitle', e)}
-              value={postTitle}
-              selectionColor="#FFCC15"
-            /> */}
-
             <Line />
 
             <MyTextInput
-              placeholder="Post Text"
+              placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll title'}
               name="postText"
               style={{}}
               placeholderTextColor={darkgray}
-              onChangeText={(e) => onChange('postText', e)}
+              onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
               value={postText}
-              selectionColor="#FFCC15"
+              selectionColor="#FFCC15" //implement a max length
+              maxLength={250}
+              multiline={true}
             />
+
+            <Poll Type={postType.post_type} />
           </StyledPostArea1>
         </InnerPostContainer>
 
         <TagDropdown>
-          <Picker
-            testID="tagdropdown"
-            nativeID="tagdropdown"
-            mode="dialog"
-            prompt="Select a tag"
-            name="tagdropdown"
-            dropdownIconColor={darkgray}
-            selectedValue={postTag}
-            onValueChange={(e) => onChange('postTag', e)}
-          >
-            {/* If first value changes, make sure to change inputs initialization as well */}
-            <Picker.Item color={darkgray} label="Revelle" value="Revelle" />
-            <Picker.Item color={darkgray} label="Muir" value="Muir" />
-            <Picker.Item color={darkgray} label="Marshall" value="Marshall" />
-            <Picker.Item color={darkgray} label="Warren" value="Warren" />
-            <Picker.Item color={darkgray} label="ERC" value="ERC" />
-            <Picker.Item color={darkgray} label="Sixth" value="Sixth" />
-            <Picker.Item color={darkgray} label="Seventh" value="Seventh" />
-            <Picker.Item color={darkgray} label="Question" value="Question" />
-            <Picker.Item color={darkgray} label="Poll" value="Poll" />
-            <Picker.Item color={darkgray} label="Food" value="Food" />
-            <Picker.Item color={darkgray} label="Social" value="Social" />
-          </Picker>
+          <MultiSelect
+            hideSubmitButton
+            items={items}
+            uniqueKey="name"
+            // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
+            // onSelectedItemsChange={console.log(postTag)}
+
+            selectedItems={selectedItems}
+            onSelectedItemsChange={onSelectedItemsChange}
+            // onToggleList = {console.log(moo)}
+            selectedItemIconColor={yellow}
+            selectedItemTextColor={black}
+            tagBorderColor={yellow}
+            tagTextColor={black}
+            textInputProps={{ editable: false }}
+            searchInputPlaceholderText=""
+            searchIcon={false}
+          ></MultiSelect>
         </TagDropdown>
       </StyledContainer>
     </Modal>

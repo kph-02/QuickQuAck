@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useFocusEffect } from '@react-navigation/native';
 //formik
 import { Formik } from 'formik';
 
@@ -13,7 +14,7 @@ import { Formik } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
-const serverIp = '192.168.1.51';
+const serverIp = '192.168.1.119';
 
 import {
   StyledContainer,
@@ -50,7 +51,18 @@ var JWTtoken = '';
 const storeToken = async (value) => {
   try {
     await AsyncStorage.setItem('token', value);
-    // console.log('Inserted Token:  ' + value);
+    // console.log('Inserted Value:  ' + value);
+  } catch (error) {
+    // saving error
+    console.error(error.message);
+  }
+};
+
+//Using Async Storage to store token JSON object locally as string
+const storeUserID = async (value) => {
+  try {
+    await AsyncStorage.setItem('user_id', value);
+    // console.log('Inserted Value:  ' + value);
   } catch (error) {
     // saving error
     console.error(error.message);
@@ -76,11 +88,13 @@ const Login = ({ navigation }) => {
       if (!parseRes.token) {
         alert(parseRes + ' Please try again.');
         storeToken('');
+        storeUserID('');
       }
 
       //Valid input, continue to feed
       else {
         storeToken(parseRes.token);
+        storeUserID(parseRes.user_id);
         navigation.navigate('TabNav', { Screen: 'Feed' });
       }
       //Store to local storage
@@ -89,6 +103,15 @@ const Login = ({ navigation }) => {
       console.error(error.message);
     }
   };
+
+  // Everytime the user navigates to this page, authentication will be removed
+  // By adding an empty string in local storage for token
+  useFocusEffect(
+    React.useCallback(() => {
+      storeToken('');
+      console.log('Cleared Authentication');
+    }, [navigation]),
+  );
 
   return (
     <StyledContainer>
@@ -107,6 +130,10 @@ const Login = ({ navigation }) => {
               email: values.email,
               password: values.password,
             };
+
+            //Reset text fields
+            values.email = '';
+            values.password = '';
 
             sendToDB(body);
           }}

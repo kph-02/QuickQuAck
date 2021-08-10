@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
@@ -39,7 +39,7 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 import CreatePost from '../screens/CreatePost';
 import FeedViews from './FeedViews';
-
+import PostMenu from '../components/PostMenu.js';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
@@ -108,28 +108,59 @@ const Welcome = ({ navigation }) => {
 
   const [selectedId, setSelectedId] = useState(null);
 
-  //renderItem function
-  const renderItem = ({ item }) => {
-    const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const color = item.post_id === selectedId ? 'white' : 'black';
+  const items = [
+    //list of items for the select list
+    { id: '{Revelle}', name: 'Revelle' },
+    { id: '{Muir}', name: 'Muir' },
+    { id: '{Marshall}', name: 'Marshall' },
+    { id: '{Warren}', name: 'Warren' },
+    { id: '{ERC}', name: 'ERC' },
+    { id: '{Sixth}', name: 'Sixth' },
+    { id: '{Seventh}', name: 'Seventh' },
+    { id: '{Question}', name: 'Question' },
+    { id: '{Poll}', name: 'Poll' },
+    { id: '{Food}', name: 'Food' },
+    { id: '{Social}', name: 'Social' },
+  ];
 
-    return (
-      <Item
-        item={item}
-        onPress={() => {
-          setSelectedId(item.id);
-          navigation.navigate('Post View');
-        }}
-        backgroundColor={{ backgroundColor }}
-        textColor={{ color }}
-      />
-    );
+  const onSelectedItemsChange = (selectedItems) => {
+    // Set Selected Items
+    // if (selectedItems.length > 3) {return}
+    setSelectedItems(selectedItems);
+    setInputs({ ...inputs, postTag: selectedItems });
   };
+
+  const [selectedItems, setSelectedItems] = useState([]);
+  // renderItem function, not needed rn, too scared to delete it
+  // const renderItem = ({ item }) => {
+  //   const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
+  //   const color = item.post_id === selectedId ? 'white' : 'black';
+
+  //   return (
+  //     <Item
+  //       item={item}
+  //       onPress={() => {
+  //         setSelectedId(item.id);
+  //         navigation.navigate('Post View');
+  //       }}
+  //       backgroundColor={{ backgroundColor }}
+  //       textColor={{ color }}
+  //     />
+  //   );
+  // };
 
   return (
     <StyledFeedContainer>
+      {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
       <StatusBar style="black" />
       <InnerContainer>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Map')}
+         style = {styles.mapTouchableStyle}
+        >
+        <Image source={require('./../assets/map.png')} style={styles.mapIcon} />
+       
+        </TouchableOpacity>
         {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
          */}
         {/* <PageTitle>Feed</PageTitle> */}
@@ -159,6 +190,8 @@ const Welcome = ({ navigation }) => {
       >
         <Image source={require('./../assets/create_post_button.png')} style={styles.floatingButtonStyle} />
       </TouchableOpacity>
+
+      <PostMenu navigation={navigation} />
     </StyledFeedContainer>
   );
 };
@@ -199,6 +232,22 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     width: width * 0.18,
     height: width * 0.18,
+  },
+  mapIcon: {
+    resizeMode: 'contain',
+    width: 30,
+    height: 30,
+    position: 'absolute',
+  },
+  mapTouchableStyle: {
+    flex: 1,
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    right: 40,
+    top: 12,
+    resizeMode : 'contain',
+    // backgroundColor: '#B0C400',
   },
 });
 

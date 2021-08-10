@@ -5,7 +5,9 @@ CREATE DATABASE Posts;
 CREATE DATABASE Chats;*/
 
 /* Install/Setup UUID as needed: (command below)*/
-/* create extension if not exists "uuid-ossp"; */
+
+create extension if not exists "uuid-ossp"; 
+create extension if not exists "postgis"; 
 
 CREATE TABLE users (
     user_id uuid NOT NULL PRIMARY KEY DEFAULT
@@ -28,7 +30,9 @@ CREATE TABLE post (
     post_id BIGSERIAL,
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
+    num_comments INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- post_location geography(point),
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT post_unique UNIQUE (post_id)
@@ -41,8 +45,13 @@ CREATE TABLE comment (
     text VARCHAR(100) NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (comment_id),
+<<<<<<< HEAD
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
+=======
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
+>>>>>>> c726fcef591c5dc476a5e747ff2b40812b40efb5
 );
 
 /*CREATE TYPE voting AS ENUM (
@@ -90,8 +99,13 @@ CREATE TABLE tags (
 CREATE TABLE post_tags (
     tag_id VARCHAR(10) NOT NULL,
     post_id INTEGER NOT NULL,
+<<<<<<< HEAD
     CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
     FOREIGN KEY(post_id) REFERENCES post(post_id),
+=======
+    FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE,
+>>>>>>> c726fcef591c5dc476a5e747ff2b40812b40efb5
     PRIMARY KEY (post_id, tag_id)
 );
 
@@ -101,8 +115,24 @@ CREATE TABLE user_tags (
     user_id uuid NOT NULL,
     tag_id VARCHAR(10) NOT NULL,
     PRIMARY KEY (user_id, tag_id),
-    FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
-    FOREIGN KEY(user_id) REFERENCES users(user_id)
+    FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+--Correct?
+CREATE TABLE anon_names (
+    anon_name_id VARCHAR(25) NOT NULL,
+    PRIMARY KEY(anon_name_id)
+);
+
+
+CREATE TABLE post_names (
+    user_id uuid NOT NULL,
+    anon_name_id VARCHAR(25) NOT NULL,
+    post_id INTEGER NOT NULL,
+    PRIMARY KEY (user_id, anon_name_id, post_id),
+    FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(anon_name_id) REFERENCES anon_names(anon_name_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
 
