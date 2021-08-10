@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import {
   Dimensions,
   StyleSheet,
@@ -183,9 +183,6 @@ const PostView = ({ route, navigation }) => {
   */
   const sendToDB = async (operation, body) => {
     await getJWT();
-
-    console.log(JSON.stringify(body));
-
     //Create a comment on the post
     if (operation === 'comment') {
       try {
@@ -215,7 +212,7 @@ const PostView = ({ route, navigation }) => {
 
         const parseRes = await response.json();
 
-        console.log('UPDATE: ' + parseRes.status);
+        console.log('UPDATE: ' + JSON.stringify(parseRes));
 
         //NEED TO UPDATE CURRENT VIEW
       } catch (error) {
@@ -234,7 +231,7 @@ const PostView = ({ route, navigation }) => {
 
         const parseRes = await response.json();
 
-        console.log('DELETE' + parseRes);
+        console.log('DELETE: ' + JSON.stringify(parseRes));
 
         navigation.navigate('Feed');
       } catch (error) {
@@ -314,6 +311,33 @@ const PostView = ({ route, navigation }) => {
     sendToDB('update', body);
   };
 
+  //When user clicks on icon to update post
+  const updatePost = () => {
+    const postType = {
+      post_type: 'Update',
+      post_text: post.post_text,
+      post_id: post.post_id,
+    };
+    console.log(updatePost);
+    navigation.navigate('Create Post', { postType });
+  };
+
+  //When user clicks on icon to delete post
+  const deletePost = () => {
+    Alert.alert('Delete Post?', 'Would you like to delete this post?', [
+      //Delete post from DB
+      {
+        text: 'Yes',
+        onPress: () => {
+          sendToDB('delete', { postId: post.post_id });
+          navigation.pop();
+          alert('Post Deleted');
+        },
+      },
+      { text: 'No' },
+    ]);
+  };
+
   return (
     /* Style for the entire screen, controls how children are aligned */
     <StyledViewPostContainer>
@@ -329,7 +353,26 @@ const PostView = ({ route, navigation }) => {
       <StatusBar style="black" />
 
       {/* The ... button above the original post's text */}
-      <View style={{ alignSelf: 'flex-end', marginRight: 20 }}>
+      <View style={{ alignSelf: 'flex-end', marginRight: 20, flexDirection: 'row' }}>
+        {/* If user is original poster, options to edit and delete will appear */}
+        {(() => {
+          if (userId === post.user_id) {
+            return (
+              <TouchableOpacity onPress={updatePost}>
+                <Image source={require('./../assets/edit_post_icon.png')} style={styles.editPost} />
+              </TouchableOpacity>
+            );
+          }
+        })()}
+        {(() => {
+          if (userId === post.user_id) {
+            return (
+              <TouchableOpacity onPress={deletePost}>
+                <Image source={require('./../assets/trash_icon.png')} style={styles.trashPost} />
+              </TouchableOpacity>
+            );
+          }
+        })()}
         <EllipsisMenu navigation={navigation} />
       </View>
 
@@ -528,6 +571,16 @@ const styles = StyleSheet.create({
   commentInputSubmit: {
     borderTopWidth: 10,
     borderColor: 'white',
+  },
+  editPost: {
+    width: width * 0.07,
+    height: width * 0.07,
+    paddingHorizontal: 15,
+  },
+  trashPost: {
+    width: width * 0.07,
+    height: width * 0.07,
+    paddingHorizontal: 15,
   },
 });
 

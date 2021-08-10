@@ -9,7 +9,6 @@ import { MenuProvider } from 'react-native-popup-menu';
 import RootStack from './navigators/RootStack';
 import TabNav from './navigators/TabNav';
 import CreatePost from './screens/CreatePost';
-import CreatePoll from './screens/CreatePoll';
 import PostView from './screens/PostView';
 import FlagPost from './screens/FlagPost';
 import EllipsisMenu from './components/EllipsisMenu';
@@ -34,7 +33,6 @@ export default function App() {
           <Stack.Screen name="RootStack" component={RootStack} />
           <Stack.Screen name="TabNav" component={TabNav} />
           <Stack.Screen name="Create Post" component={CreatePost} />
-          <Stack.Screen name="Create Poll" component={CreatePoll} />
           <Stack.Screen name="Post View" component={PostView} />
           <Stack.Screen name="Flag Post" component={FlagPost} />
           <Stack.Screen name="Menu" component={EllipsisMenu} />

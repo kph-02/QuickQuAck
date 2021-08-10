@@ -199,7 +199,7 @@ router.put("/update-post", authorization, async (req, res) => {
       status: "Update Success",
     });
   } catch (err) {
-    res.status(500).send("Server error");
+    res.status(500).json("Server error");
   }
 });
 

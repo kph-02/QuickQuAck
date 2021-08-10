@@ -28,7 +28,10 @@ const PostMenu = ({ navigation }) => {
           <MenuOption
             style={styles.menuOptions}
             onSelect={() => {
-              navigation.navigate('Create Post');
+              const postType = {
+                post_type: 'Text',
+              };
+              navigation.navigate('Create Post', { postType });
             }}
           >
             <View style={styles.options}>
@@ -37,7 +40,13 @@ const PostMenu = ({ navigation }) => {
             </View>
           </MenuOption>
           {/* Poll post */}
-          <MenuOption style={styles.menuOptions} onSelect={() => navigation.navigate('Create Poll')}>
+          <MenuOption
+            style={styles.menuOptions}
+            onSelect={() => {
+              const postType = { post_type: 'Poll' };
+              navigation.navigate('Create Post', { postType });
+            }}
+          >
             <View style={styles.options}>
               <Image source={require('./../assets/poll_icon.png')}></Image>
               <Text style={styles.text}>Poll</Text>
