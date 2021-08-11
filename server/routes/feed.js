@@ -29,7 +29,7 @@ router.post("/create-post", authorization, async (req, res) => {
       "INSERT INTO post (post_text, user_id, num_comments) VALUES ($1, $2, $3) RETURNING *;",
       [postText, author_id, num_comments]
     );
-
+    
     const postID = newPost.rows[0].post_id;
 
     for (const i of postTag) {
@@ -39,7 +39,7 @@ router.post("/create-post", authorization, async (req, res) => {
         [postID, i]
       );
     }
-
+    
     const nameAdjectives = [
       "Red",
       "Orange",
@@ -235,8 +235,8 @@ router.post("/create-comment", authorization, async (req, res) => {
       status: "Comment Success",
     });
   } catch (err) {
-    console.log(err.message);
-    res.status(500).json("Server error");
+    console.error(err.message);
+    res.status(500).json("Server Error");
   }
 });
 
@@ -244,11 +244,26 @@ router.post("/create-comment", authorization, async (req, res) => {
 router.get("/post-comments", authorization, async (req, res) => {
   try {
     const { post_id } = req.query;
-
-    const allComment = await pool.query(
-      "SELECT * FROM comment WHERE post_id=($1)",
+  
+    const allComments = await pool.query(
+      "SELECT *, AGE(NOW(), time_posted) AS comment_age FROM comment INNER JOIN "
+    + "post_names ON comment.post_id = "
+    + "post_names.post_id WHERE comment.post_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' "
+    + "AND NOW() ORDER BY time_posted DESC;",
       [post_id]
     );
+
+    /*
+    const anonName = await pool.query(
+      "SELECT * FROM post_names WHERE user_id = $1 AND post_id = $2",
+      [user_id, post_id]
+    );
+
+    const timeAgo = await pool.query(
+      "SELECT anon_name_id FROM post_names WHERE user_id = $1 AND post_id = $2",
+      [user_id, post_id]
+    );
+    */
 
     /* For future reference, this is how to order by upvotes. */
     // const allFeed = await pool.query
@@ -257,7 +272,9 @@ router.get("/post-comments", authorization, async (req, res) => {
 
     res.status(201).json({
       data: {
-        comment: allComment.rows,
+        comment: allComments.rows,
+        //time: timeAgo.rows[0],
+        //name: anonName.rows[0],
       },
     });
   } catch (err) {
@@ -270,7 +287,11 @@ router.get("/post-comments", authorization, async (req, res) => {
 router.get("/all-posts", authorization, async (req, res) => {
   try {
     const allFeed = await pool.query(
-      "SELECT post.post_id AS post_id, post.user_id AS user_id, post_text, num_comments, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW() ORDER BY time_posted DESC;"
+      "SELECT post.post_id AS post_id, post.user_id AS user_id, post_text, "
+      + "num_comments, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id "
+      + "AS anon_name FROM post INNER JOIN post_names ON post.user_id = "
+      + "post_names.user_id AND post.post_id = post_names.post_id WHERE "
+      + "time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW() ORDER BY time_posted DESC;"
     );
 
     /* For future reference, this is how to order by upvotes. */

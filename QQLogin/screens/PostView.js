@@ -101,6 +101,26 @@ const commentExamples = [
   },
 ];
 
+const formatTime = (post_age) => {
+  let postAgeDisplay = '';
+
+  //check if it exists b/c sometimes called before objects rendered so is undefined
+  if (post_age) {
+    if (post_age.hours) {
+      postAgeDisplay += post_age.hours + 'h ';
+    }
+    if (post_age.minutes) {
+      postAgeDisplay += post_age.minutes + 'm ';
+    } else {
+      postAgeDisplay += '1m ';
+    }
+
+    postAgeDisplay += 'ago';
+  }
+
+  return postAgeDisplay;
+};
+
 /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
 const Item = ({ item, onPress, backgroundColor, textColor }) => {
   const navigation = useNavigation();
@@ -110,7 +130,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => {
         style={{ marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent: 'space-between' }}
       >
         {/* (Anonymous) name of the commenter */}
-        <Text style={[styles.name]}>{item.user_id}</Text>
+        <Text style={[styles.name]}>{item.anon_name_id}</Text>
 
         {/* The ... button for each comment */}
         <View>
@@ -131,7 +151,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => {
           alignContent: 'space-around',
         }}
       >
-        <Text style={[styles.name]}>{item.time_posted} ago</Text>
+        <Text style={[styles.name]}>{formatTime(item.comment_age)} ago</Text>
         <TouchableOpacity
           title="Upvote"
           onPress={() => console.log('Upvoted!')}
@@ -145,12 +165,15 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => {
   );
 };
 
+
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
   const { post } = route.params; //post data
   const [comments, SetComments] = useState([]); //stores all comments for the post
   const [newComments, refreshNewComments] = useState(false); //determines when to get new comments from db
+  const [refresh, setRefresh] = useState(false); //Handle refreshing logic
+
 
   const getJWT = async () => {
     try {
@@ -338,6 +361,11 @@ const PostView = ({ route, navigation }) => {
     ]);
   };
 
+  const handleRefresh = () => {
+    setRefresh(true); //update animation
+    refreshNewComments(!newComments); //Change variable to trigger useEffect to pull posts from database
+  };
+  
   return (
     /* Style for the entire screen, controls how children are aligned */
     <StyledViewPostContainer>
@@ -419,8 +447,11 @@ const PostView = ({ route, navigation }) => {
           keyExtractor={(item) => item.comment_id}
           // extraData={id}
           renderItem={renderItem}
+          refreshing={refresh} //true: shows spinning animation to show loading
+          onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
         />
       </View>
+
 
       {/* Comment Section (TextInput) */}
       <Formik
