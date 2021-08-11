@@ -91,7 +91,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       <View style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}>
         {/*number of upvotes*/}
         <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>21</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_upvotes}</Text>
       </View>
       <View style={styles.infoRow}>
         {/*number of comments*/}
@@ -137,6 +137,7 @@ const FirstRoute = () => {
   const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
   const [update, setUpdate] = useState(false); //Changing will feed to update
+
   const navigation = useNavigation();
 
   //renderItem function for each item passed through
@@ -174,7 +175,6 @@ const FirstRoute = () => {
     }
   };
 
-
   //Communicating with the database to get all the posts
   const getFromDB = async () => {
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
@@ -195,6 +195,7 @@ const FirstRoute = () => {
        * "user_id":,
        * "post_text":,
        * "num_comments":,
+       * "num_upvotes"
        * "time_posted":
        *
        * "anon_name:""
@@ -229,7 +230,7 @@ const FirstRoute = () => {
     setRefresh(true); //update animation
     setUpdate(!update); //Change variable to trigger useEffect to pull posts from database
   };
-  
+
   return (
     // <StyledFeedContainer>
     //     <StatusBar style="black" />
@@ -295,6 +296,7 @@ const SecondRoute = () => {
 
   //Communicating with the database to get all the posts
   const getFromDB = async () => {
+    let post;
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
 
     try {
@@ -313,6 +315,7 @@ const SecondRoute = () => {
        * "user_id":,
        * "post_text":,
        * "num_comments":,
+       * "num_upvotes":,
        * "time_posted":
        *
        * "anon_name:""
@@ -324,10 +327,11 @@ const SecondRoute = () => {
        * milliseconds
        * ]
        * */
-      setAllData(parseRes.data.post);
+      post = parseRes.data.post;
     } catch (error) {
       console.error(error.message);
     }
+    setAllData(post);
   };
 
   //useFocusEffect triggers works like useEffect, but only when this screen is focused

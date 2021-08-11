@@ -63,6 +63,7 @@ const CreatePost = ({ route, navigation }) => {
     postText: '',
     postTag: [] /*Initialize as first value in tags drop-down*/,
     num_comments: 0 /*0 comments to begin with, updated when new comments added */,
+    num_upvotes: 0,
   });
 
   var JWTtoken = '';

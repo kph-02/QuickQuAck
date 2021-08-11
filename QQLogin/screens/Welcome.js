@@ -154,12 +154,8 @@ const Welcome = ({ navigation }) => {
       {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
       <StatusBar style="black" />
       <InnerContainer>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Map')}
-         style = {styles.mapTouchableStyle}
-        >
-        <Image source={require('./../assets/map.png')} style={styles.mapIcon} />
-       
+        <TouchableOpacity onPress={() => navigation.navigate('Map')} style={styles.mapTouchableStyle}>
+          <Image source={require('./../assets/map.png')} style={styles.mapIcon} />
         </TouchableOpacity>
         {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
          */}
@@ -183,13 +179,13 @@ const Welcome = ({ navigation }) => {
 
       <FeedViews navigation={navigation} />
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         activeOpacity={0.5}
         onPress={() => navigation.navigate('Create Post')}
         style={styles.touchableStyle}
       >
         <Image source={require('./../assets/create_post_button.png')} style={styles.floatingButtonStyle} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <PostMenu navigation={navigation} />
     </StyledFeedContainer>
@@ -246,7 +242,7 @@ const styles = StyleSheet.create({
     height: 30,
     right: 40,
     top: 12,
-    resizeMode : 'contain',
+    resizeMode: 'contain',
     // backgroundColor: '#B0C400',
   },
 });
