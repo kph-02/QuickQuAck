@@ -309,6 +309,17 @@ const MapIcon = styled.TouchableOpacity`
   marginTop: -5,
   position: 'absolute',
 `;
+
+export const MapContainer = styled.View`
+  flex: 5;
+  background-color: ${primary};
+`;
+
+export const TopMapContainer = styled.View`
+  flex: 1;
+  background-color: ${primary};
+`;
+
 export const SignInButton = ({ onPress }) => (
   <RoundedTouchableOpacitySignIn onPress={onPress}>
     <ButtonText>Sign Up</ButtonText>

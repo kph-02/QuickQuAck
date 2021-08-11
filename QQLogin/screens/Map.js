@@ -1,21 +1,19 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, Image, Button } from 'react-native';
+import { StyleSheet, View, Platform, Text, Image, Button, StatusBar, Dimensions, TouchableOpacity } from 'react-native';
 import MapView, { Heatmap, PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps';
-
+import { MapContainer, TopMapContainer } from './../components/styles';
 import * as Location from 'expo-location';
-import * as Permissions from 'expo-permissions';
+import { AntDesign } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
 export default class Map extends Component {
-  //   static navigationOptions = {
-  //     title: 'New York',
-  //   };
 
   //State
   state = {
     location: {
-        latitude: 32.880213553722704,
-        longitude: -117.23399204377725,
-
+      latitude: 32.880213553722704,
+      longitude: -117.23399204377725,
     },
     geocode: null,
     errorMessage: '',
@@ -46,8 +44,9 @@ export default class Map extends Component {
 
   // Next, the function will use expo-location getCurrentPositionAsync function to get the location data.
 
+  
   getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       this.setState({
         errorMessage: 'Permission to access location was denied',
@@ -69,31 +68,32 @@ export default class Map extends Component {
   //Requesting permissions to access location as soon as map is opened
   componentDidMount() {
     this.getLocationAsync();
-    console.log(this.state.geocode)
+    console.log(this.state.location);
+    console.log(this.state.geocode);
   }
 
   render() {
+
     return (
-      <View style={styles.container}>
+      
+      <View>
+        <StatusBar translucent={true} backgroundColor="transparent" barStyle="dark-content" />
         <MapView
           mapType="standard"
           customMapStyle={this.mapStyle}
           loadingEnabled={true}
           scrollEnabled={true}
-          showsCompass={true}
           showsUserLocation={true}
           provider={null}
           ref={(map) => (this._map = map)}
           style={styles.map}
           region={{
-              latitude: this.state.location.latitude,
-              longitude: this.state.location.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }
-          }
+            latitude: this.state.location.latitude,
+            longitude: this.state.location.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
         >
-
           <Marker coordinate={{ latitude: 32.88232190507297, longitude: -117.23403495912069 }}>
             <Callout>
               <Text>bro what </Text>
@@ -105,10 +105,19 @@ export default class Map extends Component {
             </Callout>
           </Marker>
         </MapView>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          onPress={() => console.log("This doesnt work idk why")}
+          style={styles.touchableStyle}
+        >
+          <Image source={require('./../assets/backb.png')} style={styles.floatingButtonStyle} />
+        </TouchableOpacity>
       </View>
     );
   }
 }
+
+const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   container: {
@@ -116,9 +125,30 @@ const styles = StyleSheet.create({
   },
   map: {
     height: '100%',
+    zIndex: -1,
+    elevation: -1,
   },
+
   duck: {
     width: 100,
     top: 10,
+  },
+
+  touchableStyle: {
+    position: 'absolute',
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 20,
+    top: 50,
+    zIndex: 1,
+    elevation: 1,
+  },
+  floatingButtonStyle: {
+    resizeMode: 'cover',
+    width: width * 0.18,
+    height: width * 0.18,
+    zIndex: 1,
   },
 });
