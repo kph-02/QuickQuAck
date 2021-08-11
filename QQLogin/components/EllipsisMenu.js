@@ -1,5 +1,5 @@
 import React, { useState, Component } from 'react';
-import { Dimensions, Platform, StyleSheet, Text, Alert } from 'react-native';
+import { Dimensions, Platform, StyleSheet, Text, Alert, TouchableHighlight } from 'react-native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, renderers } from 'react-native-popup-menu';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -11,8 +11,8 @@ const EllipsisMenu = ({ navigation }) => {
   return (
     <Menu renderer={SlideInMenu}>
       {/* Slide-in Menu from the bottom is triggered by the Ellipsis (...) button */}
-      <MenuTrigger>
-        <MaterialCommunityIcons name="dots-horizontal" color="#BDBDBD" size={height * 0.035} />
+      <MenuTrigger customStyles={triggerStyles}>
+        <MaterialCommunityIcons name="dots-horizontal" color="#BDBDBD" size={height * 0.035}/>
       </MenuTrigger>
 
       {/* Three menu options: Send Message, Flag as inappropriate, Block Posts from User */}
@@ -80,5 +80,17 @@ const styles = StyleSheet.create({
     fontSize: height * 0.019,
   },
 });
+
+const triggerStyles = {
+  TriggerTouchableComponent: TouchableHighlight,
+  triggerTouchable: {
+    activeOpacity: 0.6,
+    style: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 100,
+    },
+  },
+};
 
 export default EllipsisMenu;

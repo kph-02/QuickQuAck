@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable} from 'react-native';
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
@@ -186,8 +186,10 @@ const Welcome = ({ navigation }) => {
       >
         <Image source={require('./../assets/create_post_button.png')} style={styles.floatingButtonStyle} />
       </TouchableOpacity> */}
-
-      <PostMenu navigation={navigation} />
+      <View style={styles.touchableStyle}>
+        <PostMenu navigation={navigation} />
+      </View>
+      
     </StyledFeedContainer>
   );
 };

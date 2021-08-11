@@ -7,8 +7,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 
-export default class Map extends Component {
-
+class Maps extends Component {
   //State
   state = {
     location: {
@@ -44,7 +43,6 @@ export default class Map extends Component {
 
   // Next, the function will use expo-location getCurrentPositionAsync function to get the location data.
 
-  
   getLocationAsync = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -69,13 +67,12 @@ export default class Map extends Component {
   componentDidMount() {
     this.getLocationAsync();
     console.log(this.state.location);
-    console.log(this.state.geocode);
+    // console.log(this.state.geocode);
   }
 
   render() {
-
+    const {navigation} = this.props;
     return (
-      
       <View>
         <StatusBar translucent={true} backgroundColor="transparent" barStyle="dark-content" />
         <MapView
@@ -107,7 +104,7 @@ export default class Map extends Component {
         </MapView>
         <TouchableOpacity
           activeOpacity={0.5}
-          onPress={() => console.log("This doesnt work idk why")}
+          onPress={() => navigation.pop()}
           style={styles.touchableStyle}
         >
           <Image source={require('./../assets/backb.png')} style={styles.floatingButtonStyle} />
@@ -115,6 +112,12 @@ export default class Map extends Component {
       </View>
     );
   }
+}
+
+export default function Map(props) {
+  const navigation = useNavigation();
+
+  return <Maps {...props} navigation={navigation} />;
 }
 
 const { width, height } = Dimensions.get('screen');

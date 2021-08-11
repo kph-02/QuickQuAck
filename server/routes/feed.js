@@ -122,7 +122,7 @@ router.post("/user-tag-selection", async (req, res) => {
     res.status(201).json({
       status: "Tag's have been inserted",
       data: {
-        tags: postTags.rows[0],
+        tags: postTag,
       },
     });
   } catch (err) {
