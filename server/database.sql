@@ -45,24 +45,39 @@ CREATE TABLE comment (
     text VARCHAR(100) NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (comment_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
 );
 
-CREATE TYPE voting AS ENUM (
+/*CREATE TYPE voting AS ENUM (
     'like',
     'dislike'
-);
+);*/
 
-CREATE TABLE vote (
+/*
+SELECT x, (ENUM_RANGE(NULL::voting))[x] 
+    FROM generate_series(-1, 1) x
+*/
+
+CREATE TABLE post_votes (
     user_id uuid NOT NULL,
     post_id INTEGER NOT NULL,
-    comment_id INTEGER NOT NULL,
-    vote_value voting, 
+    vote_value INTEGER NOT NULL CHECK (-1 <= vote_value AND vote_value <= 1), 
     PRIMARY KEY (user_id, post_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE,
-    FOREIGN KEY (comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
+);
+
+CREATE TABLE comment_votes(
+  user_id uuid NOT NULL,
+  comment_id INTEGER NOT NULL,
+  post_id INTEGER NOT NULL,
+  vote_value INTEGER NOT NULL CHECK (-1 <= vote_value AND vote_value <= 1),
+  PRIMARY KEY (user_id, comment_id),
+  CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_comment FOREIGN KEY(comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
 );
 
 -- storage of all the tags
@@ -79,8 +94,8 @@ CREATE TABLE tags (
 CREATE TABLE post_tags (
     tag_id VARCHAR(10) NOT NULL,
     post_id INTEGER NOT NULL,
-    FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES post(post_id),
     PRIMARY KEY (post_id, tag_id)
 );
 

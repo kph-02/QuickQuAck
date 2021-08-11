@@ -183,13 +183,13 @@ const Welcome = ({ navigation }) => {
 
       <FeedViews navigation={navigation} />
 
-      {/* <TouchableOpacity
+      <TouchableOpacity
         activeOpacity={0.5}
         onPress={() => navigation.navigate('Create Post')}
         style={styles.touchableStyle}
       >
         <Image source={require('./../assets/create_post_button.png')} style={styles.floatingButtonStyle} />
-      </TouchableOpacity> */}
+      </TouchableOpacity>
 
       <PostMenu navigation={navigation} />
     </StyledFeedContainer>

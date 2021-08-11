@@ -14,6 +14,7 @@ Create Comment (POST)
 Delete Post (DELETE)
 Update Post(PUT)
 Update Comment(PUT)
+Upvote/Downvote a post (POST)
 */
 
 router.post("/create-post", authorization, async (req, res) => {
@@ -130,16 +131,21 @@ router.post("/user-tag-selection", async (req, res) => {
 
 // This renders a page of posts based upon filtering of tags selected during user creation sorted in ascending order of time posted
 
-//this is kinda buddy
+//
 router.get("/home-feed", authorization, async (req, res) => {
+  const user_id = req.user;
+
   try {
     // add a date time filter so its only last 24 hrs
-    const filteredFeed = await pool.query(
-      "SELECT DISTINCT ON (pt.post_id) pt.post_id, p.user_id, p.post_text, p.time_posted, ut.tag_id FROM post AS p JOIN user_tags as ut ON ut.user_id = p.user_id JOIN post_tags AS pt on pt.tag_id = ut.tag_id WHERE (pt.tag_id = 'Muir') ORDER BY pt.post_id ASC, p.time_posted DESC;"
+    console.log("This is UID " + user_id);
+    const homeFeed = await pool.query(
+      "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, p.num_comments, AGE(NOW(), p.time_posted) AS post_age FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) WHERE UT.User_id = $1) AS SB ORDER BY SB.time_posted DESC;",
+      [user_id]
     );
+
     res.status(201).json({
       data: {
-        post: filteredFeed.rows,
+        post: homeFeed.rows,
       },
     });
   } catch (err) {
@@ -150,7 +156,7 @@ router.get("/home-feed", authorization, async (req, res) => {
 
 // router.get("/filtered-feed", authorization, async (req, res) => {
 //   try {
-//     //This will select from the 'tagpicker' dropdown within the post functionality
+//     //This will select from the 'tagpicker' dropdown within the post fuponctionality
 
 //     var tag = req.body.tagpicker;
 
@@ -300,6 +306,90 @@ router.get("/search-posts", authorization, async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
+  }
+});
+
+// delete a comment
+router.delete("/delete-comment", authorization, async (req, res) => {
+    try {
+        const { comment_id } = req.body;
+        // code to select any single comment
+        const deletedComment = await pool.query("DELETE FROM comment WHERE comment_id = $1 RETURNING *", [comment_id]);
+        res.status(201).json({
+            status: "Deleted comment"
+        });
+    } catch (err) {
+        res.status(500).send("Server error");
+    }
+});
+
+// edit a comment
+
+// get post votes
+router.get('/post-votes', authorization, async (req, res) => {
+    try {
+        const { post_id } = req.body;
+        const postVotes = await pool.query("SELECT * FROM post_votes WHERE post_id = $1", [post_id]); 
+        res.status(201).send(postVotes.rows);
+    } catch (err) {
+        res.status(500).send({ error: err.message });
+    }
+});
+
+// get comment votes
+router.get('/comment-votes', authorization, async (req, res) => {
+    try {
+        const { comment_id } = req.body;
+        const commentVotes = await pool.query("SELECT * FROM comment_votes WHERE comment_id = $1", [comment_id]);
+        res.status(201).send(commentVotes.rows);
+    } catch (err) {
+        res.status(500).send({ error: err.message });
+    }
+});
+
+// add/undo post vote
+router.post("/post-vote", authorization, async (req, res) => {
+    try {
+        const { user_id, post_id, vote_value } = req.body;
+        // if the same vote from the same person on the same post exists  
+        const exactDuplicate = await pool.query("SELECT * FROM post_votes WHERE (user_id = $1 AND post_id = $2 AND vote_value = $3)", [user_id, post_id, vote_value]);
+        if (exactDuplicate.rows.length > 0) {
+            const deleteVote = await pool.query("DELETE FROM post_votes WHERE (user_id = $1 AND post_id = $2 AND vote_value = $3)", [user_id, post_id, vote_value]);
+        }
+        else {
+          try {
+              const insertVote = await pool.query("INSERT INTO post_votes VALUES($1, $2, $3) RETURNING *",
+              [user_id, post_id, vote_value]);
+          } catch (err) {
+              const updateVote = await pool.query("UPDATE post_votes SET vote_value = $1 WHERE (user_id = $2 AND post_id = $3) RETURNING *", [vote_value, user_id, post_id]);
+          }
+        }
+      res.status(201).send("Complete");
+    } catch (err) {
+        res.status(500).send({ error: err.message });
+    }
+});
+
+// add/undo comment voes
+router.post("/comment-vote", authorization, async (req, res) => {
+  try {
+      const { user_id, comment_id, vote_value } = req.body;
+      // if the same vote from the same person on the same post exists  
+      const exactDuplicate = await pool.query("SELECT * FROM comment_votes WHERE (user_id = $1 AND comment_id = $2 AND vote_value = $3)", [user_id, comment_id, vote_value]);
+      if (exactDuplicate.rows.length > 0) {
+          const deleteVote = await pool.query("DELETE FROM comment_votes WHERE (user_id = $1 AND comment_id = $2 AND vote_value = $3)", [user_id, comment_id, vote_value]);
+      }
+      else {
+        try {
+            const insertVote = await pool.query("INSERT INTO comment_votes VALUES($1, $2, $3) RETURNING *",
+            [user_id, comment_id, vote_value]);
+        } catch (err) {
+            const updateVote = await pool.query("UPDATE comment_votes SET vote_value = $1 WHERE (user_id = $2 AND comment_id = $3) RETURNING *", [vote_value, user_id, comment_id]);
+        }
+      }
+    res.status(201).send("Complete");
+  } catch (err) {
+      res.status(500).send({ error: err.message });
   }
 });
 
