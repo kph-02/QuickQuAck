@@ -13,6 +13,7 @@ import PostView from './screens/PostView';
 import FlagPost from './screens/FlagPost';
 import EllipsisMenu from './components/EllipsisMenu';
 import ChatRoom from './screens/ChatRoom';
+import ChatRoomEllipsis from './components/ChatRoomEllipsis';
 
 // import { StackActions } from '@react-navigation/native';
 
@@ -35,6 +36,7 @@ export default function App() {
         <Stack.Screen name="Flag Post" component={FlagPost} />
         <Stack.Screen name="Menu" component={EllipsisMenu} />
         <Stack.Screen name="Chat" component={ChatRoom} />
+        <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
       </Stack.Navigator>
     </NavigationContainer>
   </MenuProvider>

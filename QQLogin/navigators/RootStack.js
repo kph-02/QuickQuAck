@@ -17,6 +17,7 @@ import FeedViews from '../screens/FeedViews';
 import FlagPost from '../screens/FlagPost';
 import EllipsisMenu from '../components/EllipsisMenu';
 import ChatRoom from '../screens/ChatRoom';
+import ChatRoomEllipsis from '../components/ChatRoomEllipsis';
 
 const Stack = createStackNavigator();
 
@@ -39,6 +40,7 @@ const RootStack = () => {
                 <Stack.Screen name="Flag Post" component={FlagPost} />
                 <Stack.Screen name="Menu" component={EllipsisMenu} />
                 <Stack.Screen name="Chat" component={ChatRoom} />
+                <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
         </Stack.Navigator>
        
     )

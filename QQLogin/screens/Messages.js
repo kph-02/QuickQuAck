@@ -17,7 +17,7 @@ import {
 } from './../components/styles';
 
 
-//Hardcoded Message Data
+//Hardcoded Message (room) Data
 const messages = [
   {
     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
@@ -106,7 +106,7 @@ const Messages = ({ navigation }) => {
         item={item}
         onPress={() => {
           setSelectedId(item.id);
-          navigation.navigate('Chat');
+          navigation.navigate('Chat', {user: item.user, avatarColor: item.color});
         }}
         backgroundColor={{ backgroundColor }}
       />
