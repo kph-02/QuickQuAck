@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import {
   Dimensions,
   StyleSheet,
@@ -20,7 +20,7 @@ import { serverIp } from './Login.js';
 
 //Store Authentication Token
 var JWTtoken = '';
-
+var userId = '';
 //formik
 import { Formik, Field, Form } from 'formik';
 
@@ -104,52 +104,58 @@ const commentExamples = [
 /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
 const Item = ({ item, onPress, backgroundColor, textColor }) => {
   const navigation = useNavigation();
-  return(
+  return (
     <View style={[styles.item, backgroundColor]}>
-    <View style={{marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent:'space-between'}}>
+      <View
+        style={{ marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent: 'space-between' }}
+      >
+        {/* (Anonymous) name of the commenter */}
+        <Text style={[styles.name]}>{item.user_id}</Text>
 
-      {/* (Anonymous) name of the commenter */}
-      <Text style={[styles.name]}>{item.user_id}</Text>
+        {/* The ... button for each comment */}
+        <View>
+          <EllipsisMenu navigation={navigation} />
+        </View>
+      </View>
 
-      {/* The ... button for each comment */}
-      <View>
-        <EllipsisMenu navigation={navigation}/>
+      {/* The text for the comment */}
+      <Text style={[styles.commentText, textColor]}>{item.text}</Text>
+
+      {/* The row of when the comment was posted, along with the number of upvotes */}
+      <View
+        style={{
+          flexDirection: 'row',
+          marginTop: 10,
+          alignItems: 'center',
+          marginLeft: 20,
+          alignContent: 'space-around',
+        }}
+      >
+        {/* Time posted */}
+        <Text style={[styles.name]}>{item.time_posted} ago</Text>
+        <TouchableOpacity
+          title="Upvote"
+          onPress={() => console.log('Upvoted!')}
+          style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
+        >
+          <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
+          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.likes}</Text>
+        </TouchableOpacity>
       </View>
     </View>
-
-    {/* The text for the comment */}
-    <Text style={[styles.commentText, textColor]}>{item.text}</Text>
-
-    {/* The row of when the comment was posted, along with the number of upvotes */}
-    <View
-      style={{
-        flexDirection: 'row',
-        marginTop: 10,
-        alignItems: 'center',
-        marginLeft: 20,
-        alignContent: 'space-around',
-      }}
-    >
-      <Text style={[styles.name]}>{item.time_posted} ago</Text>
-      <TouchableOpacity
-        title="Upvote"
-        onPress={() => console.log('Upvoted!')}
-        style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
-      >
-        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
-        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.likes}</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
   );
 };
 
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
-  const { post } = route.params;
-  const [comments, SetComments] = useState([]);
-  const [newComments, refreshNewComments] = useState(false);
+  const { post } = route.params; //post data
+  const [comments, SetComments] = useState([]); //stores all comments for the post
+  const [newComments, refreshNewComments] = useState(false); //determines when to get new comments from db
+
+  //handling upvotes, UPDATE TO INITIALIZE TO PASSED IN VALUES
+  const [upvoted, setUpvoted] = useState(false);
+  const [upvotes, setUpvotes] = useState(post.num_upvotes);
 
   const getJWT = async () => {
     try {
@@ -161,13 +167,26 @@ const PostView = ({ route, navigation }) => {
       console.error(error.message);
     }
   };
-  //communicate registration information with the database
 
+  const getUserID = async () => {
+    try {
+      await AsyncStorage.getItem('user_id').then((user_id) => {
+        //console.log('Retrieved Token: ' + token);
+        userId = user_id;
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  /*Send information to the DB
+    operation: What operation is being done: 
+      comment: creating a comment
+      update: updating the post
+      delete: deleting the post
+    body: information to send to the DB
+  */
   const sendToDB = async (operation, body) => {
-    await getJWT();
-
-    console.log(JSON.stringify(body));
-
     //Create a comment on the post
     if (operation === 'comment') {
       try {
@@ -179,8 +198,8 @@ const PostView = ({ route, navigation }) => {
 
         const parseRes = await response.json();
 
-        console.log('COMMENT: ' + JSON.stringify(parseRes));
-        refreshNewComments(!newComments);
+        // console.log('COMMENT: ' + JSON.stringify(parseRes));
+        refreshNewComments(!newComments); //update the page with the new comment
       } catch (error) {
         console.error(error.message);
       }
@@ -197,7 +216,9 @@ const PostView = ({ route, navigation }) => {
 
         const parseRes = await response.json();
 
-        console.log('UPDATE: ' + parseRes.status);
+        // console.log('UPDATE: ' + JSON.stringify(parseRes));
+
+        //NEED TO UPDATE CURRENT VIEW
       } catch (error) {
         console.error(error.message);
       }
@@ -214,7 +235,9 @@ const PostView = ({ route, navigation }) => {
 
         const parseRes = await response.json();
 
-        console.log('DELETE' + parseRes);
+        // console.log('DELETE: ' + JSON.stringify(parseRes));
+
+        navigation.navigate('Feed');
       } catch (error) {
         console.error(error.message);
       }
@@ -244,8 +267,7 @@ const PostView = ({ route, navigation }) => {
 
   //Getting comments from the database to show for post
   const getFromDB = async () => {
-    await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
-    const query = 'post_id=' + post.post_id;
+    const query = 'post_id=' + post.post_id; //sets up query information
     try {
       // Update server with user's registration information
       const response = await fetch('http://' + serverIp + ':5000/feed/post-comments?' + query, {
@@ -257,21 +279,52 @@ const PostView = ({ route, navigation }) => {
       const parseRes = await response.json();
 
       //Updates postData to have post information using useState
+      //temporary if statement just so second view might work, will delete soon
       if (parseRes.data) {
         SetComments(parseRes.data.comment);
-      } else {
-        SetComments(commentExamples);
       }
     } catch (error) {
       console.error(error.message);
     }
   };
 
-  //useEffect triggers when objects are rendered, so this only occurs once instead of looping infinitely
+  //Get from database whether user has upvoted this post before or not
+  const getUpvoted = async () => {
+    try {
+      const query = 'post_id=' + post.post_id + '&user_id=' + userId;
+
+      // Update server with user's registration information
+      const response = await fetch('http://' + serverIp + ':5000/feed/post-votes?' + query, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+
+      console.log(parseRes);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
     getFromDB();
     console.log('Comments Refreshed');
   }, [newComments]);
+
+  //triggers on first load
+  useEffect(() => {
+    async function fetchAuthorizations() {
+      await getJWT();
+      await getUserID();
+    }
+
+    fetchAuthorizations();
+
+    getUpvoted();
+  }, []);
 
   /* Controls the look of each "item", or comment in this context */
   const renderItem = ({ item }) => {
@@ -280,13 +333,88 @@ const PostView = ({ route, navigation }) => {
     return <Item item={item} backgroundColor={{ backgroundColor }} textColor={{ color }} />;
   };
 
-  const updateNumComments = () => {
+  //Updates database with whether this user upvoted post or not
+  const updatePostValue = async (body) => {
+    console.log(body);
+
+    try {
+      const response = await fetch('http://' + serverIp + ':5000/feed/post-vote', {
+        method: 'POST',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      console.log('Update Upvotes: ' + JSON.stringify(parseRes));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //Update the attributes of the post such as the number of comments and upvotes
+  const updatePostAttributes = () => {
     const body = {
-      postId: post.post_id,
+      post_id: post.post_id,
       num_comments: comments.length,
+      num_upvotes: upvotes,
     };
 
     sendToDB('update', body);
+    //Update whether the use upvoted in the database
+
+    const bodyUpvotes = {
+      user_id: userId,
+      post_id: post.post_id,
+      vote_value: upvoted ? 1 : 0,
+    };
+    updatePostValue(bodyUpvotes);
+  };
+
+  //When user clicks on icon to update post
+  const updatePost = () => {
+    const postType = {
+      post_type: 'Update',
+      post_text: post.post_text,
+      post_id: post.post_id,
+    };
+    navigation.navigate('Create Post', { postType });
+    updatePostAttributes();
+  };
+
+  //When user clicks on icon to delete post
+  const deletePost = () => {
+    Alert.alert('Delete Post?', 'Would you like to delete this post?', [
+      //Delete post from DB
+      {
+        text: 'Yes',
+        onPress: () => {
+          sendToDB('delete', { postId: post.post_id });
+          navigation.pop();
+          alert('Post Deleted');
+        },
+      },
+      { text: 'No' },
+    ]);
+  };
+
+  //handles functionality for when user upvotes a post
+  const handleUpvote = () => {
+    let incrementUpvotes = 0;
+
+    //toggle upvote button
+    setUpvoted(!upvoted);
+
+    // If true, then upvote was removed, so decrement upvote
+    // This is because setUpvoted takes into effect for the next
+    // iteration due to how useStates work
+    if (upvoted) {
+      incrementUpvotes = -1;
+    } else {
+      incrementUpvotes = 1;
+    }
+
+    setUpvotes(upvotes + incrementUpvotes);
   };
 
   return (
@@ -296,7 +424,8 @@ const PostView = ({ route, navigation }) => {
       <TouchableOpacity
         style={{ marginLeft: 10, width: 50, paddingLeft: 5 }}
         onPress={() => {
-          navigation.navigate('Feed'), updateNumComments();
+          navigation.navigate('Feed');
+          updatePostAttributes();
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
@@ -304,9 +433,28 @@ const PostView = ({ route, navigation }) => {
       <StatusBar style="black" />
 
       {/* The ... button above the original post's text */}
-        <View style={{alignSelf: 'flex-end', marginRight: 20}}>
-            <EllipsisMenu navigation={navigation}/>
-        </View>
+      <View style={{ alignSelf: 'flex-end', marginRight: 20, flexDirection: 'row' }}>
+        {/* If user is original poster, options to edit and delete will appear */}
+        {(() => {
+          if (userId === post.user_id) {
+            return (
+              <TouchableOpacity onPress={updatePost}>
+                <Image source={require('./../assets/edit_post_icon.png')} style={styles.editPost} />
+              </TouchableOpacity>
+            );
+          }
+        })()}
+        {(() => {
+          if (userId === post.user_id) {
+            return (
+              <TouchableOpacity onPress={deletePost}>
+                <Image source={require('./../assets/trash_icon.png')} style={styles.trashPost} />
+              </TouchableOpacity>
+            );
+          }
+        })()}
+        <EllipsisMenu navigation={navigation} />
+      </View>
 
       {/* The Original Post's Text */}
       <View style={styles.postBox}>
@@ -324,11 +472,17 @@ const PostView = ({ route, navigation }) => {
         </View>
         <TouchableOpacity
           title="Upvote"
-          onPress={() => console.log('Upvoted!')}
+          onPress={handleUpvote}
           style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}
         >
-          <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
-          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>21</Text>
+          {/* Upvote button */}
+          <MaterialCommunityIcons
+            name="chevron-up"
+            color={upvoted ? '#FFCC15' : '#BDBDBD'}
+            size={35}
+            style={{ width: 29 }}
+          />
+          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{upvotes}</Text>
         </TouchableOpacity>
         <View style={styles.infoRow}>
           <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
@@ -402,67 +556,6 @@ const PostView = ({ route, navigation }) => {
         )}
       </Formik>
       <Line />
-
-      {/* What Ajay originally had in PostView: */}
-      {/* <View style={{flex: 0.2, backgroundColor: 'lightcyan', justifyContent: 'center'}}>
-          <Text style={styles.commentText}>Slight margin bottom adder thing</Text>
-        </View> */}
-      {/* <SubTitle></SubTitle>
-          <Formik
-            initialValues={{
-              postText: '',
-              postId: '',
-            }}
-            onSubmit={(values) => {
-              //Setting up information to send to database
-              body = {
-                postText: values.postText,
-                postId: values.postId,
-              };
-
-              sendToDB(body);
-              navigation.navigate('CreatePost');
-            }}
-          >
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
-              <StyledFormArea>
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Text"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postText')}
-                  onBlur={handleBlur('postText')}
-                  value={values.postText}
-                  selectionColor="#FFCC15"
-                />
-
-                <MyTextInput
-                  label=""
-                  icon=""
-                  placeholder="Post Id"
-                  style={{}}
-                  placeholderTextColor={darkgray}
-                  onChangeText={handleChange('postId')}
-                  onBlur={handleBlur('postId')}
-                  value={values.postId}
-                  selectionColor="#FFCC15"
-                />
-
-                <StyledButton onPress={((event) => setOpt(event, UPDATE), handleSubmit)}>
-                  <ButtonText>Update Post</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={() => navigation.navigate('Feed')}>
-                  <ButtonText>Back</ButtonText>
-                </StyledButton>
-                <StyledButton onPress={((event) => setOpt(event, DELETE), handleSubmit)}>
-                  <ButtonText>Delete Post</ButtonText>
-                </StyledButton>
-                <Line />
-              </StyledFormArea>
-            )}
-          </Formik> */}
     </StyledViewPostContainer>
   );
 };
@@ -564,6 +657,16 @@ const styles = StyleSheet.create({
   commentInputSubmit: {
     borderTopWidth: 10,
     borderColor: 'white',
+  },
+  editPost: {
+    width: width * 0.07,
+    height: width * 0.07,
+    paddingHorizontal: 15,
+  },
+  trashPost: {
+    width: width * 0.07,
+    height: width * 0.07,
+    paddingHorizontal: 15,
   },
 });
 

@@ -10,6 +10,8 @@ import Login from './../screens/Login';
 import Signup from './../screens/Signup';
 import Welcome from './../screens/Welcome';
 import Splash from './../screens/Splash';
+import Profile from '../screens/Profile';
+import Settings from '../screens/Settings';
 import CreatePost from '../screens/CreatePost';
 import TabNav from './TabNav';
 import PostView from './../screens/PostView';
@@ -18,6 +20,8 @@ import FlagPost from '../screens/FlagPost';
 import EllipsisMenu from '../components/EllipsisMenu';
 import ChatRoom from '../screens/ChatRoom';
 import ChatRoomEllipsis from '../components/ChatRoomEllipsis';
+import TagSelection from '../screens/TagSelection';
+import Map from '../screens/Map';
 
 const Stack = createStackNavigator();
 
@@ -39,6 +43,8 @@ const RootStack = () => {
                 <Stack.Screen name="Feed Views" component={FeedViews} />
                 <Stack.Screen name="Flag Post" component={FlagPost} />
                 <Stack.Screen name="Menu" component={EllipsisMenu} />
+                <Stack.Screen name="Map" component={Map} />
+                <Stack.Screen name="TagSelection" component={TagSelection} />
                 <Stack.Screen name="Chat" component={ChatRoom} />
                 <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
         </Stack.Navigator>

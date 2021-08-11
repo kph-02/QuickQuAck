@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-//import { AsyncStorage } from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
@@ -41,14 +41,23 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
+//Using Async Storage to store token JSON object locally as string
+const storeUserID = async (value) => {
+  try {
+    await AsyncStorage.setItem('user_id', value);
+    // console.log('Inserted Token:  ' + value);
+  } catch (error) {
+    // saving error
+    console.error(error.message);
+  }
+};
+
 const Signup = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
   const [agree, setAgree] = useState(false);
 
   //communicate registration information with the database
   const sendToDB = async (body) => {
-    console.log(body);
-
     try {
       // Update server with user's registration information
       const response = await fetch('http://' + serverIp + ':5000/auth/register', {
@@ -60,13 +69,14 @@ const Signup = ({ navigation }) => {
       const parseRes = await response.json();
 
       //Sign-Up unsuccessful
-      if (!parseRes.token) {
+      if (!parseRes.user_id) {
         alert(parseRes);
       }
       //Sign-Up successful
       else {
+        storeUserID(parseRes.user_id);
         alert('Account Creation Successful!');
-        navigation.navigate('Login');
+        navigation.navigate('TagSelection');
       }
 
       // possibly add if/else statement to determine if setAuth should be true or false
@@ -123,6 +133,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('firstName')}
                   value={values.firstName}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -135,6 +146,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('lastName')}
                   value={values.lastName}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -147,6 +159,7 @@ const Signup = ({ navigation }) => {
                   value={values.email}
                   keyboardType="email-address"
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -162,6 +175,7 @@ const Signup = ({ navigation }) => {
                   hidePassword={hidePassword}
                   setHidePassword={setHidePassword}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -173,6 +187,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('dob')}
                   value={values.dob}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -184,6 +199,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('college')}
                   value={values.college}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -195,6 +211,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('gy')}
                   value={values.gy}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MsgBox>By clicking Sign Up, you agree to Quick QuAck's Terms & Conditions.</MsgBox>

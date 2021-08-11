@@ -14,8 +14,8 @@ import { Formik } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
+// const serverIp = '192.168.1.119';
 const serverIp = '192.168.0.153';
-
 import {
   StyledContainer,
   InnerContainer,
@@ -51,7 +51,18 @@ var JWTtoken = '';
 const storeToken = async (value) => {
   try {
     await AsyncStorage.setItem('token', value);
-    // console.log('Inserted Token:  ' + value);
+    // console.log('Inserted Value:  ' + value);
+  } catch (error) {
+    // saving error
+    console.error(error.message);
+  }
+};
+
+//Using Async Storage to store token JSON object locally as string
+const storeUserID = async (value) => {
+  try {
+    await AsyncStorage.setItem('user_id', value);
+    // console.log('Inserted Value:  ' + value);
   } catch (error) {
     // saving error
     console.error(error.message);
@@ -77,11 +88,13 @@ const Login = ({ navigation }) => {
       if (!parseRes.token) {
         alert(parseRes + ' Please try again.');
         storeToken('');
+        storeUserID('');
       }
 
       //Valid input, continue to feed
       else {
         storeToken(parseRes.token);
+        storeUserID(parseRes.user_id);
         navigation.navigate('TabNav', { Screen: 'Feed' });
       }
       //Store to local storage
