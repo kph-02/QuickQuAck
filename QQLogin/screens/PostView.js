@@ -131,6 +131,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => {
           alignContent: 'space-around',
         }}
       >
+        {/* Time posted */}
         <Text style={[styles.name]}>{item.time_posted} ago</Text>
         <TouchableOpacity
           title="Upvote"
@@ -281,8 +282,6 @@ const PostView = ({ route, navigation }) => {
       //temporary if statement just so second view might work, will delete soon
       if (parseRes.data) {
         SetComments(parseRes.data.comment);
-      } else {
-        SetComments(commentExamples);
       }
     } catch (error) {
       console.error(error.message);
