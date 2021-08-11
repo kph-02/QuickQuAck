@@ -159,7 +159,7 @@ const TagSelection = ({ navigation }) => {
           textInputProps={{ editable: false }}
           searchInputPlaceholderText=""
           searchIcon={false}
-          fixedHeight={true}
+          fixedHeight={false}
           selectText=""
         ></MultiSelect>
       </View>

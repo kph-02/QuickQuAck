@@ -25,12 +25,12 @@ CREATE TABLE users (
     revealed_users uuid[]
 ); 
 
-
 CREATE TABLE post (
     post_id BIGSERIAL,
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
     num_comments INTEGER NOT NULL,
+    num_upvotes INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- post_location geography(point),
     PRIMARY KEY (post_id),

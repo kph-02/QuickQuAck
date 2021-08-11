@@ -19,6 +19,7 @@ import FeedViews from '../screens/FeedViews';
 import FlagPost from '../screens/FlagPost';
 import EllipsisMenu from '../components/EllipsisMenu';
 import TagSelection from '../screens/TagSelection';
+import Map from '../screens/Map';
 const Stack = createStackNavigator();
 
 const RootStack = () => {
@@ -42,7 +43,7 @@ const RootStack = () => {
       <Stack.Screen name="Feed Views" component={FeedViews} />
       <Stack.Screen name="Flag Post" component={FlagPost} />
       <Stack.Screen name="Menu" component={EllipsisMenu} />
-
+      <Stack.Screen name="Map" component={Map} />
       <Stack.Screen name="TagSelection" component={TagSelection} />
     </Stack.Navigator>
   );
