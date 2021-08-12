@@ -131,6 +131,25 @@ router.post("/user-tag-selection", async (req, res) => {
   }
 });
 
+router.delete("clear-tag-selection"),
+  async (req, res) => {
+    const user_id = req.user;
+
+    try {
+      const tagDeletion = await pool.query(
+        "DELETE FROM user_tags WHERE user_id = $1",
+        [user_id]
+      );
+
+      res.status(201).json({
+        status: "Delete success",
+      });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json("Server Error");
+    }
+  };
+
 // This renders a page of posts based upon filtering of tags selected during user creation sorted in ascending order of time posted
 
 //
