@@ -6,7 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -18,8 +17,5 @@
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.12",
     "pg": "^8.6.0"
-  },
-  "engines": {
-    "node": "14.17.3"
   }
 }
