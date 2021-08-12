@@ -75,6 +75,7 @@ class Maps extends Component {
     const {navigation} = this.props;
     return (
       <View>
+        
         <StatusBar translucent={true} backgroundColor="transparent" barStyle="dark-content" />
         <MapView
           mapType="standard"
@@ -108,7 +109,7 @@ class Maps extends Component {
           onPress={() => navigation.pop()}
           style={styles.touchableStyle}
         >
-          <Image source={require('./../assets/backb.png')} style={styles.floatingButtonStyle} />
+          <Image source={require('./../assets/backbo.png')} style={styles.floatingButtonStyle} />
         </TouchableOpacity>
       </View>
     );
