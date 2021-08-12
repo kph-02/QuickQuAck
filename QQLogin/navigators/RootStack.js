@@ -18,35 +18,38 @@ import PostView from './../screens/PostView';
 import FeedViews from '../screens/FeedViews';
 import FlagPost from '../screens/FlagPost';
 import EllipsisMenu from '../components/EllipsisMenu';
+import ChatRoom from '../screens/ChatRoom';
+import ChatRoomEllipsis from '../components/ChatRoomEllipsis';
 import TagSelection from '../screens/TagSelection';
 import Map from '../screens/Map';
+
 const Stack = createStackNavigator();
 
 const RootStack = () => {
-  return (
-    <Stack.Navigator
-      initialRouteName="Splash"
-      screenOptions={({ route, navigation }) => ({
-        gestureEnabled: true,
-        headerShown: false,
-        headerTransparent: true,
-      })}
-    >
-      <Stack.Screen name="Splash" component={Splash} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
-      <Stack.Screen name="TabNav" component={TabNav} />
-      {/* <Stack.Screen name="Profile" component={Profile} /> */}
-      <Stack.Screen name="Settings" component={Settings} />
-      <Stack.Screen name="Create Post" component={CreatePost} />
-      <Stack.Screen name="Post View" component={PostView} />
-      <Stack.Screen name="Feed Views" component={FeedViews} />
-      <Stack.Screen name="Flag Post" component={FlagPost} />
-      <Stack.Screen name="Menu" component={EllipsisMenu} />
-      <Stack.Screen name="Map" component={Map} />
-      <Stack.Screen name="TagSelection" component={TagSelection} />
-    </Stack.Navigator>
-  );
-};
+    return(
+        <Stack.Navigator
+            initialRouteName="Splash"
+            screenOptions={({route, navigation}) => ({
+            gestureEnabled: true,
+            headerShown: false,
+            headerTransparent: true})
+            }>
+                <Stack.Screen name="Splash" component={Splash} />
+                <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="Signup" component={Signup} />
+                <Stack.Screen name="TabNav" component={TabNav} />
+                <Stack.Screen name="Create Post" component={CreatePost} />
+                <Stack.Screen name="Post View" component={PostView} />
+                <Stack.Screen name="Feed Views" component={FeedViews} />
+                <Stack.Screen name="Flag Post" component={FlagPost} />
+                <Stack.Screen name="Menu" component={EllipsisMenu} />
+                <Stack.Screen name="Map" component={Map} />
+                <Stack.Screen name="TagSelection" component={TagSelection} />
+                <Stack.Screen name="Chat" component={ChatRoom} />
+                <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
+        </Stack.Navigator>
+       
+    )
+}
 
 export default RootStack;
