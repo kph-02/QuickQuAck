@@ -41,6 +41,7 @@ CREATE TABLE post (
 CREATE TABLE comment (
     comment_id BIGSERIAL,
     post_id INTEGER NOT NULL,
+    num_upvotes INTEGER NOT NULL,
     user_id uuid NOT NULL,
     text VARCHAR(100) NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -107,7 +107,13 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => {
   return (
     <View style={[styles.item, backgroundColor]}>
       <View
-        style={{ marginLeft: 20, marginBottom: 8, flexDirection: 'row', width: '94%', justifyContent: 'space-between' }}
+        style={{
+          marginLeft: 20,
+          marginBottom: 8,
+          flexDirection: 'row',
+          width: '94%',
+          justifyContent: 'space-between',
+        }}
       >
         {/* (Anonymous) name of the commenter */}
         <Text style={[styles.name]}>{item.user_id}</Text>
@@ -140,8 +146,21 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => {
           onPress={() => console.log('Upvoted!')}
           style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
         >
-          <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
-          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.likes}</Text>
+          <MaterialCommunityIcons
+            name="chevron-up"
+            color="#BDBDBD"
+            size={35}
+            style={{ width: 29 }}
+            onPress={handleCommentUpvote(item.comment_id)}
+          />
+          <Text
+            style={[
+              styles.name,
+              { color: commentsUpvoted[item.comment_id] ? '#FFCC15' : '#BDBDBD', marginHorizontal: 0 },
+            ]}
+          >
+            {commentUpvotes[item.comment_id] ? commentUpvotes[item.comment_id] : 0}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -155,9 +174,13 @@ const PostView = ({ route, navigation }) => {
   const [comments, SetComments] = useState([]); //stores all comments for the post
   const [newComments, refreshNewComments] = useState(false); //determines when to get new comments from db
 
-  //handling upvotes, UPDATE TO INITIALIZE TO PASSED IN VALUES
+  //handling post upvotes
   const [upvoted, setUpvoted] = useState();
   const [upvotes, setUpvotes] = useState(post.num_upvotes);
+
+  //handle comment upvotes
+  const [commentsUpvoted, setCommentsUpvoted] = useState([]);
+  const [commentUpvotes, setCommentUpvotes] = useState([]);
 
   const getJWT = async () => {
     try {
@@ -413,21 +436,42 @@ const PostView = ({ route, navigation }) => {
 
   //handles functionality for when user upvotes a post
   const handleUpvote = () => {
+    let upvote = !upvoted;
     let incrementUpvotes = 0;
 
-    //toggle upvote button
-    setUpvoted(!upvoted);
-
-    // If true, then upvote was removed, so decrement upvote
-    // This is because setUpvoted takes into effect for the next
-    // iteration due to how useStates work
-    if (upvoted) {
-      incrementUpvotes = -1;
-    } else {
+    // If true, then upvote was added, else upvote was removed
+    if (upvote) {
       incrementUpvotes = 1;
+    } else {
+      incrementUpvotes = -1;
     }
 
+    //toggle upvote button
+    setUpvoted(upvote);
     setUpvotes(upvotes + incrementUpvotes);
+  };
+
+  const handleCommentUpvote = (comment_id) => {
+    let upvoted = commentsUpvoted;
+    let upvotes = commentUpvotes;
+    let incrementUpvotes = 0;
+
+    //If comment was upvoted before, just toggle it. If not, set to false
+    if (upvoted[comment_id]) {
+      upvoted[comment_id] = !upvoted[comment_id];
+    } else {
+      upvoted[comment_id] = true;
+    }
+
+    //if true now, upvote was added, if false upvote was removed
+    if (upvoted[comment_id] === true) {
+      upvotes[comment_id]++;
+    } else {
+      upvotes[comment_id]--;
+    }
+
+    setCommentsUpvoted(upvoted);
+    setCommentUpvotes(upvotes);
   };
 
   return (
@@ -532,6 +576,7 @@ const PostView = ({ route, navigation }) => {
           body = {
             commentText: values.commentText,
             post_id: post.post_id,
+            num_upvotes: 0,
           };
 
           sendToDB('comment', body);
