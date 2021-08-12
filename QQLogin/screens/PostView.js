@@ -430,6 +430,27 @@ const PostView = ({ route, navigation }) => {
     setUpvotes(upvotes + incrementUpvotes);
   };
 
+  //format the time of the post from the database to display it to the screen
+  const formatTime = (post_age) => {
+    let postAgeDisplay = '';
+
+    //check if it exists b/c sometimes called before objects rendered so is undefined
+    if (post_age) {
+      if (post_age.hours) {
+        postAgeDisplay += post_age.hours + 'h ';
+      }
+      if (post_age.minutes) {
+        postAgeDisplay += post_age.minutes + 'm ';
+      } else {
+        postAgeDisplay += '1m ';
+      }
+
+      postAgeDisplay += 'ago';
+    }
+
+    return postAgeDisplay;
+  };
+
   return (
     /* Style for the entire screen, controls how children are aligned */
     <StyledViewPostContainer>
@@ -497,15 +518,18 @@ const PostView = ({ route, navigation }) => {
           />
           <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{upvotes}</Text>
         </TouchableOpacity>
+        {/* Number of comments */}
         <View style={styles.infoRow}>
           <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
           <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{comments.length}</Text>
         </View>
+        {/* Name of poster */}
         <View style={[styles.infoRow, { marginLeft: 10 }]}>
-          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>Blue Raccoon</Text>
+          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{post.anon_name}</Text>
         </View>
+        {/* time posted */}
         <View style={{ marginLeft: 10 }}>
-          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>8m ago</Text>
+          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(post.post_age)}</Text>
         </View>
       </View>
 
