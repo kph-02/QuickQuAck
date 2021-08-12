@@ -1,13 +1,17 @@
-CREATE DATABASE Main;
-
 /*CREATE DATABASE Users; 
 CREATE DATABASE Posts;
 CREATE DATABASE Chats;*/
 
 /* Install/Setup UUID as needed: (command below)*/
 
+    -- post_location geography(point),
+
+-- create extension if not exists "postgis"; 
+
+
+CREATE DATABASE Main;
+
 create extension if not exists "uuid-ossp"; 
-create extension if not exists "postgis"; 
 
 CREATE TABLE users (
     user_id uuid NOT NULL PRIMARY KEY DEFAULT
@@ -32,7 +36,6 @@ CREATE TABLE post (
     num_comments INTEGER NOT NULL,
     num_upvotes INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- post_location geography(point),
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT post_unique UNIQUE (post_id)
@@ -49,15 +52,6 @@ CREATE TABLE comment (
     CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
 );
 
-/*CREATE TYPE voting AS ENUM (
-    'like',
-    'dislike'
-);*/
-
-/*
-SELECT x, (ENUM_RANGE(NULL::voting))[x] 
-    FROM generate_series(-1, 1) x
-*/
 
 CREATE TABLE post_votes (
     user_id uuid NOT NULL,
@@ -80,16 +74,11 @@ CREATE TABLE comment_votes(
   FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
 );
 
--- storage of all the tags
 
 CREATE TABLE tags (
     tag_id VARCHAR(10) NOT NULL,
     PRIMARY KEY (tag_id)
 );
-
-
--- insert into this table to connect tags to posts 
--- connecting a tag to a post
 
 CREATE TABLE post_tags (
     tag_id VARCHAR(10) NOT NULL,
@@ -99,8 +88,6 @@ CREATE TABLE post_tags (
     PRIMARY KEY (post_id, tag_id)
 );
 
--- connecting tags to a user 
-
 CREATE TABLE user_tags (
     user_id uuid NOT NULL,
     tag_id VARCHAR(10) NOT NULL,
@@ -109,12 +96,10 @@ CREATE TABLE user_tags (
     FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
---Correct?
 CREATE TABLE anon_names (
     anon_name_id VARCHAR(25) NOT NULL,
     PRIMARY KEY(anon_name_id)
 );
-
 
 CREATE TABLE post_names (
     user_id uuid NOT NULL,
