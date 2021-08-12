@@ -397,10 +397,10 @@ router.post("/post-vote", authorization, async (req, res) => {
       [user_id, post_id, vote_value]
     );
     if (exactDuplicate.rows.length > 0) {
-      const deleteVote = await pool.query(
-        "DELETE FROM post_votes WHERE (user_id = $1 AND post_id = $2 AND vote_value = $3)",
-        [user_id, post_id, vote_value]
-      );
+      // const deleteVote = await pool.query(
+      //   "DELETE FROM post_votes WHERE (user_id = $1 AND post_id = $2 AND vote_value = $3)",
+      //   [user_id, post_id, vote_value]
+      // );
     } else {
       try {
         const insertVote = await pool.query(
