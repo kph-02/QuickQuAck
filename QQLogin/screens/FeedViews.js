@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -74,15 +74,72 @@ const AdjustTextPreview = ({ style, text }) => {
   );
 };
 
+const StyledTag = ({tag}) => {
+  let tagcolor = '';
+
+  if (tag === 'Muir') {
+    tagcolor = '#7FD85F';
+  } else if (tag === 'Marshall') {
+    tagcolor = '#FA4A4A';
+  } else if (tag === 'Seventh') {
+    tagcolor = '#FA9E4A';
+  } else if (tag === 'Poll') {
+    tagcolor = '#AC5CEB';
+  } else if (tag === 'Question') {
+    tagcolor = '#FF8383';
+  } else if (tag === 'Food') {
+    tagcolor = '#9EE444';
+  } else if (tag === 'Warren') {
+    tagcolor = '#AA5F5F';
+  } else if (tag === 'Revelle') {
+    tagcolor = '#FEDB5F';
+  } else if (tag === 'ERC') {
+    tagcolor = '#2891F2';
+  } else if (tag === 'Social') {
+    tagcolor = '#97E1F9';
+  } else if (tag === 'Sixth') {
+    tagcolor = '#49D3FE';
+  } else {
+    tagcolor = 'gray';
+  }
+  return (
+    <View style={{
+          paddingHorizontal: 15,
+          borderRadius: 15,
+          marginVertical: 10,
+          marginLeft: 10,
+          paddingVertical: 2,
+          backgroundColor: tagcolor}}>
+      <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
+    </View>
+  );
+}
+
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     {/* View for the text preview of each post as shown on the feed */}
     <View style={{ justifyContent: 'center', marginLeft: 25, marginRight: 25 }}>
       <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.post_text} />
-      {/* <Text style={[styles.bodyText, textColor]}>{item.post_text}</Text> */}
+    </View>
+    {/* Tags Info Row */}
+    <View
+      style={[
+        styles.postTouchables,
+        {
+          justifyContent: 'flex-start',
+          backgroundColor: 'white',
+          borderTopWidth: 0,
+          borderTopColor: 'white',
+          marginBottom: 10,
+          marginTop: 5,
+          marginLeft: 15,
+        },
+      ]}
+    >
+      <StyledTag tag={item.tagArray}/>
     </View>
     {/* The Data of each Post */}
-    <View style={[styles.postTouchables, { backgroundColor: 'white' }]}>
+    <View style={[styles.postTouchables, { marginTop: 0, backgroundColor: 'white' }]}>
       <View style={[styles.infoRow, { marginRight: 5 }]}>
         {/*number of people who've viewed the post*/}
         <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
@@ -144,6 +201,7 @@ const FirstRoute = () => {
   const renderItem = ({ item }) => {
     const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
     const color = item.post_id === selectedId ? 'white' : 'black';
+  
     return (
       <Item
         //destructure the item
@@ -188,6 +246,7 @@ const FirstRoute = () => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
+      console.log(parseRes);
 
       /*
        *"post":[
@@ -467,7 +526,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 10,
     borderTopColor: '#EFEFEF',
     borderTopWidth: 1,
   },
