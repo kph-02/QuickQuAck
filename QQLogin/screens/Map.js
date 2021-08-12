@@ -49,6 +49,7 @@ class Maps extends Component {
       this.setState({
         errorMessage: 'Permission to access location was denied',
       });
+      return
     }
 
     let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
