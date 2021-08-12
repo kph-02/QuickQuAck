@@ -133,6 +133,8 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => {
       >
         {/* Time posted */}
         <Text style={[styles.name]}>{item.time_posted} ago</Text>
+
+        {/* Upvotes */}
         <TouchableOpacity
           title="Upvote"
           onPress={() => console.log('Upvoted!')}
@@ -154,7 +156,7 @@ const PostView = ({ route, navigation }) => {
   const [newComments, refreshNewComments] = useState(false); //determines when to get new comments from db
 
   //handling upvotes, UPDATE TO INITIALIZE TO PASSED IN VALUES
-  const [upvoted, setUpvoted] = useState(false);
+  const [upvoted, setUpvoted] = useState();
   const [upvotes, setUpvotes] = useState(post.num_upvotes);
 
   const getJWT = async () => {
@@ -290,6 +292,8 @@ const PostView = ({ route, navigation }) => {
 
   //Get from database whether user has upvoted this post before or not
   const getUpvoted = async () => {
+    let initialVote = false;
+
     try {
       const query = 'post_id=' + post.post_id + '&user_id=' + userId;
 
@@ -302,7 +306,19 @@ const PostView = ({ route, navigation }) => {
       //The response includes post information, need in json format
       const parseRes = await response.json();
 
-      console.log(parseRes);
+      //Vote values will be returned in an array, but we just want the first object here
+      if (parseRes[0]) {
+        if (parseRes[0].vote_value == 1) {
+          initialVote = true;
+        }
+      }
+
+      // console.log(userId);
+      // console.log(post.post_id);
+      // console.log(parseRes);
+      // console.log(initialVote);
+
+      setUpvoted(initialVote);
     } catch (error) {
       console.error(error.message);
     }
@@ -319,11 +335,10 @@ const PostView = ({ route, navigation }) => {
     async function fetchAuthorizations() {
       await getJWT();
       await getUserID();
+      getUpvoted();
     }
 
     fetchAuthorizations();
-
-    getUpvoted();
   }, []);
 
   /* Controls the look of each "item", or comment in this context */
@@ -335,8 +350,6 @@ const PostView = ({ route, navigation }) => {
 
   //Updates database with whether this user upvoted post or not
   const updatePostValue = async (body) => {
-    console.log(body);
-
     try {
       const response = await fetch('http://' + serverIp + ':5000/feed/post-vote', {
         method: 'POST',
