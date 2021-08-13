@@ -321,6 +321,52 @@ const PostView = ({ route, navigation }) => {
     );
   }
 
+  //Renders all tags associated with the original post
+  const RenderStyledTags = ({tags}) => {
+  return tags.map(function(tag) {
+    let tagcolor = '';
+
+    if (tag === 'Muir') {
+      tagcolor = '#7FD85F';
+    } else if (tag === 'Marshall') {
+      tagcolor = '#FA4A4A';
+    } else if (tag === 'Seventh') {
+      tagcolor = '#FA9E4A';
+    } else if (tag === 'Poll') {
+      tagcolor = '#AC5CEB';
+    } else if (tag === 'Question') {
+      tagcolor = '#FF8383';
+    } else if (tag === 'Food') {
+      tagcolor = '#9EE444';
+    } else if (tag === 'Warren') {
+      tagcolor = '#AA5F5F';
+    } else if (tag === 'Revelle') {
+      tagcolor = '#FEDB5F';
+    } else if (tag === 'ERC') {
+      tagcolor = '#2891F2';
+    } else if (tag === 'Social') {
+      tagcolor = '#97E1F9';
+    } else if (tag === 'Sixth') {
+      tagcolor = '#49D3FE';
+    } else {
+      tagcolor = 'gray';
+    }
+    return (
+      <View 
+      key={tag}
+      style={{
+            paddingHorizontal: 15,
+            borderRadius: 15,
+            marginVertical: 10,
+            marginRight: 10,
+            paddingVertical: 2,
+            backgroundColor: tagcolor}}>
+        <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
+      </View>
+    );
+  });
+}
+
   //Getting comments from the database to show for post
   const getFromDB = async () => {
     const query = 'post_id=' + post.post_id; //sets up query information
@@ -579,14 +625,9 @@ const PostView = ({ route, navigation }) => {
       </View>
 
       {/* Container/View for the Tags associated with this post */}
-      <View style={[styles.postTouchables, {justifyContent: 'flex-start', backgroundColor: 'white', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5 }]}>
+      <View style={[styles.postTouchables, {justifyContent: 'flex-start', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5,  }]}>
         <StyledTag style={{paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, paddingVertical: 2}} tag={post.tag_id}/>
-        {/* <View style={{backgroundColor: '#FF8383', paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, marginLeft: 10, paddingVertical: 2}}>
-          <Text style={{color: 'white', fontWeight: "normal"}}>{post.tag_id}</Text>
-        </View>
-        <View style={{backgroundColor: '#97E1F9', paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, marginLeft: 10, paddingVertical: 2}}>
-          <Text style={{color: 'white', fontWeight: "normal"}}>{post.tag_id}</Text>
-        </View> */}
+        {/* <RenderStyledTags tags={post.tagarray}/> */}
       </View>
       {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
 

@@ -78,13 +78,7 @@ const StyledTag = ({tag}) => {
   );
 }
 
-// const RenderStyledTags = (tags) => {
-//   console.log("This is where we're trying stuff out...");
-//   // tags.map((tag) => console.log(tag));
-//   // return null;
-//   return tags.map((tag) => { <StyledTag tag={tag} /> });
-// }
-
+// Renders all tags associated with the post
 const RenderStyledTags = ({tags}) => {
   return tags.map(function(tag) {
     let tagcolor = '';
@@ -115,7 +109,9 @@ const RenderStyledTags = ({tags}) => {
       tagcolor = 'gray';
     }
     return (
-      <View style={{
+      <View 
+      key={tag}
+      style={{
             paddingHorizontal: 15,
             borderRadius: 15,
             marginVertical: 10,
@@ -151,8 +147,8 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         },
       ]}
     >
-      <StyledTag tag={item.tag_id}/>
-      {/* <RenderStyledTags tags={item.tagarray} /> */}
+      {/* <StyledTag tag={item.tag_id}/> */}
+      <RenderStyledTags tags={item.tagarray} />
     </View>
     {/* The Data of each Post */}
     <View style={[styles.postTouchables, { marginTop: 0, backgroundColor: 'white' }]}>
