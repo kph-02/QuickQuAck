@@ -50,12 +50,14 @@ import { Picker } from '@react-native-picker/picker';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-const FlagPost = ({ navigation }) => {
+const FlagPost = ({ route, navigation }) => {
   // Use State hooks
   const [composePost, setComposePost] = useState(false);
   const [agree, setAgree] = useState(false);
   const [selectedValue, setSelectedValue] = useState(true);
   const [modalOpen, setModalOpen] = useState(true);
+
+  const {post, user} = route.params;
 
   //Hooks and initial states for the Selectors
   const [checkboxState, setCheckboxState] = useState([
@@ -179,12 +181,12 @@ const FlagPost = ({ navigation }) => {
         
         {/* Section/Container for Anonymous Username */}
         <View style={{backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1}}>
-          <Text style={{marginLeft: 15, color: 'black', fontSize: 14}}>Blue Raccoon</Text>
+          <Text style={{marginLeft: 15, color: 'black', fontSize: 14}}>{user}</Text>
         </View>
 
         {/* Section/Container for Text in the Post/Comment to be reported */}
         <View style={{backgroundColor: 'white', paddingVertical: 15 , borderTopColor: '#DADADA', borderTopWidth: 1}}>
-          <Text style={{marginLeft: 15, color: 'black', fontSize: 14}}>Who's playing at Sun God today at 7pm?</Text>
+          <Text style={{marginLeft: 15, color: 'black', fontSize: 14}} numberOfLines={1}>{post}</Text>
         </View>
 
         {/* Section to separate Post/Comment data from Selectors */}

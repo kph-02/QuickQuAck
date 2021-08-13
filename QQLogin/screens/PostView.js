@@ -114,7 +114,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => {
 
         {/* The ... button for each comment */}
         <View>
-          <EllipsisMenu navigation={navigation} />
+          <EllipsisMenu navigation={navigation} postText={item.text} postUser={item.user_id}/>
         </View>
       </View>
 
@@ -523,7 +523,7 @@ const PostView = ({ route, navigation }) => {
             );
           }
         })()}
-        <EllipsisMenu navigation={navigation} />
+        <EllipsisMenu navigation={navigation} postText={post.post_text} postUser={post.anon_name}/>
       </View>
 
       {/* The Original Post's Text */}

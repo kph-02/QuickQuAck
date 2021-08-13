@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { SlideInMenu } = renderers;
 
-const EllipsisMenu = ({ navigation }) => {
+const EllipsisMenu = ({ navigation, postText, postUser }) => {
   return (
     <Menu renderer={SlideInMenu}>
       {/* Slide-in Menu from the bottom is triggered by the Ellipsis (...) button */}
@@ -31,7 +31,7 @@ const EllipsisMenu = ({ navigation }) => {
         </MenuOption>
 
         {/* Flag as Inappropriate */}
-        <MenuOption onSelect={() => navigation.navigate('Flag Post')} style={{ paddingVertical: 10 }}>
+        <MenuOption onSelect={() => navigation.navigate('Flag Post', {post: postText, user: postUser})} style={{ paddingVertical: 10 }}>
           <Text style={styles.text}>Flag as inappropriate</Text>
         </MenuOption>
 
