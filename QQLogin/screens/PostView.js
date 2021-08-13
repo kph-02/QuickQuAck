@@ -101,72 +101,6 @@ const commentExamples = [
   },
 ];
 
-/* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
-const Item = ({ item, onPress, backgroundColor, textColor }) => {
-  const navigation = useNavigation();
-  return (
-    <View style={[styles.item, backgroundColor]}>
-      <View
-        style={{
-          marginLeft: 20,
-          marginBottom: 8,
-          flexDirection: 'row',
-          width: '94%',
-          justifyContent: 'space-between',
-        }}
-      >
-        {/* (Anonymous) name of the commenter */}
-        <Text style={[styles.name]}>{item.user_id}</Text>
-
-        {/* The ... button for each comment */}
-        <View>
-          <EllipsisMenu navigation={navigation} />
-        </View>
-      </View>
-
-      {/* The text for the comment */}
-      <Text style={[styles.commentText, textColor]}>{item.text}</Text>
-
-      {/* The row of when the comment was posted, along with the number of upvotes */}
-      <View
-        style={{
-          flexDirection: 'row',
-          marginTop: 10,
-          alignItems: 'center',
-          marginLeft: 20,
-          alignContent: 'space-around',
-        }}
-      >
-        {/* Time posted */}
-        <Text style={[styles.name]}>{item.time_posted} ago</Text>
-
-        {/* Upvotes */}
-        <TouchableOpacity
-          title="Upvote"
-          onPress={() => console.log('Upvoted!')}
-          style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
-        >
-          <MaterialCommunityIcons
-            name="chevron-up"
-            color="#BDBDBD"
-            size={35}
-            style={{ width: 29 }}
-            onPress={handleCommentUpvote(item.comment_id)}
-          />
-          <Text
-            style={[
-              styles.name,
-              { color: commentsUpvoted[item.comment_id] ? '#FFCC15' : '#BDBDBD', marginHorizontal: 0 },
-            ]}
-          >
-            {commentUpvotes[item.comment_id] ? commentUpvotes[item.comment_id] : 0}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
-
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
@@ -181,6 +115,67 @@ const PostView = ({ route, navigation }) => {
   //handle comment upvotes
   const [commentsUpvoted, setCommentsUpvoted] = useState([]);
   const [commentUpvotes, setCommentUpvotes] = useState([]);
+  const [refreshComments, setRefreshComments] = useState(false);
+
+  /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
+  const Item = ({ item, onPress, backgroundColor, textColor }) => {
+    const navigation = useNavigation();
+    return (
+      <View style={[styles.item, backgroundColor]}>
+        <View
+          style={{
+            marginLeft: 20,
+            marginBottom: 8,
+            flexDirection: 'row',
+            width: '94%',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* (Anonymous) name of the commenter */}
+          <Text style={[styles.name]}>{item.user_id}</Text>
+
+          {/* The ... button for each comment */}
+          <View>
+            <EllipsisMenu navigation={navigation} />
+          </View>
+        </View>
+
+        {/* The text for the comment */}
+        <Text style={[styles.commentText, textColor]}>{item.text}</Text>
+
+        {/* The row of when the comment was posted, along with the number of upvotes */}
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: 10,
+            alignItems: 'center',
+            marginLeft: 20,
+            alignContent: 'space-around',
+          }}
+        >
+          {/* Time posted */}
+          <Text style={[styles.name]}>{item.time_posted} ago</Text>
+
+          {/* Upvotes */}
+          <TouchableOpacity
+            title="Upvote"
+            onPress={() => handleCommentUpvote(item.comment_id)}
+            style={{ marginLeft: 10, flexDirection: 'row', alignItems: 'center' }}
+          >
+            <MaterialCommunityIcons
+              name="chevron-up"
+              color="#BDBDBD"
+              size={35}
+              style={{ width: 29, color: commentsUpvoted[item.comment_id] ? '#FFCC15' : '#BDBDBD' }}
+            />
+            <Text style={[styles.name, { marginHorizontal: 0 }]}>
+              {commentUpvotes[item.comment_id] ? commentUpvotes[item.comment_id] : 0}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
 
   const getJWT = async () => {
     try {
@@ -463,6 +458,11 @@ const PostView = ({ route, navigation }) => {
       upvoted[comment_id] = true;
     }
 
+    if (upvotes[comment_id] === undefined) {
+      console.log('Was NaN');
+      upvotes[comment_id] = 0;
+    }
+
     //if true now, upvote was added, if false upvote was removed
     if (upvoted[comment_id] === true) {
       upvotes[comment_id]++;
@@ -470,8 +470,11 @@ const PostView = ({ route, navigation }) => {
       upvotes[comment_id]--;
     }
 
+    console.log(upvotes[comment_id]);
+
     setCommentsUpvoted(upvoted);
     setCommentUpvotes(upvotes);
+    setRefreshComments(!refreshComments); //re-renders the components in the flatlist
   };
 
   return (
@@ -527,12 +530,12 @@ const PostView = ({ route, navigation }) => {
           <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
           <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
         </View>
+        {/* Upvote button */}
         <TouchableOpacity
           title="Upvote"
           onPress={handleUpvote}
           style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}
         >
-          {/* Upvote button */}
           <MaterialCommunityIcons
             name="chevron-up"
             color={upvoted ? '#FFCC15' : '#BDBDBD'}
@@ -560,7 +563,7 @@ const PostView = ({ route, navigation }) => {
           horizontal={false}
           data={comments}
           keyExtractor={(item) => item.comment_id}
-          // extraData={id}
+          extraData={refreshComments}
           renderItem={renderItem}
         />
       </View>
