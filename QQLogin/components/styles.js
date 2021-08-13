@@ -100,7 +100,7 @@ export const PageTitlePost = styled.Text`
   font-weight: bold;
   color: ${black};
   padding: 90px;
-  right: 125px;
+  right: 145px;
   bottom: 50px;
 `;
 

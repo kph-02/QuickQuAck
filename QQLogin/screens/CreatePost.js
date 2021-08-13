@@ -200,11 +200,11 @@ const CreatePost = ({ route, navigation }) => {
       <StyledContainer>
         <StatusBar style="black" />
         <InnerPostContainer>
-          <ExtraBackView>
+          {/* <ExtraBackView>
             <TextLink onPress={() => navigation.pop()}>
               <TextPostContent>Back</TextPostContent>
             </TextLink>
-          </ExtraBackView>
+          </ExtraBackView> */}
           <ExtraPostView>
             <TextLink onPress={onPressButton} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}>
               <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
