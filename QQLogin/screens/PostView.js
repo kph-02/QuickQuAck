@@ -117,6 +117,11 @@ const PostView = ({ route, navigation }) => {
   const [commentUpvotes, setCommentUpvotes] = useState([]);
   const [refreshComments, setRefreshComments] = useState(false);
 
+  //Mapping array , takes comment_id and returns the index its stored in for commentsUpvoted and commentUpvotes
+  //This is done so when passed to db, can just iterate array w/o empty values, makes 100000x easier
+  const [mapComments, setMapComments] = useState([]);
+  const [currIndex, setCurrIndex] = useState(0); //current index to map to
+
   /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
   const Item = ({ item, onPress, backgroundColor, textColor }) => {
     const navigation = useNavigation();
@@ -166,15 +171,44 @@ const PostView = ({ route, navigation }) => {
               name="chevron-up"
               color="#BDBDBD"
               size={35}
-              style={{ width: 29, color: commentsUpvoted[item.comment_id] ? '#FFCC15' : '#BDBDBD' }}
+              style={{
+                width: 29,
+                // Very messy -> first check if comment was mapped, if was then check if comment
+                color: mapComments[item.comment_id]
+                  ? commentsUpvoted[mapComments[item.comment_id]].vote_value
+                    ? '#FFCC15'
+                    : '#BDBDBD'
+                  : '#BDBDBD',
+              }}
             />
             <Text style={[styles.name, { marginHorizontal: 0 }]}>
-              {commentUpvotes[item.comment_id] ? commentUpvotes[item.comment_id] : 0}
+              {mapComments[item.comment_id] ? commentUpvotes[mapComments[item.comment_id]].votes : 0}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
     );
+  };
+
+  //format the time of the post from the database to display it to the screen
+  const formatTime = (post_age) => {
+    let postAgeDisplay = '';
+
+    //check if it exists b/c sometimes called before objects rendered so is undefined
+    if (post_age) {
+      if (post_age.hours) {
+        postAgeDisplay += post_age.hours + 'h ';
+      }
+      if (post_age.minutes) {
+        postAgeDisplay += post_age.minutes + 'm ';
+      } else {
+        postAgeDisplay += '1m ';
+      }
+
+      postAgeDisplay += 'ago';
+    }
+
+    return postAgeDisplay;
   };
 
   const getJWT = async () => {
@@ -286,7 +320,7 @@ const PostView = ({ route, navigation }) => {
   };
 
   /* Controls what color each tag is */
-  const StyledTag = ({style, tag}) => {
+  const StyledTag = ({ style, tag }) => {
     let tagcolor = '';
 
     if (tag === 'Muir') {
@@ -315,11 +349,11 @@ const PostView = ({ route, navigation }) => {
       tagcolor = '#FFCC15';
     }
     return (
-      <View style={[style, {backgroundColor: tagcolor}]}>
+      <View style={[style, { backgroundColor: tagcolor }]}>
         <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
       </View>
     );
-  }
+  };
 
   //Getting comments from the database to show for post
   const getFromDB = async () => {
@@ -344,8 +378,9 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
-  //Get from database whether user has upvoted this post before or not
+  //Get from database whether user has upvoted this post/comments before or not
   const getUpvoted = async () => {
+    //posts
     let initialVote = false;
 
     try {
@@ -376,6 +411,46 @@ const PostView = ({ route, navigation }) => {
     } catch (error) {
       console.error(error.message);
     }
+
+    //Comments
+    try {
+      const query = 'post_id=' + post.post_id + '&user_id=' + userId;
+
+      // Update server with user's registration information
+      const response = await fetch('http://' + serverIp + ':5000/feed/comment-votes?' + query, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+
+      // console.log('Initial Comments: ' + JSON.stringify(parseRes));
+
+      // store initial values to update useState
+      let upvoted = [];
+      let index = 0;
+
+      if (parseRes === []) {
+        console.log('No Comments!');
+      } else {
+        console.log(parseRes);
+        //Populate upvoted table with initial values from database
+        for (const comments of parseRes) {
+          mapComments[comments.comment_id] = index; //Add comment_id to mapping array
+          upvoted[index] = { comment_id: comments.comment_id, vote_value: comments.vote_value }; //update entry
+          index++;
+        }
+      }
+
+      console.log('Upvoted Comments: ' + upvoted);
+
+      //Update hooks
+      setCommentsUpvoted(upvoted);
+      setCurrIndex(index);
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   //Triggered everytime a new comment is submitted, gets comment from DB to display it
@@ -389,10 +464,12 @@ const PostView = ({ route, navigation }) => {
     async function fetchAuthorizations() {
       await getJWT();
       await getUserID();
-      getUpvoted();
+      getUpvoted(); //get upvoted values for posts/comments
     }
 
     fetchAuthorizations();
+
+    console.log('Comments Upvoted: ' + commentsUpvoted);
   }, []);
 
   /* Controls the look of each "item", or comment in this context */
@@ -413,7 +490,7 @@ const PostView = ({ route, navigation }) => {
 
       const parseRes = await response.json();
 
-      console.log('Update Upvotes: ' + JSON.stringify(parseRes));
+      // console.log('Update Upvotes: ' + JSON.stringify(parseRes));
     } catch (error) {
       console.error(error.message);
     }
@@ -428,14 +505,40 @@ const PostView = ({ route, navigation }) => {
     };
 
     sendToDB('update', body);
-    //Update whether the use upvoted in the database
 
+    //Update whether the use upvoted in the database
     const bodyUpvotes = {
       user_id: userId,
       post_id: post.post_id,
       vote_value: upvoted ? 1 : 0,
     };
     updatePostValue(bodyUpvotes);
+
+    //Comments that were changed by the user, to change in the database
+    const bodyCommentUpvotes = {
+      user_id: userId,
+      post_id: post.post_id,
+      vote_values: commentsUpvoted,
+    };
+    updateCommentValues(bodyCommentUpvotes);
+  };
+
+  //updating the database with whether the user upvoted the comment or not
+  const updateCommentValues = async (body) => {
+    console.log(body);
+    try {
+      const response = await fetch('http://' + serverIp + ':5000/feed/comment-vote', {
+        method: 'POST',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      // console.log('Update Comment Upvotes: ' + JSON.stringify(parseRes));
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   //When user clicks on icon to update post
@@ -483,55 +586,57 @@ const PostView = ({ route, navigation }) => {
   };
 
   const handleCommentUpvote = (comment_id) => {
+    //Copy useState parameters b/c shouldn't call useState in if statements
+    let map = mapComments;
+    let moveIndex = 0;
     let upvoted = commentsUpvoted;
     let upvotes = commentUpvotes;
-    let incrementUpvotes = 0;
 
-    //If comment was upvoted before, just toggle it. If not, set to false
-    if (upvoted[comment_id]) {
-      upvoted[comment_id] = !upvoted[comment_id];
-    } else {
-      upvoted[comment_id] = true;
+    //Comment index in upvoted/upvotes array
+    let commentIndex = 0;
+
+    //Set up comment in mapping
+    //comments hasn't been mapped yet, so map it.
+    if (mapComments[comment_id] === undefined) {
+      map[comment_id] = currIndex;
+      commentIndex = currIndex;
+      moveIndex = 1;
+    }
+    //comment already mapped, get mapped value
+    else {
+      commentIndex = map[comment_id];
     }
 
-    if (upvotes[comment_id] === undefined) {
-      console.log('Was NaN');
-      upvotes[comment_id] = 0;
+    //If comment was upvoted before, just toggle it. If not, set to 1.
+    if (upvoted[commentIndex] === undefined) {
+      upvoted[commentIndex] = { comment_id: comment_id, vote_value: 1 };
+    } else {
+      //Flipping vote value to match user input
+      if (upvoted[commentIndex].vote_value === 0) {
+        upvoted[commentIndex].vote_value++;
+      } else {
+        upvoted[commentIndex].vote_value--;
+      }
+    }
+
+    if (upvotes[commentIndex] === undefined) {
+      upvotes[commentIndex] = { comment_id: comment_id, votes: 0 }; //edit to initial value + 1 later
     }
 
     //if true now, upvote was added, if false upvote was removed
-    if (upvoted[comment_id] === true) {
-      upvotes[comment_id]++;
+    if (upvoted[commentIndex].vote_value === 1) {
+      upvotes[commentIndex].votes++;
     } else {
-      upvotes[comment_id]--;
+      upvotes[commentIndex].votes--;
     }
 
-    console.log(upvotes[comment_id]);
-
+    //Update useState hooks
+    setMapComments(map);
+    setCurrIndex(currIndex + moveIndex);
     setCommentsUpvoted(upvoted);
     setCommentUpvotes(upvotes);
+
     setRefreshComments(!refreshComments); //re-renders the components in the flatlist
-  };
-
-  //format the time of the post from the database to display it to the screen
-  const formatTime = (post_age) => {
-    let postAgeDisplay = '';
-
-    //check if it exists b/c sometimes called before objects rendered so is undefined
-    if (post_age) {
-      if (post_age.hours) {
-        postAgeDisplay += post_age.hours + 'h ';
-      }
-      if (post_age.minutes) {
-        postAgeDisplay += post_age.minutes + 'm ';
-      } else {
-        postAgeDisplay += '1m ';
-      }
-
-      postAgeDisplay += 'ago';
-    }
-
-    return postAgeDisplay;
   };
 
   return (
@@ -579,8 +684,23 @@ const PostView = ({ route, navigation }) => {
       </View>
 
       {/* Container/View for the Tags associated with this post */}
-      <View style={[styles.postTouchables, {justifyContent: 'flex-start', backgroundColor: 'white', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5 }]}>
-        <StyledTag style={{paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, paddingVertical: 2}} tag={post.tag_id}/>
+      <View
+        style={[
+          styles.postTouchables,
+          {
+            justifyContent: 'flex-start',
+            backgroundColor: 'white',
+            borderTopWidth: 0,
+            borderTopColor: 'white',
+            marginBottom: 10,
+            marginTop: 5,
+          },
+        ]}
+      >
+        <StyledTag
+          style={{ paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, paddingVertical: 2 }}
+          tag={post.tag_id}
+        />
         {/* <View style={{backgroundColor: '#FF8383', paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, marginLeft: 10, paddingVertical: 2}}>
           <Text style={{color: 'white', fontWeight: "normal"}}>{post.tag_id}</Text>
         </View>
