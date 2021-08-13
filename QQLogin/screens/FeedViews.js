@@ -11,44 +11,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
 
 var JWTtoken = ''; //Store JWT for authentication
-// const homeposts = [
-//   {
-//     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-//     user: 'Blue Raccoon',
-//     likes: '2',
-//     body: 'This is a sample post!',
-//   },
-//   {
-//     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-//     user: 'Red Monkey',
-//     likes: '12',
-//     body: "Who's playing at Sun God today at 7pm?",
-//   },
-//   {
-//     id: '58694a0f-3da1-471f-bd96-145571e29d72',
-//     user: 'Purple Unicorn',
-//     likes: '21',
-//     body: 'Which dining hall has the best special today?',
-//   },
-//   {
-//     id: '58894a0f-3da1-471f-bd96-145571e29d82',
-//     user: 'Green Tortoise',
-//     likes: '10',
-//     body: 'Which dining hall has the best special today?',
-//   },
-//   {
-//     id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-//     user: 'Pink Seahorse',
-//     likes: '16',
-//     body: 'What games do you all play?',
-//   },
-//   {
-//     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-//     user: 'Yellow Squirrel',
-//     likes: '25',
-//     body: 'Test post lol',
-//   },
-// ];
 
 const allposts = [
   {
