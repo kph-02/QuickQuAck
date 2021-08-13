@@ -51,7 +51,6 @@ const RootStack = () => {
                 <Stack.Screen name="TagSelection" component={TagSelection} />
                 <Stack.Screen name="Chat" component={ChatRoom} />
                 <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
-                <Stack.Screen name="Settings" component={Settings} />
 
         </Stack.Navigator>
        

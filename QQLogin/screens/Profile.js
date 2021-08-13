@@ -24,13 +24,11 @@ const Profile = ({ navigation }) => {
       </View>
       <Image
         style={styles.avatar}
-        source={{
-          uri: 'https://i.guim.co.uk/img/static/sys-images/Guardian/Pix/pictures/2013/8/1/1375354802439/Blue---the-colour-008.jpg?width=300&quality=45&auto=format&fit=max&dpr=2&s=d32b70ddf7ecff3771c2d99d32eae422',
-        }}
+        source={require('./../assets/AnonDuck.jpg')}
       />
       <View style={styles.body}>
         <View style={styles.bodyContent}>
-          <Text style={styles.name}>ID #000000</Text>
+          <Text style={styles.name}>Timmy Turner</Text>
           <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Settings')}>
             <Text style={{ marginRight: 300, fontSize: 13 }}>Settings</Text>
             <AntDesign name="right" size={20} color="#BDBDBD" />

@@ -199,12 +199,13 @@ const CreatePost = ({ route, navigation }) => {
     >
       <StyledContainer>
         <StatusBar style="black" />
-        <InnerPostContainer>
-          {/* <ExtraBackView>
+        <View style={{right:165, bottom: 40, zIndex: 1}}>
             <TextLink onPress={() => navigation.pop()}>
               <TextPostContent>Back</TextPostContent>
             </TextLink>
-          </ExtraBackView> */}
+          </View>
+        <InnerPostContainer>
+     
           <ExtraPostView>
             <TextLink onPress={onPressButton} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}>
               <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
@@ -248,6 +249,7 @@ const CreatePost = ({ route, navigation }) => {
             textInputProps={{ editable: false }}
             searchInputPlaceholderText=""
             searchIcon={false}
+            // styleMainWrapper={{width: 350}}
           ></MultiSelect>
         </TagDropdown>
       </StyledContainer>
