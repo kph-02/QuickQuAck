@@ -80,9 +80,8 @@ const CreatePost = ({ route, navigation }) => {
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
     e.preventDefault(); //prevent refresh
-
     //Check if the post has content, if not, prevent submission and notify
-    if (inputs.postText) {
+    if (inputs.postText && inputs.postTag.length != 0) {
       sendToDB(postType.post_type, inputs);
 
       if (postType.post_type === 'Update') {
@@ -97,7 +96,7 @@ const CreatePost = ({ route, navigation }) => {
         }
       }
     } else {
-      alert('Can not submit an empty post!');
+      alert('Can not submit a post without content or tags!');
     }
   };
 
