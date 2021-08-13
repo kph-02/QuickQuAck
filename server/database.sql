@@ -44,6 +44,7 @@ CREATE TABLE post (
 CREATE TABLE comment (
     comment_id BIGSERIAL,
     post_id INTEGER NOT NULL,
+    num_upvotes INTEGER NOT NULL,
     user_id uuid NOT NULL,
     text VARCHAR(100) NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -83,8 +84,8 @@ CREATE TABLE tags (
 CREATE TABLE post_tags (
     tag_id VARCHAR(10) NOT NULL,
     post_id INTEGER NOT NULL,
-    CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
-    FOREIGN KEY(post_id) REFERENCES post(post_id),
+    CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (post_id, tag_id)
 );
 
@@ -111,3 +112,14 @@ CREATE TABLE post_names (
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+INSERT INTO tags (tag_id) VALUES ('Revelle');
+INSERT INTO tags (tag_id) VALUES ('Muir');
+INSERT INTO tags (tag_id) VALUES ('Warren');
+INSERT INTO tags (tag_id) VALUES ('ERC');
+INSERT INTO tags (tag_id) VALUES ('Marshall');
+INSERT INTO tags (tag_id) VALUES ('Sixth');
+INSERT INTO tags (tag_id) VALUES ('Seventh');
+INSERT INTO tags (tag_id) VALUES ('Food');
+INSERT INTO tags (tag_id) VALUES ('Social');
+INSERT INTO tags (tag_id) VALUES ('Poll');
+INSERT INTO tags (tag_id) VALUES ('Question');

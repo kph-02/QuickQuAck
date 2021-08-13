@@ -257,11 +257,11 @@ router.delete("/delete-post", authorization, async (req, res) => {
 // post a comment
 router.post("/create-comment", authorization, async (req, res) => {
   try {
-    const { commentText, post_id } = req.body;
+    const { commentText, post_id, num_upvotes } = req.body;
     const user_id = req.user;
     const newComment = await pool.query(
-      "INSERT INTO comment (text, user_id, post_id) VALUES ($1, $2, $3) RETURNING *",
-      [commentText, user_id, post_id]
+      "INSERT INTO comment (text, user_id, post_id, num_upvotes) VALUES ($1, $2, $3, $4) RETURNING *",
+      [commentText, user_id, post_id, num_upvotes]
     );
     res.status(201).json({
       status: "Comment Success",

@@ -12,6 +12,7 @@ import Welcome from './../screens/Welcome';
 import Splash from './../screens/Splash';
 import Profile from '../screens/Profile';
 import Settings from '../screens/Settings';
+import Notifications from './../screens/Notifications';
 import CreatePost from '../screens/CreatePost';
 import TabNav from './TabNav';
 import PostView from './../screens/PostView';
@@ -37,6 +38,9 @@ const RootStack = () => {
                 <Stack.Screen name="Splash" component={Splash} />
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="Signup" component={Signup} />
+                <Stack.Screen name="Profile" component={Profile} />
+                <Stack.Screen name="Settings" component={Settings} />
+                <Stack.Screen name="Notifications" component={Notifications} />
                 <Stack.Screen name="TabNav" component={TabNav} />
                 <Stack.Screen name="Create Post" component={CreatePost} />
                 <Stack.Screen name="Post View" component={PostView} />
@@ -47,6 +51,8 @@ const RootStack = () => {
                 <Stack.Screen name="TagSelection" component={TagSelection} />
                 <Stack.Screen name="Chat" component={ChatRoom} />
                 <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
+                <Stack.Screen name="Settings" component={Settings} />
+
         </Stack.Navigator>
        
     )

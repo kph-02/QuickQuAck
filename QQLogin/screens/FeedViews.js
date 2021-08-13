@@ -37,6 +37,7 @@ const AdjustTextPreview = ({ style, text }) => {
 };
 
 const StyledTag = ({tag}) => {
+  //console.log(tag);
   let tagcolor = '';
 
   if (tag === 'Muir') {
@@ -54,9 +55,9 @@ const StyledTag = ({tag}) => {
   } else if (tag === 'Warren') {
     tagcolor = '#AA5F5F';
   } else if (tag === 'Revelle') {
-    tagcolor = '#FEDB5F';
-  } else if (tag === 'ERC') {
     tagcolor = '#2891F2';
+  } else if (tag === 'ERC') {
+    tagcolor = '#FEDB5F';
   } else if (tag === 'Social') {
     tagcolor = '#97E1F9';
   } else if (tag === 'Sixth') {
@@ -76,6 +77,58 @@ const StyledTag = ({tag}) => {
     </View>
   );
 }
+
+// const RenderStyledTags = (tags) => {
+//   console.log("This is where we're trying stuff out...");
+//   // tags.map((tag) => console.log(tag));
+//   // return null;
+//   return tags.map((tag) => { <StyledTag tag={tag} /> });
+// }
+
+const RenderStyledTags = ({tags}) => {
+  return tags.map(function(tag) {
+    let tagcolor = '';
+
+    if (tag === 'Muir') {
+      tagcolor = '#7FD85F';
+    } else if (tag === 'Marshall') {
+      tagcolor = '#FA4A4A';
+    } else if (tag === 'Seventh') {
+      tagcolor = '#FA9E4A';
+    } else if (tag === 'Poll') {
+      tagcolor = '#AC5CEB';
+    } else if (tag === 'Question') {
+      tagcolor = '#FF8383';
+    } else if (tag === 'Food') {
+      tagcolor = '#9EE444';
+    } else if (tag === 'Warren') {
+      tagcolor = '#AA5F5F';
+    } else if (tag === 'Revelle') {
+      tagcolor = '#FEDB5F';
+    } else if (tag === 'ERC') {
+      tagcolor = '#2891F2';
+    } else if (tag === 'Social') {
+      tagcolor = '#97E1F9';
+    } else if (tag === 'Sixth') {
+      tagcolor = '#49D3FE';
+    } else {
+      tagcolor = 'gray';
+    }
+    return (
+      <View style={{
+            paddingHorizontal: 15,
+            borderRadius: 15,
+            marginVertical: 10,
+            marginLeft: 10,
+            paddingVertical: 2,
+            backgroundColor: tagcolor}}>
+        <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
+      </View>
+    );
+  });
+}
+
+
 
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
@@ -99,6 +152,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       ]}
     >
       <StyledTag tag={item.tag_id}/>
+      {/* <RenderStyledTags tags={item.tagarray} /> */}
     </View>
     {/* The Data of each Post */}
     <View style={[styles.postTouchables, { marginTop: 0, backgroundColor: 'white' }]}>
@@ -127,6 +181,59 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
     </View>
   </TouchableOpacity>
 );
+
+const ItemTwo = ({ item, onPress, backgroundColor, textColor }) => (
+  <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
+    {/* View for the text preview of each post as shown on the feed */}
+    <View style={{ justifyContent: 'center', marginLeft: 25, marginRight: 25 }}>
+      <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.post_text} />
+    </View>
+    {/* Tags Info Row */}
+    <View
+      style={[
+        styles.postTouchables,
+        {
+          justifyContent: 'flex-start',
+          backgroundColor: 'white',
+          borderTopWidth: 0,
+          borderTopColor: 'white',
+          marginBottom: 10,
+          marginTop: 5,
+          marginLeft: 15,
+        },
+      ]}
+    >
+      <StyledTag tag={item.tag_id}/>
+      {/* <RenderStyledTags tags={item.tagarray} /> */}
+    </View>
+    {/* The Data of each Post */}
+    <View style={[styles.postTouchables, { marginTop: 0, backgroundColor: 'white' }]}>
+      <View style={[styles.infoRow, { marginRight: 5 }]}>
+        {/*number of people who've viewed the post*/}
+        <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+      </View>
+      <View style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}>
+        {/*number of upvotes*/}
+        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_upvotes}</Text>
+      </View>
+      <View style={styles.infoRow}>
+        {/*number of comments*/}
+        <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
+      </View>
+      <View style={[styles.infoRow, { marginLeft: 10 }]}>
+        {/*Anonymous name of user*/}
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.anon_name}</Text>
+      </View>
+      <View style={{ marginLeft: 10 }}>
+        <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
+      </View>
+    </View>
+  </TouchableOpacity>
+);
+
 
 //format the time of the post from the database to display it to the screen
 const formatTime = (post_age) => {
@@ -208,8 +315,8 @@ const FirstRoute = () => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
-      console.log(parseRes);
-
+      // console.log(parseRes);
+      // console.log(parseRes.data.post[0].tagarray);
       /*
        *"post":[
        * {"post_id":,
@@ -285,7 +392,7 @@ const SecondRoute = () => {
     const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
     const color = item.post_id === selectedId ? 'white' : 'black';
     return (
-      <Item
+      <ItemTwo
         //destructure the item
         item={item}
         //Functionality for when a post is pressed
@@ -349,6 +456,7 @@ const SecondRoute = () => {
        * ]
        * */
       post = parseRes.data.post;
+      
     } catch (error) {
       console.error(error.message);
     }
