@@ -143,7 +143,6 @@ export const StyledPostInput = styled.TextInput`
   height: 200px;
   margin-vertical: 3px;
   margin-bottom: 10px;
-  maxlength="8";
   color: ${black};
 `;
 

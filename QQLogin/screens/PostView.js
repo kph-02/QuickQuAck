@@ -304,15 +304,15 @@ const PostView = ({ route, navigation }) => {
     } else if (tag === 'Warren') {
       tagcolor = '#AA5F5F';
     } else if (tag === 'Revelle') {
-      tagcolor = '#FEDB5F';
-    } else if (tag === 'ERC') {
       tagcolor = '#2891F2';
+    } else if (tag === 'ERC') {
+      tagcolor = '#FEDB5F';
     } else if (tag === 'Social') {
       tagcolor = '#97E1F9';
     } else if (tag === 'Sixth') {
       tagcolor = '#49D3FE';
     } else {
-      tagcolor = '#FFCC15';
+      tagcolor = 'gray';
     }
     return (
       <View style={[style, {backgroundColor: tagcolor}]}>

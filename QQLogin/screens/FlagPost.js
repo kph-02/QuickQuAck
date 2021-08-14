@@ -93,8 +93,8 @@ const FlagPost = ({ route, navigation }) => {
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
     e.preventDefault();
-
     sendToDB(inputs);
+    navigation.pop();
     //not sure if modal will handle this navigation below, try later
     //navigation.navigate('TabNav', { Screen: 'Feed' });
   };

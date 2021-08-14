@@ -49,7 +49,7 @@ class Maps extends Component {
       this.setState({
         errorMessage: 'Permission to access location was denied',
       });
-      return
+      return;
     }
 
     let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
@@ -72,10 +72,10 @@ class Maps extends Component {
   }
 
   render() {
-    const {navigation} = this.props;
+    const { navigation } = this.props;
+    const markerKhosla = require('./../assets/coleslaw.jpg');
     return (
       <View>
-        
         <StatusBar translucent={true} backgroundColor="transparent" barStyle="dark-content" />
         <MapView
           mapType="standard"
@@ -93,22 +93,32 @@ class Maps extends Component {
             longitudeDelta: 0.01,
           }}
         >
-          <Marker coordinate={{ latitude: 32.88232190507297, longitude: -117.23403495912069 }}>
+          <Marker pinColor="#FFCC15" coordinate={{ latitude: 32.88232190507297, longitude: -117.23403495912069 }}>
             <Callout>
-              <Text>bro what </Text>
+              <Text>Why can't I step on the seal?</Text>
             </Callout>
           </Marker>
-          <Marker draggable coordinate={{ latitude: 32.88122376973488, longitude: -117.23757610041588 }}>
+          <Marker pinColor="#FFCC15" draggable coordinate={{ latitude: 32.88122376973488, longitude: -117.23757610041588 }}>
             <Callout>
-              <Text>Woweee</Text>
+              <Text>what if we... studied together... on geisel 8th floor.. aha ha.. just kidding.. unless..?</Text>
             </Callout>
           </Marker>
+          <Marker pinColor="#FFCC15" draggable coordinate={{ latitude: 32.87971535134385, longitude: -117.23555259895977 }}>
+            <Callout>
+              <Text>Not gonna lie, Tapex has the best food on campus.</Text>
+            </Callout>
+          </Marker>
+          {/* <Marker coordinate={{ latitude: 32.88030632248851, longitude: -117.23991170827364 }}>
+            <Callout>
+        
+              <Text>
+                <Image source={markerKhosla} style={{maxHeight: 100, minHeight: 100,resizeMode: 'cover' }} />
+              </Text>
+          
+            </Callout>
+          </Marker> */}
         </MapView>
-        <TouchableOpacity
-          activeOpacity={0.5}
-          onPress={() => navigation.pop()}
-          style={styles.touchableStyle}
-        >
+        <TouchableOpacity activeOpacity={0.5} onPress={() => navigation.pop()} style={styles.touchableStyle}>
           <Image source={require('./../assets/backbo.png')} style={styles.floatingButtonStyle} />
         </TouchableOpacity>
       </View>
