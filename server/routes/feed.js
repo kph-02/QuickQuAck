@@ -302,7 +302,7 @@ router.get("/post-comments", authorization, async (req, res) => {
 router.get("/all-posts", authorization, async (req, res) => {
   try {
     const allFeed = await pool.query(
-      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age;"
+      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id  INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age;"
     );
 
     /* For future reference, this is how to order by upvotes. */

@@ -285,42 +285,6 @@ const PostView = ({ route, navigation }) => {
     );
   };
 
-  /* Controls what color each tag is */
-  const StyledTag = ({style, tag}) => {
-    let tagcolor = '';
-
-    if (tag === 'Muir') {
-      tagcolor = '#7FD85F';
-    } else if (tag === 'Marshall') {
-      tagcolor = '#FA4A4A';
-    } else if (tag === 'Seventh') {
-      tagcolor = '#FA9E4A';
-    } else if (tag === 'Poll') {
-      tagcolor = '#AC5CEB';
-    } else if (tag === 'Question') {
-      tagcolor = '#FF8383';
-    } else if (tag === 'Food') {
-      tagcolor = '#9EE444';
-    } else if (tag === 'Warren') {
-      tagcolor = '#AA5F5F';
-    } else if (tag === 'Revelle') {
-      tagcolor = '#2891F2';
-    } else if (tag === 'ERC') {
-      tagcolor = '#FEDB5F';
-    } else if (tag === 'Social') {
-      tagcolor = '#97E1F9';
-    } else if (tag === 'Sixth') {
-      tagcolor = '#49D3FE';
-    } else {
-      tagcolor = 'gray';
-    }
-    return (
-      <View style={[style, {backgroundColor: tagcolor}]}>
-        <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
-      </View>
-    );
-  }
-
   //Renders all tags associated with the original post
   const RenderStyledTags = ({tags}) => {
   return tags.map(function(tag) {
@@ -626,8 +590,7 @@ const PostView = ({ route, navigation }) => {
 
       {/* Container/View for the Tags associated with this post */}
       <View style={[styles.postTouchables, {justifyContent: 'flex-start', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5,  }]}>
-        <StyledTag style={{paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, paddingVertical: 2}} tag={post.tag_id}/>
-        {/* <RenderStyledTags tags={post.tagarray}/> */}
+        <RenderStyledTags tags={post.tagarray}/>
       </View>
       {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
 
