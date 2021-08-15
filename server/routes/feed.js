@@ -106,9 +106,17 @@ router.post("/user-tag-selection", async (req, res) => {
     const { postTag } = req.body;
     const { user_id } = req.body;
 
-    //hardcoded author_id cuz idk how to pull on it using req.user
-    // const author_id = "5bae78ef-8641-4d9c-837d-b78fb4c158fb";
+    const selectedTags = await pool.query(
+      "SELECT user_id, ARRAY_AGG(tag_id) as tagArray FROM user_tags WHERE user_id = $1 GROUP BY user_id",
+      [user_id]
+    );
 
+    if (selectedTags) {
+      const DeleteTags = await pool.query(
+        "DELETE FROM user_tags WHERE user_id = $1 RETURNING *;",
+        [user_id]
+      );
+    }
     for (const i of postTag) {
       console.log("Console says " + i);
       const postTags = await pool.query(
@@ -130,25 +138,6 @@ router.post("/user-tag-selection", async (req, res) => {
     res.status(500).json("Server Error");
   }
 });
-
-router.delete("clear-tag-selection"),
-  async (req, res) => {
-    const user_id = req.user;
-
-    try {
-      const tagDeletion = await pool.query(
-        "DELETE FROM user_tags WHERE user_id = $1",
-        [user_id]
-      );
-
-      res.status(201).json({
-        status: "Delete success",
-      });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).json("Server Error");
-    }
-  };
 
 // This renders a page of posts based upon filtering of tags selected during user creation sorted in ascending order of time posted
 
@@ -179,25 +168,6 @@ router.get("/home-feed", authorization, async (req, res) => {
     res.status(500).json("Server Error");
   }
 });
-
-// router.get("/filtered-feed", authorization, async (req, res) => {
-//   try {
-//     //This will select from the 'tagpicker' dropdown within the post fuponctionality
-
-//     var tag = req.body.tagpicker;
-
-//     let sql =
-//       "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, pt.tag_id FROM post AS p JOIN post_tags as pt ON pt.post_id = p.post_id JOIN tags AS t on t.tag_id = pt.tag_id WHERE (t.tag_id = ${tag}) ORDER BY time_posted DESC;";
-
-//     const filteredFeed = await pool.query(sql);
-//     res.status(200).json({
-//       status: "feed filtered",
-//     });
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).send("Server Error");
-//   }
-// });
 
 // update a post
 router.put("/update-post", authorization, async (req, res) => {
@@ -323,23 +293,24 @@ router.get("/all-posts", authorization, async (req, res) => {
   }
 });
 
-//INCOMPLETE: This renders home-posts in the past 24 hours sorted in Ascending order
-//This is filtered by the selected tags on profile
-router.get("/home-posts", authorization, async (req, res) => {
+//This renders all the posts a user has submitted in the past 24 hours sorted in Ascending order
+router.get("/user-posts", authorization, async (req, res) => {
   try {
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+    const user_id = req.user;
+    const userFeed = await pool.query(
+      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE (time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AND post.user_id = $1) AS SB ORDER BY SB.post_age;",
+      [user_id]
+    );
 
-//INCOMPLETE: This renders search-posts in the past 24 hours.
-//The user selects < 5 tags for search
-router.get("/search-posts", authorization, async (req, res) => {
-  try {
+
+    res.status(201).json({
+      data: {
+        post: userFeed.rows,
+      },
+    });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server Error");
+    res.status(500).json("Server Error");
   }
 });
 
@@ -420,6 +391,27 @@ router.post("/post-vote", authorization, async (req, res) => {
     res.status(201).json("Complete");
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+//iltering by selecting a singular tag on the main feed
+router.get("/tag-filter", authorization, async (req, res) => {
+  const tag_id = req.body;
+
+  try {
+    const tagFeed = await pool.query(
+      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB WHERE $1 = ANY(SB.tagArray) ORDER BY SB.post_age;",
+      [tag]
+    );
+
+    res.status(201).json({
+      data: {
+        post: tagFeed.rows,
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
   }
 });
 

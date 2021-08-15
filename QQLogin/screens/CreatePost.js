@@ -7,7 +7,7 @@ import { serverIp } from './Login.js';
 import Poll from '../components/Poll.js';
 //formik
 import { Formik } from 'formik';
-
+import { Switch } from 'react-native-switch';
 //icons
 
 import { Octicons, Ionicons } from '@expo/vector-icons';
@@ -47,7 +47,7 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import { Picker } from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
 import { TextInput } from 'react-native-gesture-handler';
-
+import Map from '../screens/Map'
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
@@ -69,6 +69,7 @@ const CreatePost = ({ route, navigation }) => {
 
   var JWTtoken = '';
 
+ 
   //Stores values to update input fields from user
   const { postText, postTag } = inputs;
 
@@ -189,7 +190,6 @@ const CreatePost = ({ route, navigation }) => {
       onChange('postText', postType.post_text);
     }
   }, []);
-
   return (
     <Modal
       transparent={true}
@@ -250,6 +250,9 @@ const CreatePost = ({ route, navigation }) => {
               multiline
             />
             <Poll Type={postType.post_type} />
+            {/* <Button
+            title="test" 
+            onPress= {() => console.log(Map.getLocationAsync())} /> */}
           </View>
 
         {/* <InnerPostContainer> */}

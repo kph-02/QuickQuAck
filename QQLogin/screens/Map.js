@@ -128,7 +128,6 @@ class Maps extends Component {
 
 export default function Map(props) {
   const navigation = useNavigation();
-
   return <Maps {...props} navigation={navigation} />;
 }
 
