@@ -101,6 +101,26 @@ const commentExamples = [
   },
 ];
 
+const formatTime = (post_age) => {
+  let postAgeDisplay = '';
+
+  //check if it exists b/c sometimes called before objects rendered so is undefined
+  if (post_age) {
+    if (post_age.hours) {
+      postAgeDisplay += post_age.hours + 'h ';
+    }
+    if (post_age.minutes) {
+      postAgeDisplay += post_age.minutes + 'm ';
+    } else {
+      postAgeDisplay += '1m ';
+    }
+
+    postAgeDisplay += 'ago';
+  }
+
+  return postAgeDisplay;
+};
+
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
@@ -154,7 +174,7 @@ const PostView = ({ route, navigation }) => {
           }}
         >
           {/* Time posted */}
-          <Text style={[styles.name]}>{item.time_posted} ago</Text>
+        <Text style={[styles.name]}>{formatTime(item.comment_age)} ago</Text>
 
           {/* Upvotes */}
           <TouchableOpacity
