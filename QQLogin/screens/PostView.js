@@ -137,6 +137,14 @@ const PostView = ({ route, navigation }) => {
   const [commentUpvotes, setCommentUpvotes] = useState([]);
   const [refreshComments, setRefreshComments] = useState(false);
 
+  const [refresh, setRefresh] = useState(false); //Handle refreshing logic
+
+  const handleRefresh = () => {
+    setRefresh(true); //update animation
+    refreshNewComments(!newComments); //Change variable to trigger useEffect to pull posts from database
+    setRefresh(false);
+  };
+
   /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
   const Item = ({ item, onPress, backgroundColor, textColor }) => {
     const navigation = useNavigation();
@@ -658,6 +666,8 @@ const PostView = ({ route, navigation }) => {
           keyExtractor={(item) => item.comment_id}
           extraData={refreshComments}
           renderItem={renderItem}
+          refreshing={refresh} //true: shows spinning animation to show loading
+          onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
         />
       </View>
 
