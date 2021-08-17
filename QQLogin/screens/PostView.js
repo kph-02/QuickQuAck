@@ -551,7 +551,7 @@ const PostView = ({ route, navigation }) => {
       <TouchableOpacity
         style={{ marginLeft: 10, width: 50, paddingLeft: 5 }}
         onPress={() => {
-          navigation.navigate('Feed');
+          navigation.pop();
           updatePostAttributes();
         }}
       >

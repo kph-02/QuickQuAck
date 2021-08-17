@@ -67,11 +67,12 @@ export default function TabNav() {
           }}
         />
         <Tab.Screen name="Profile" component={Profile} 
-            options={{
+            options={({route}) => ({
                   tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons name="account-circle" color={color} size={26} />
                   ),
-              }}
+                  tabBarVisible: true,
+              })}
         />
         <Tab.Screen name="Messages" component={Messages} 
             options={{

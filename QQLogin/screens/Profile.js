@@ -33,7 +33,9 @@ const Profile = ({ navigation }) => {
             <Text style={{ marginRight: 300, fontSize: 13 }}>Settings</Text>
             <AntDesign name="right" size={20} color="#BDBDBD" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={styles.buttonContainer}
+            onPress={() => navigation.navigate('Activity')}>
             <Text style={{ marginRight: 300, fontSize: 13 }}>Activity</Text>
             <AntDesign name="right" size={20} color="#BDBDBD" />
           </TouchableOpacity>
