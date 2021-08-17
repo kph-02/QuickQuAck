@@ -25,7 +25,7 @@ const Profile = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.navigate('TagSelection')} style={styles.buttonContainer}>
             <Text style={{ marginRight: 290, fontSize: 13 }}>Edit Interest Tags</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('UserInfo')} style={styles.buttonContainer}>
             <Text style={{ marginRight: 290, fontSize: 13 }}>Edit Personal Info</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.buttonContainer}>
