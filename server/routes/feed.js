@@ -263,11 +263,35 @@ router.post("/create-comment", authorization, async (req, res) => {
       "INSERT INTO comment (text, user_id, post_id, num_upvotes) VALUES ($1, $2, $3, $4) RETURNING *",
       [commentText, user_id, post_id, num_upvotes]
     );
+    const newVote = await pool.query(
+      "INSERT INTO comment_votes (comment_id, user_id, post_id, vote_value) VALUES ($1, $2, $3, $4) RETURNING *",
+      [newComment.rows[0].comment_id, user_id, post_id, 1]
+    );
+
     res.status(201).json({
       status: "Comment Success",
+      comment_id: newComment.rows[0].comment_id,
     });
   } catch (err) {
     console.log(err.message);
+    res.status(500).json("Server error");
+  }
+});
+
+// update a comment
+router.put("/update-comment", authorization, async (req, res) => {
+  try {
+    const { commentText, comment_id } = req.body;
+
+    const updateText = await pool.query(
+      "UPDATE comment SET text = $1 where comment_id = $2",
+      [commentText, comment_id]
+    );
+
+    res.status(201).json({
+      status: "Update Success",
+    });
+  } catch (err) {
     res.status(500).json("Server error");
   }
 });
@@ -425,48 +449,46 @@ router.post("/post-vote", authorization, async (req, res) => {
 
 // add/undo comment votes
 router.post("/comment-vote", authorization, async (req, res) => {
-  const { user_id, vote_values, post_id } = req.body;
+  const { user_id, comments, post_id } = req.body;
 
   try {
-    for (const comment of vote_values) {
-      try {
-        const insertVote = await pool.query(
-          "INSERT INTO comment_votes (user_id, comment_id, vote_value, post_id) VALUES($1, $2, $3, $4) RETURNING *",
-          [user_id, comment.comment_id, comment.vote_value, post_id]
-        );
-      } catch (err) {
-        const updateVote = await pool.query(
-          "UPDATE comment_votes SET vote_value = $1 WHERE (user_id = $2 AND comment_id = $3) RETURNING *",
-          [comment.vote_value, user_id, comment.comment_id]
-        );
-        console.log(err.message);
+    for (const i of comments) {
+      console.log(i);
+
+      //If vote value is given, update here
+      // UPDATE TO EITHER INESRT OR UPDATE IN THE TRY CATCH :D
+      if (!(i.vote_value === undefined)) {
+        try {
+          const insertVote = await pool.query(
+            "INSERT INTO comment_votes VALUES($1, $2, $3) RETURNING *",
+            [user_id, comment_id, vote_value]
+          );
+
+          console.log("Inserted");
+        } catch (err) {
+          console.log("Updated");
+
+          const updateVote = await pool.query(
+            "UPDATE comment_votes SET vote_value = $1 WHERE (user_id = $2 AND comment_id = $3) RETURNING *",
+            [vote_value, user_id, comment_id]
+          );
+          console.log(err.message);
+        }
+      }
+
+      //If number of votes are given, update here
+      if (!(i.votes === undefined)) {
+        try {
+          let updateVoteCount = await pool.query(
+            "UPDATE comment SET num_upvotes = $1 WHERE comment_id = $2 RETURNING *",
+            [i.votes, i.comment_id]
+          );
+          console.log("Upvote updated");
+        } catch (err) {
+          console.log(err.message);
+        }
       }
     }
-
-    //Made slight alterations to this code, keeping it rn in case I break everything
-    //   // if the same vote from the same person on the same post exists
-    //   const exactDuplicate = await pool.query(
-    //     "SELECT * FROM comment_votes WHERE (user_id = $1 AND comment_id = $2 AND vote_value = $3)",
-    //     [user_id, comment_id, vote_value]
-    //   );
-    //   if (exactDuplicate.rows.length > 0) {
-    //     const deleteVote = await pool.query(
-    //       "DELETE FROM comment_votes WHERE (user_id = $1 AND comment_id = $2 AND vote_value = $3)",
-    //       [user_id, comment_id, vote_value]
-    //     );
-    //   } else {
-    //     try {
-    //       const insertVote = await pool.query(
-    //         "INSERT INTO comment_votes VALUES($1, $2, $3) RETURNING *",
-    //         [user_id, comment_id, vote_value]
-    //       );
-    //     } catch (err) {
-    //       const updateVote = await pool.query(
-    //         "UPDATE comment_votes SET vote_value = $1 WHERE (user_id = $2 AND comment_id = $3) RETURNING *",
-    //         [vote_value, user_id, comment_id]
-    //       );
-    //     }
-    //   }
     res.status(201).json("Complete");
   } catch (err) {
     res.status(500).json({ error: err.message });

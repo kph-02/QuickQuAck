@@ -114,7 +114,6 @@ const PostView = ({ route, navigation }) => {
 
   //handle comment upvotes
   const [commentsUpvoted, setCommentsUpvoted] = useState([]);
-  const [commentUpvotes, setCommentUpvotes] = useState([]);
   const [refreshComments, setRefreshComments] = useState(false);
 
   //Mapping array , takes comment_id and returns the index its stored in for commentsUpvoted and commentUpvotes
@@ -173,8 +172,8 @@ const PostView = ({ route, navigation }) => {
               size={35}
               style={{
                 width: 29,
-                // Very messy -> first check if comment was mapped, if was then check if comment
-                color: mapComments[item.comment_id]
+                // Very messy -> first check if comment was mapped, if was then check if comment was upvoted
+                color: commentsUpvoted[mapComments[item.comment_id]]
                   ? commentsUpvoted[mapComments[item.comment_id]].vote_value
                     ? '#FFCC15'
                     : '#BDBDBD'
@@ -182,7 +181,9 @@ const PostView = ({ route, navigation }) => {
               }}
             />
             <Text style={[styles.name, { marginHorizontal: 0 }]}>
-              {mapComments[item.comment_id] ? commentUpvotes[mapComments[item.comment_id]].votes : 0}
+              {commentsUpvoted[mapComments[item.comment_id]].votes
+                ? commentsUpvoted[mapComments[item.comment_id]].votes
+                : 0}
             </Text>
           </TouchableOpacity>
         </View>
@@ -253,6 +254,22 @@ const PostView = ({ route, navigation }) => {
         const parseRes = await response.json();
 
         // console.log('COMMENT: ' + JSON.stringify(parseRes));
+
+        let index = currIndex;
+        let map = mapComments;
+        let upvote = commentsUpvoted;
+
+        //comment was added successfully, add to map array
+        if (!(parseRes.comment_id === undefined)) {
+          map[parseRes.comment_id] = index;
+          upvote[map[parseRes.comment_id]] = { comment_id: parseRes.comment_id, vote_value: 1, votes: 1 };
+          index++;
+        }
+
+        setCurrIndex(index);
+        setMapComments(map);
+        setCommentsUpvoted(upvote);
+
         refreshNewComments(!newComments); //update the page with the new comment
       } catch (error) {
         console.error(error.message);
@@ -371,27 +388,31 @@ const PostView = ({ route, navigation }) => {
       //Copy useState parameters b/c shouldn't call useState in if statements
       let map = mapComments;
       let index = currIndex;
-      let upvotes = commentUpvotes;
+      let upvote = commentsUpvoted;
       let comments = [];
 
       //Updates postData to have post information using useState
       if (parseRes.data) {
         comments = parseRes.data.comment;
         //iterate through the comments to update upvotes array
-        for (const comment of parseRes.data.comment) {
-          //Set up comment in mapping
+        for (const comment of comments) {
+          console.log(comment);
           //comments hasn't been mapped yet, so map it.
-          if (map[comments.comment_id] === undefined) {
-            map[comments.comment_id] = index;
+          if (map[comment.comment_id] === undefined) {
+            map[comment.comment_id] = index;
             index++;
           }
-
-          upvotes[mapComments[comment.comment_id]] = { comment_id: comments.comment_id, votes: comments.num_upvotes };
+          //update upvoted table
+          upvote[map[comment.comment_id]] = {
+            comment_id: comment.comment_id,
+            vote_value: comment.vote_value, //this is wrong, need way to get all comments from this user on this post
+            votes: comment.num_upvotes,
+          };
         }
       }
 
       SetComments(comments);
-      setCommentUpvotes(upvotes);
+      setCommentsUpvoted(upvote);
       setCurrIndex(index);
       setMapComments(map);
     } catch (error) {
@@ -449,25 +470,26 @@ const PostView = ({ route, navigation }) => {
       // console.log('Initial Comments: ' + JSON.stringify(parseRes));
 
       // store initial values to update useState
-      let upvoted = [];
-      let upvotes = [];
-      let index = 0;
-      let mapIndex = [];
+      let upvote = commentsUpvoted;
+      let index = currIndex;
+      let mapIndex = mapComments;
 
       if (parseRes === []) {
         console.log('No Comments!');
       } else {
         //Populate upvoted table with initial values from database
-        for (const comments of parseRes) {
-          mapIndex[comments.comment_id] = index; //Add comment_id to mapping array
-          upvoted[index] = { comment_id: comments.comment_id, vote_value: comments.vote_value }; //update entry
-          index++;
+        for (const comment of parseRes) {
+          //check if commment index is not mapped and map it
+          if (mapIndex[comment.comment_id] === undefined) {
+            mapIndex[comment.comment_id] = index; //Add comment_id to mapping array
+
+            index++;
+          }
         }
       }
 
       //Update hooks
-      setCommentsUpvoted(upvoted);
-      setCommentUpvotes(upvotes);
+      setCommentsUpvoted(upvote);
       setCurrIndex(index);
       setMapComments(mapIndex);
     } catch (error) {
@@ -485,8 +507,8 @@ const PostView = ({ route, navigation }) => {
   //triggers on first load
   useEffect(() => {
     async function fetchAuthorizations() {
+      getUserID();
       await getJWT();
-      await getUserID();
       await getUpvoted(); //get upvoted values for posts/comments
     }
 
@@ -539,7 +561,7 @@ const PostView = ({ route, navigation }) => {
     const bodyCommentUpvotes = {
       user_id: userId,
       post_id: post.post_id,
-      vote_values: commentsUpvoted,
+      comments: commentsUpvoted,
     };
     updateCommentValues(bodyCommentUpvotes);
   };
@@ -610,14 +632,13 @@ const PostView = ({ route, navigation }) => {
     let map = mapComments;
     let moveIndex = 0;
     let upvoted = commentsUpvoted;
-    let upvotes = commentUpvotes;
 
     //Comment index in upvoted/upvotes array
     let commentIndex = 0;
 
     //Set up comment in mapping
     //comments hasn't been mapped yet, so map it.
-    if (mapComments[comment_id] === undefined) {
+    if (map[comment_id] === undefined) {
       map[comment_id] = currIndex;
       commentIndex = currIndex;
       moveIndex = 1;
@@ -629,32 +650,24 @@ const PostView = ({ route, navigation }) => {
 
     //If comment was upvoted before, just toggle it. If not, set to 1.
     if (upvoted[commentIndex] === undefined) {
-      upvoted[commentIndex] = { comment_id: comment_id, vote_value: 1 };
+      upvoted[commentIndex] = { comment_id: comment_id, vote_value: 1, votes: 1 };
     } else {
       //Flipping vote value to match user input
       if (upvoted[commentIndex].vote_value === 0) {
-        upvoted[commentIndex].vote_value++;
+        upvoted[commentIndex].vote_value = 1;
+        upvoted[commentIndex].votes++;
       } else {
-        upvoted[commentIndex].vote_value--;
+        upvoted[commentIndex].vote_value = 0;
+        upvoted[commentIndex].votes--;
       }
     }
 
-    if (upvotes[commentIndex] === undefined) {
-      upvotes[commentIndex] = { comment_id: comment_id, votes: 0 }; //edit to initial value + 1 later
-    }
-
-    //if true now, upvote was added, if false upvote was removed
-    if (upvoted[commentIndex].vote_value === 1) {
-      upvotes[commentIndex].votes++;
-    } else {
-      upvotes[commentIndex].votes--;
-    }
+    let index = currIndex + moveIndex;
 
     //Update useState hooks
     setMapComments(map);
-    setCurrIndex(currIndex + moveIndex);
+    setCurrIndex(index);
     setCommentsUpvoted(upvoted);
-    setCommentUpvotes(upvotes);
 
     setRefreshComments(!refreshComments); //re-renders the components in the flatlist
   };
