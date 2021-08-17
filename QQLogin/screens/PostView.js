@@ -174,6 +174,7 @@ const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
   const { post } = route.params; //post data
   const [comments, SetComments] = useState([]); //stores all comments for the post
+  const [anonName, setAnonName] = useState();
   const [newComments, refreshNewComments] = useState(false); //determines when to get new comments from db
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
 
@@ -213,13 +214,35 @@ const PostView = ({ route, navigation }) => {
   */
   const sendToDB = async (operation, body) => {
     //Create a comment on the post
-    if (operation === 'comment') {
+    if (operation === 'foreignComment') {
       try {
-        const response = await fetch('http://' + serverIp + ':5000/feed/create-comment', {
+        const response = await fetch('http://' + serverIp + ':5000/feed/new-comment', {
           method: 'POST',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         });
+
+        console.log("FOREIGN COMMENT CREATED!");
+        const parseRes = await response.json();
+        const newAnonName = parseRes.anon_name_id;
+        // console.log('COMMENT: ' + JSON.stringify(parseRes));
+        refreshNewComments(!newComments); //update the page with the new comment
+        setAnonName(newAnonName); // sets new Anon Name
+
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+
+    if (operation === 'existingComment') {
+      try {
+        const response = await fetch('http://' + serverIp + ':5000/feed/add-comment', {
+          method: 'POST',
+          headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        console.log("EXISTING COMMENT CREATED!");
 
         const parseRes = await response.json();
 
@@ -291,26 +314,61 @@ const PostView = ({ route, navigation }) => {
   };
 
   //Getting comments from the database to show for post
-  const getFromDB = async () => {
-    const query = 'post_id=' + post.post_id; //sets up query information
-    try {
-      // Update server with user's registration information
-      const response = await fetch('http://' + serverIp + ':5000/feed/post-comments?' + query, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json', token: JWTtoken },
-      });
+  const getFromDB = async (operation) => {
 
-      //The response includes post information, need in json format
+    if (operation === 'anonName') {
+      try {
+        const query = 'post_id=' + post.post_id; //sets up query information
+
+        const response = await fetch('http://' + serverIp + ':5000/feed/comment-name?' + query, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', token: JWTtoken },
+        });
+
       const parseRes = await response.json();
 
-      //Updates postData to have post information using useState
-      //temporary if statement just so second view might work, will delete soon
-      if (parseRes.data) {
-        SetComments(parseRes.data.comment);
+      let anon_name = '';
+
+      console.log("Checkpoint 1.");
+      console.log(parseRes.data.anon_name_id);
+      if(parseRes.data.anon_name_id !== undefined) {
+        anon_name = parseRes.data.anon_name_id;
+        console.log("Checkpoint 2a, Existing anon Name: " + anon_name);
+      } else {
+        anon_name = null;
+        console.log("Checkpoint 2b, should be null: " + anon_name);
       }
-    } catch (error) {
-      console.error(error.message);
+
+      setAnonName(anon_name);
+      console.log("Checkout 3a anonName: null if new user, non null if not: " + anonName);
+      console.log("Checkout 3b anon_name : null if new user, non null if not: " + anon_name);
+
+      } catch (error) {
+        console.error(error.message);
+      }
     }
+    if (operation === 'getComments') {
+      try {
+        const query = 'post_id=' + post.post_id; //sets up query information
+        // Update server with user's registration information
+        const response = await fetch('http://' + serverIp + ':5000/feed/post-comments?' + query, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', token: JWTtoken },
+        });
+  
+        //The response includes post information, need in json format
+        const parseRes = await response.json();
+  
+        //Updates postData to have post information using useState
+        //temporary if statement just so second view might work, will delete soon
+        SetComments(parseRes.data.comment);
+        
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+    const query = 'post_id=' + post.post_id; //sets up query information
+    
   };
 
   //Get from database whether user has upvoted this post before or not
@@ -349,7 +407,7 @@ const PostView = ({ route, navigation }) => {
 
   //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
-    getFromDB();
+    getFromDB('getComments');
     console.log('Comments Refreshed');
   }, [newComments]);
 
@@ -564,8 +622,15 @@ const PostView = ({ route, navigation }) => {
             commentText: values.commentText,
             post_id: post.post_id,
           };
+          getFromDB('anonName');
 
-          sendToDB('comment', body);
+          if (anonName === null) {
+            sendToDB('foreignComment', body);
+          } else {
+            console.log("This is current anonName: " + anonName); //is undefined here
+            sendToDB('existingComment', body);
+          }
+          //sendToDB('comment', body);
           values.commentText = '';
         }}
       >
