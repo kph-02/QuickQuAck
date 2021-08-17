@@ -368,11 +368,32 @@ const PostView = ({ route, navigation }) => {
       //The response includes post information, need in json format
       const parseRes = await response.json();
 
+      //Copy useState parameters b/c shouldn't call useState in if statements
+      let map = mapComments;
+      let index = currIndex;
+      let upvotes = commentUpvotes;
+      let comments = [];
+
       //Updates postData to have post information using useState
-      //temporary if statement just so second view might work, will delete soon
       if (parseRes.data) {
-        SetComments(parseRes.data.comment);
+        comments = parseRes.data.comment;
+        //iterate through the comments to update upvotes array
+        for (const comment of parseRes.data.comment) {
+          //Set up comment in mapping
+          //comments hasn't been mapped yet, so map it.
+          if (map[comments.comment_id] === undefined) {
+            map[comments.comment_id] = index;
+            index++;
+          }
+
+          upvotes[mapComments[comment.comment_id]] = { comment_id: comments.comment_id, votes: comments.num_upvotes };
+        }
       }
+
+      SetComments(comments);
+      setCommentUpvotes(upvotes);
+      setCurrIndex(index);
+      setMapComments(map);
     } catch (error) {
       console.error(error.message);
     }
@@ -429,25 +450,26 @@ const PostView = ({ route, navigation }) => {
 
       // store initial values to update useState
       let upvoted = [];
+      let upvotes = [];
       let index = 0;
+      let mapIndex = [];
 
       if (parseRes === []) {
         console.log('No Comments!');
       } else {
-        console.log(parseRes);
         //Populate upvoted table with initial values from database
         for (const comments of parseRes) {
-          mapComments[comments.comment_id] = index; //Add comment_id to mapping array
+          mapIndex[comments.comment_id] = index; //Add comment_id to mapping array
           upvoted[index] = { comment_id: comments.comment_id, vote_value: comments.vote_value }; //update entry
           index++;
         }
       }
 
-      console.log('Upvoted Comments: ' + upvoted);
-
       //Update hooks
       setCommentsUpvoted(upvoted);
+      setCommentUpvotes(upvotes);
       setCurrIndex(index);
+      setMapComments(mapIndex);
     } catch (error) {
       console.error(error.message);
     }
@@ -457,6 +479,7 @@ const PostView = ({ route, navigation }) => {
   useEffect(() => {
     getFromDB();
     console.log('Comments Refreshed');
+    setRefreshComments(!refreshComments); //refresh flatlist
   }, [newComments]);
 
   //triggers on first load
@@ -464,12 +487,10 @@ const PostView = ({ route, navigation }) => {
     async function fetchAuthorizations() {
       await getJWT();
       await getUserID();
-      getUpvoted(); //get upvoted values for posts/comments
+      await getUpvoted(); //get upvoted values for posts/comments
     }
 
     fetchAuthorizations();
-
-    console.log('Comments Upvoted: ' + commentsUpvoted);
   }, []);
 
   /* Controls the look of each "item", or comment in this context */
@@ -525,7 +546,6 @@ const PostView = ({ route, navigation }) => {
 
   //updating the database with whether the user upvoted the comment or not
   const updateCommentValues = async (body) => {
-    console.log(body);
     try {
       const response = await fetch('http://' + serverIp + ':5000/feed/comment-vote', {
         method: 'POST',
