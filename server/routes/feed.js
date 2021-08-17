@@ -2,6 +2,8 @@ const express = require("express"); //import Express
 const router = express(); //create an Express application on the app variable
 const authorization = require("../middleware/authorization");
 const pool = require("../db");
+const bcrypt = require("bcrypt");
+
 
 //
 
@@ -453,7 +455,7 @@ router.post("/comment-vote", authorization, async (req, res) => {
 });
 
 
-router.put("edit-user-info", authorization, async (req, res) => {
+router.put("/edit-user-info", authorization, async (req, res) => {
   try {
     const { firstName, lastName, email, password, college, gy } = req.body;
     const user_id = req.user;
@@ -475,7 +477,7 @@ router.put("edit-user-info", authorization, async (req, res) => {
 
       const updateUserPassword = await pool.query(
         "UPDATE users SET user_password = $1 WHERE user_id = $2",
-        [password, user_id]
+        [bcryptPassword, user_id]
       );
     } else if (college && gy) {
       const updateUserSchool = await pool.query(

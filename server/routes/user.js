@@ -3,7 +3,7 @@ const router = express(); //create an Express application on the app variable
 const authorization = require("../middleware/authorization");
 const pool = require("../db");
 
-router.put("edit-user-info", authorization, async (req, res) => {
+router.put("/edit-user-info", authorization, async (req, res) => {
   try {
     const { firstName, lastName, email, password, college, gy } = req.body;
     const user_id = req.user;

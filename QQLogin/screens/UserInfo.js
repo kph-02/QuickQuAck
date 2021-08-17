@@ -223,7 +223,7 @@ const UserInfo = ({ navigation }) => {
             value={email}
             selectionColor="#FFCC15" //implement a max length
           />
-          <StyledButton onPress={handleModal2}>
+          <StyledButton onPress={onPressButtonEmail}>
             <ButtonText>Change Email</ButtonText>
           </StyledButton>
         </View>
