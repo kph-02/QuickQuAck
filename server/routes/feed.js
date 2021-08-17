@@ -4,7 +4,6 @@ const authorization = require("../middleware/authorization");
 const pool = require("../db");
 const bcrypt = require("bcrypt");
 
-
 //
 
 /*
@@ -119,7 +118,7 @@ router.post("/user-tag-selection", async (req, res) => {
         [user_id]
       );
     }
-    
+
     for (const i of postTag) {
       console.log("Console says " + i);
       const postTags = await pool.query(
@@ -251,10 +250,10 @@ router.get("/post-comments", authorization, async (req, res) => {
     const { post_id } = req.query;
 
     const allComment = await pool.query(
-      "SELECT *, AGE(NOW(), time_posted) AS comment_age FROM comment INNER JOIN "
-    + "post_names ON comment.post_id = "
-    + "post_names.post_id WHERE comment.post_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' "
-    + "AND NOW() ORDER BY time_posted DESC;",
+      "SELECT *, AGE(NOW(), time_posted) AS comment_age FROM comment INNER JOIN " +
+        "post_names ON comment.post_id = " +
+        "post_names.post_id WHERE comment.post_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' " +
+        "AND NOW() ORDER BY time_posted DESC;",
       [post_id]
     );
 
@@ -307,7 +306,6 @@ router.get("/user-posts", authorization, async (req, res) => {
       "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE (time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AND post.user_id = $1) AS SB ORDER BY SB.post_age;",
       [user_id]
     );
-
 
     res.status(201).json({
       data: {
@@ -454,10 +452,17 @@ router.post("/comment-vote", authorization, async (req, res) => {
   }
 });
 
-
 router.put("/edit-user-info", authorization, async (req, res) => {
   try {
-    const { firstName, lastName, email, password, college, gy } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      college,
+      gy,
+      currentPassword,
+    } = req.body;
     const user_id = req.user;
     if (firstName && lastName) {
       const updateUserName = await pool.query(
@@ -475,10 +480,26 @@ router.put("/edit-user-info", authorization, async (req, res) => {
       const salt = await bcrypt.genSalt(saltRound);
       const bcryptPassword = await bcrypt.hash(password, salt);
 
-      const updateUserPassword = await pool.query(
-        "UPDATE users SET user_password = $1 WHERE user_id = $2",
-        [bcryptPassword, user_id]
+      const dbPassword = await pool.query(
+        "SELECT user_password FROM users WHERE user_id = $1",
+        [user_id]
       );
+
+      const validPassword = await bcrypt.compare(
+        currentPassword,
+        dbPassword.rows[0].user_password
+      );
+      console.log(validPassword);
+      // const bcryptCurrentPassword = await bcrypt.hash(dbPassword.rows[0].user_password, salt);
+
+      if (validPassword) {
+        const updateUserPassword = await pool.query(
+          "UPDATE users SET user_password = $1 WHERE user_id = $2",
+          [bcryptPassword, user_id]
+        );
+      } else {
+        return res.status(401).json("Current Password is incorrect.");
+      }
     } else if (college && gy) {
       const updateUserSchool = await pool.query(
         "UPDATE users SET college = $1, grad_year = $2 WHERE user_id = $3",
@@ -491,5 +512,17 @@ router.put("/edit-user-info", authorization, async (req, res) => {
   }
 });
 
+router.get("/current-password", authorization, async (req, res) => {
+  try {
+    const user_id = req.user;
+    const currentPassword = await pool.query(
+      "SELECT user_password FROM users WHERE user_id = $1",
+      [user_id]
+    );
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
 
 module.exports = router;

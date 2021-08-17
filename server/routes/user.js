@@ -5,7 +5,7 @@ const pool = require("../db");
 
 router.put("/edit-user-info", authorization, async (req, res) => {
   try {
-    const { firstName, lastName, email, password, college, gy } = req.body;
+    const { firstName, lastName, email, password, college, gy, currentPassword } = req.body;
     const user_id = req.user;
 
     if (firstName && lastName) {

@@ -9,7 +9,7 @@ const Profile = ({ navigation }) => {
         <View style={{ flexDirection: 'row', marginRight: 100, justifyContent: 'space-evenly' }}>
           <TouchableOpacity
             style={{ marginRight: 60, width: 50, paddingTop: 70 }}
-            onPress={() => navigation.navigate('Profile')}
+            onPress={() => navigation.pop()}
           >
             <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
           </TouchableOpacity>

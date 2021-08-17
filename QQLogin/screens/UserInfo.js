@@ -6,7 +6,7 @@ import { serverIp } from './Login.js';
 
 import { useFocusEffect } from '@react-navigation/native';
 //formik
-import { Formik } from 'formik';
+import { Formik, setIn } from 'formik';
 
 import { Colors, StyledPostInput, StyledButton, ButtonText } from './../components/styles';
 
@@ -43,33 +43,44 @@ const UserInfo = ({ navigation }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const handleModal = () => {
     setModalOpen(!modalOpen);
+    clearState();
   };
 
   const [modalOpen2, setModalOpen2] = useState(false);
   const handleModal2 = () => {
     setModalOpen2(!modalOpen2);
+    clearState();
   };
 
   const [modalOpen3, setModalOpen3] = useState(false);
   const handleModal3 = () => {
     setModalOpen3(!modalOpen3);
+    clearState();
   };
 
   const [modalOpen4, setModalOpen4] = useState(false);
   const handleModal4 = () => {
     setModalOpen4(!modalOpen4);
+    clearState();
   };
 
-  const [inputs, setInputs] = useState({
+  const initialState = {
     firstName: '',
     lastName: '',
     email: '',
     password: '',
     college: '',
     gy: '',
-  });
+    currentPassword:'',
+  };
 
-  const { firstName, lastName, email, password, college, gy } = inputs;
+  const [inputs, setInputs] = useState(initialState);
+
+  const clearState = () => {
+    setInputs({ ...initialState });
+  };
+
+  const { firstName, lastName, email, password, college, gy, currentPassword} = inputs;
 
   //Getting JWT from local storage, must exist otherwise user can't be on this page
   const getJWT = async () => {
@@ -100,6 +111,7 @@ const UserInfo = ({ navigation }) => {
 
       // const parseRes = await response.json();
 
+
       // console.log(parseRes);
     } catch (error) {
       console.error(error.message);
@@ -118,7 +130,7 @@ const UserInfo = ({ navigation }) => {
     //Check if the post has content, if not, prevent submission and notify
     if (inputs.firstName && inputs.lastName) {
       sendToDB(inputs);
-      navigation.pop();
+      handleModal();
     } else {
       alert('Please enter your first and last name.');
     }
@@ -130,7 +142,7 @@ const UserInfo = ({ navigation }) => {
     //Check if the post has content, if not, prevent submission and notify
     if (inputs.email) {
       sendToDB(inputs);
-      navigation.pop();
+      handleModal2();
     } else {
       alert('Please enter your new email.');
     }
@@ -139,9 +151,9 @@ const UserInfo = ({ navigation }) => {
   const onPressButtonPassword = async (e) => {
     e.preventDefault(); //prevent refresh
     //Check if the post has content, if not, prevent submission and notify
-    if (inputs.password) {
+    if (inputs.password && inputs.currentPassword) {
       sendToDB(inputs);
-      navigation.pop();
+      handleModal3();
     } else {
       alert('Please enter your new password.');
     }
@@ -152,6 +164,8 @@ const UserInfo = ({ navigation }) => {
     //Check if the post has content, if not, prevent submission and notify
     if (inputs.gy && inputs.college) {
       sendToDB(inputs);
+      handleModal4();
+
       navigation.pop();
     } else {
       alert('Please enter your school information.');
@@ -240,6 +254,15 @@ const UserInfo = ({ navigation }) => {
         <View style={styles.modalBodyContent}>
           <Text style={styles.welcome}>Please enter a new password.</Text>
           <MyTextInput
+            placeholder="Current Password"
+            name="currentPassword"
+            // style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }}
+            placeholderTextColor={darkgray}
+            onChangeText={(e) => onChange('currentPassword', e)} //update inputs to match user input
+            value={currentPassword}
+            selectionColor="#FFCC15" //implement a max length
+          />
+          <MyTextInput
             placeholder="New Password"
             name="password"
             // style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }}
@@ -287,7 +310,7 @@ const UserInfo = ({ navigation }) => {
             value={gy}
             selectionColor="#FFCC15"
           />
-          <StyledButton onPress={handleModal4}>
+          <StyledButton onPress={onPressButtonSchool}>
             <ButtonText>Change School Information</ButtonText>
           </StyledButton>
         </View>
