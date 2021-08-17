@@ -249,7 +249,10 @@ router.get("/post-comments", authorization, async (req, res) => {
     const { post_id } = req.query;
 
     const allComment = await pool.query(
-      "SELECT * FROM comment WHERE post_id=($1)",
+      "SELECT *, AGE(NOW(), time_posted) AS comment_age FROM comment INNER JOIN "
+    + "post_names ON comment.post_id = "
+    + "post_names.post_id WHERE comment.post_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' "
+    + "AND NOW() ORDER BY time_posted DESC;",
       [post_id]
     );
 

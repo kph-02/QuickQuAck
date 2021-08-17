@@ -101,6 +101,26 @@ const commentExamples = [
   },
 ];
 
+const formatTime = (post_age) => {
+  let postAgeDisplay = '';
+
+  //check if it exists b/c sometimes called before objects rendered so is undefined
+  if (post_age) {
+    if (post_age.hours) {
+      postAgeDisplay += post_age.hours + 'h ';
+    }
+    if (post_age.minutes) {
+      postAgeDisplay += post_age.minutes + 'm ';
+    } else {
+      postAgeDisplay += '1m ';
+    }
+
+    postAgeDisplay += 'ago';
+  }
+
+  return postAgeDisplay;
+};
+
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
@@ -116,6 +136,14 @@ const PostView = ({ route, navigation }) => {
   const [commentsUpvoted, setCommentsUpvoted] = useState([]);
   const [commentUpvotes, setCommentUpvotes] = useState([]);
   const [refreshComments, setRefreshComments] = useState(false);
+
+  const [refresh, setRefresh] = useState(false); //Handle refreshing logic
+
+  const handleRefresh = () => {
+    setRefresh(true); //update animation
+    refreshNewComments(!newComments); //Change variable to trigger useEffect to pull posts from database
+    setRefresh(false);
+  };
 
   /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
   const Item = ({ item, onPress, backgroundColor, textColor }) => {
@@ -154,7 +182,7 @@ const PostView = ({ route, navigation }) => {
           }}
         >
           {/* Time posted */}
-          <Text style={[styles.name]}>{item.time_posted} ago</Text>
+        <Text style={[styles.name]}>{formatTime(item.comment_age)} ago</Text>
 
           {/* Upvotes */}
           <TouchableOpacity
@@ -551,7 +579,7 @@ const PostView = ({ route, navigation }) => {
       <TouchableOpacity
         style={{ marginLeft: 10, width: 50, paddingLeft: 5 }}
         onPress={() => {
-          navigation.navigate('Feed');
+          navigation.pop();
           updatePostAttributes();
         }}
       >
@@ -638,6 +666,8 @@ const PostView = ({ route, navigation }) => {
           keyExtractor={(item) => item.comment_id}
           extraData={refreshComments}
           renderItem={renderItem}
+          refreshing={refresh} //true: shows spinning animation to show loading
+          onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
         />
       </View>
 

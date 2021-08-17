@@ -24,6 +24,7 @@ import ChatRoomEllipsis from '../components/ChatRoomEllipsis';
 import TagSelection from '../screens/TagSelection';
 import Map from '../screens/Map';
 import UserInfo from '../screens/UserInfo';
+import UserActivity from '../screens/UserActivity';
 
 const Stack = createStackNavigator();
 
@@ -53,6 +54,7 @@ const RootStack = () => {
                 <Stack.Screen name="Chat" component={ChatRoom} />
                 <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
                 <Stack.Screen name="UserInfo" component={UserInfo} />
+                <Stack.Screen name="Activity" component={UserActivity} />
 
         </Stack.Navigator>
        
