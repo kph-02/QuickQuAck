@@ -8,7 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Welcome from '../screens/Welcome';
 import Profile from '../screens/Profile';
 import Notifications from '../screens/Notifications';
-import CreatePost from '../screens/CreatePost';
+import Settings from '../screens/Settings';
 import Signup from '../screens/Signup';
 import Login from '../screens/Login';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -80,10 +80,10 @@ export default function TabNav() {
                   ),
               }}
         />
-        <Tab.Screen name="Notifications" component={Notifications} 
+        <Tab.Screen name="Settings" component={Settings} 
             options={{
                   tabBarIcon: ({ color, size }) => (
-                      <MaterialCommunityIcons name="bell-outline" color={color} size={26} />
+                      <MaterialCommunityIcons name="cog" color={color} size={26} />
                   ),
               }}
         />

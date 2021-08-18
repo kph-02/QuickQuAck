@@ -22,7 +22,7 @@ const Profile = ({ navigation }) => {
             <Text style={{ marginRight: 235, fontSize: 13 }}>Allow Notifications</Text>
             <Switch trackColor={{ false: '#767577', true: '#FFCC15' }}></Switch>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('TagSelection')} style={styles.buttonContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('TagSettings')} style={styles.buttonContainer}>
             <Text style={{ marginRight: 290, fontSize: 13 }}>Edit Interest Tags</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.buttonContainer}>

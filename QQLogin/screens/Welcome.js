@@ -167,11 +167,13 @@ const Welcome = ({ navigation }) => {
           lightTheme="true"
           containerStyle={{
             width: '90%',
-            height: height * 0.07,
+            height: height * 0.09,
             alignItems: 'center',
-            marginTop: height * 0.02,
+            marginTop: height * 0.01,
             borderRadius: 100,
-            backgroundColor: '#F2F2F2',
+            backgroundColor: '#FFFFFF',
+            borderBottomColor: 'transparent',
+            borderTopColor: 'transparent'
           }}
           inputContainerStyle={{ borderRadius: 100, height: '100%', width: '100%', backgroundColor: '#F9F9F9' }}
         />

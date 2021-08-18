@@ -121,16 +121,18 @@ const Messages = ({ navigation }) => {
       <View style={{alignItems: 'center', paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: '#DADADA'}}>
         <Text style={styles.pageTitle}>Messages</Text>
         <SearchBar
-          placeholder="Search Inbox"
+          placeholder="Search Messages"
           // onChangeText={this.updateSearch}
           lightTheme="true"
           containerStyle={{
             width: '90%',
-            height: height * 0.07,
+            height: height * 0.09,
             alignItems: 'center',
-            marginTop: height * 0.025,
+            marginTop: height * 0.01,
             borderRadius: 100,
-            backgroundColor: '#F2F2F2',
+            backgroundColor: '#FFFFFF',
+            borderBottomColor: 'transparent',
+            borderTopColor: 'transparent'
           }}
           inputContainerStyle={{ borderRadius: 100, height: '100%', width: '100%', backgroundColor: '#F9F9F9' }}
         />
