@@ -311,6 +311,8 @@ router.get("/post-comments", authorization, async (req, res) => {
     // ("SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
     // "'24 HOURS' AND NOW() ORDER BY votevalue DESC;");
 
+    console.log(allComment.rows);
+
     res.status(201).json({
       data: {
         comment: allComment.rows,
@@ -453,26 +455,18 @@ router.post("/comment-vote", authorization, async (req, res) => {
 
   try {
     for (const i of comments) {
-      console.log(i);
-
       //If vote value is given, update here
-      // UPDATE TO EITHER INESRT OR UPDATE IN THE TRY CATCH :D
       if (!(i.vote_value === undefined)) {
         try {
           const insertVote = await pool.query(
             "INSERT INTO comment_votes VALUES($1, $2, $3) RETURNING *",
-            [user_id, comment_id, vote_value]
+            [user_id, i.comment_id, i.vote_value]
           );
-
-          console.log("Inserted");
         } catch (err) {
-          console.log("Updated");
-
           const updateVote = await pool.query(
             "UPDATE comment_votes SET vote_value = $1 WHERE (user_id = $2 AND comment_id = $3) RETURNING *",
-            [vote_value, user_id, comment_id]
+            [i.vote_value, user_id, i.comment_id]
           );
-          console.log(err.message);
         }
       }
 
@@ -483,7 +477,6 @@ router.post("/comment-vote", authorization, async (req, res) => {
             "UPDATE comment SET num_upvotes = $1 WHERE comment_id = $2 RETURNING *",
             [i.votes, i.comment_id]
           );
-          console.log("Upvote updated");
         } catch (err) {
           console.log(err.message);
         }
