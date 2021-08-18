@@ -4,18 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Notifications = ({ navigation }) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-          <TouchableOpacity
-            style={{ marginRight: 15, width: 50, paddingTop: 70 }}
-            onPress={() => navigation.navigate('Feed')}
-          >
-            <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.headline}>Notifications</Text>
-        </View>
-      </View>
+    <View style={styles.container}>c
 
       {/* for display only */}
 

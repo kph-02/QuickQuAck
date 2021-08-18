@@ -43,6 +43,16 @@ class Maps extends Component {
 
   // Next, the function will use expo-location getCurrentPositionAsync function to get the location data.
 
+  // postMarkers = () => {
+  //   return this.state.reports.map((post) => <Marker
+  //     key={post.id}
+  //     coordinate={{ latitude: post.lat, longitude: post.lon }}
+  //     title={post.location}
+  //     description={post.post_id}
+  //   >
+  //   </Marker >)
+  // }
+
   getLocationAsync = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -108,15 +118,7 @@ class Maps extends Component {
               <Text>Not gonna lie, Tapex has the best food on campus.</Text>
             </Callout>
           </Marker>
-          {/* <Marker coordinate={{ latitude: 32.88030632248851, longitude: -117.23991170827364 }}>
-            <Callout>
-        
-              <Text>
-                <Image source={markerKhosla} style={{maxHeight: 100, minHeight: 100,resizeMode: 'cover' }} />
-              </Text>
-          
-            </Callout>
-          </Marker> */}
+ 
         </MapView>
         <TouchableOpacity activeOpacity={0.5} onPress={() => navigation.pop()} style={styles.touchableStyle}>
           <Image source={require('./../assets/backbo.png')} style={styles.floatingButtonStyle} />

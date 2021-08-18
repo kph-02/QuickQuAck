@@ -14,9 +14,10 @@ import { Formik } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
-const serverIp = '192.168.1.75';
-// const serverIp = '192.168.0.153';
 // const serverIp = '192.168.1.119';
+//const serverIp = '192.168.0.153';
+// const serverIp = '192.168.50.115';
+const serverIp = '192.168.1.51';
 import {
   StyledContainer,
   InnerContainer,

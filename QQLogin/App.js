@@ -19,12 +19,13 @@ import TagSelection from './screens/TagSelection';
 import Welcome from './screens/Welcome';
 import Map from './screens/Map';
 import Signup from './screens/Signup';
-// import { StackActions } from '@react-navigation/native';
-
+import UserInfo from './screens/UserInfo';// import { StackActions } from '@react-navigation/native';
+import Notifications from './screens/Notifications';
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
+  // <UserInfo />
   <MenuProvider>
     <NavigationContainer>
       <Stack.Navigator
