@@ -21,6 +21,7 @@ import { serverIp } from './Login.js';
 //Store Authentication Token
 var JWTtoken = '';
 var userId = '';
+
 //formik
 import { Formik, Field, Form } from 'formik';
 
@@ -461,6 +462,7 @@ const PostView = ({ route, navigation }) => {
       console.log('Getting Comments -----------------------------------------------------------');
       console.log(upvote);
       console.log('Index: ' + index);
+      console.log(upvote.length);
       console.log('Getting Comments -----------------------------------------------------------');
     } catch (error) {
       console.error(error.message);
@@ -565,13 +567,13 @@ const PostView = ({ route, navigation }) => {
   //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
     async function updateComments() {
-      await getFromDB();
+      getFromDB();
+      console.log('Index Value: ' + currIndex);
       await getCommentsUpvoted();
 
       setRefreshComments(!refreshComments); //refresh flatlist
       console.log('Comments Refreshed');
     }
-
     updateComments();
   }, [newComments]);
 
@@ -580,8 +582,7 @@ const PostView = ({ route, navigation }) => {
     async function fetchAuthorizations() {
       getUserID();
       await getJWT();
-      await getUpvoted(); //get upvoted values for posts/comments
-      await getCommentsUpvoted();
+      await getUpvoted();
     }
 
     fetchAuthorizations();
