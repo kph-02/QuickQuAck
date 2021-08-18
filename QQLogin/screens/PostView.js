@@ -21,6 +21,7 @@ import { serverIp } from './Login.js';
 //Store Authentication Token
 var JWTtoken = '';
 var userId = '';
+
 //formik
 import { Formik, Field, Form } from 'formik';
 
@@ -134,15 +135,27 @@ const PostView = ({ route, navigation }) => {
 
   //handle comment upvotes
   const [commentsUpvoted, setCommentsUpvoted] = useState([]);
-  const [commentUpvotes, setCommentUpvotes] = useState([]);
   const [refreshComments, setRefreshComments] = useState(false);
 
+  //Mapping array , takes comment_id and returns the index its stored in for commentsUpvoted and commentUpvotes
+  //This is done so when passed to db, can just iterate array w/o empty values, makes 100000x easier
+  const [mapComments, setMapComments] = useState([]);
+  // const [currIndex, setCurrIndex] = useState(0); //current index to map to
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setRefresh(true); //update animation
+
+    //Comments that were changed by the user, to change in the database
+    const bodyCommentUpvotes = {
+      user_id: userId,
+      post_id: post.post_id,
+      comments: commentsUpvoted,
+    };
+
+    await updateCommentValues(bodyCommentUpvotes);
+
     refreshNewComments(!newComments); //Change variable to trigger useEffect to pull posts from database
-    setRefresh(false);
   };
 
   /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
@@ -164,7 +177,7 @@ const PostView = ({ route, navigation }) => {
 
           {/* The ... button for each comment */}
           <View>
-            <EllipsisMenu navigation={navigation} postText={item.text} postUser={item.user_id}/>
+            <EllipsisMenu navigation={navigation} postText={item.text} postUser={item.user_id} />
           </View>
         </View>
 
@@ -182,7 +195,7 @@ const PostView = ({ route, navigation }) => {
           }}
         >
           {/* Time posted */}
-        <Text style={[styles.name]}>{formatTime(item.comment_age)} ago</Text>
+          <Text style={[styles.name]}>{formatTime(item.comment_age)} ago</Text>
 
           {/* Upvotes */}
           <TouchableOpacity
@@ -194,15 +207,46 @@ const PostView = ({ route, navigation }) => {
               name="chevron-up"
               color="#BDBDBD"
               size={35}
-              style={{ width: 29, color: commentsUpvoted[item.comment_id] ? '#FFCC15' : '#BDBDBD' }}
+              style={{
+                width: 29,
+                // Very messy -> first check if comment was mapped, if was then check if comment was upvoted
+                color: commentsUpvoted[mapComments[item.comment_id]]
+                  ? commentsUpvoted[mapComments[item.comment_id]].vote_value
+                    ? '#FFCC15'
+                    : '#BDBDBD'
+                  : '#BDBDBD',
+              }}
             />
             <Text style={[styles.name, { marginHorizontal: 0 }]}>
-              {commentUpvotes[item.comment_id] ? commentUpvotes[item.comment_id] : 0}
+              {commentsUpvoted[mapComments[item.comment_id]].votes
+                ? commentsUpvoted[mapComments[item.comment_id]].votes
+                : 0}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
     );
+  };
+
+  //format the time of the post from the database to display it to the screen
+  const formatTime = (post_age) => {
+    let postAgeDisplay = '';
+
+    //check if it exists b/c sometimes called before objects rendered so is undefined
+    if (post_age) {
+      if (post_age.hours) {
+        postAgeDisplay += post_age.hours + 'h ';
+      }
+      if (post_age.minutes) {
+        postAgeDisplay += post_age.minutes + 'm ';
+      } else {
+        postAgeDisplay += '1m ';
+      }
+
+      postAgeDisplay += 'ago';
+    }
+
+    return postAgeDisplay;
   };
 
   const getJWT = async () => {
@@ -247,6 +291,23 @@ const PostView = ({ route, navigation }) => {
         const parseRes = await response.json();
 
         // console.log('COMMENT: ' + JSON.stringify(parseRes));
+
+        let map = mapComments;
+        let upvote = commentsUpvoted;
+
+        //comment was added successfully, add to map array
+        if (!(parseRes.comment_id === undefined)) {
+          map[parseRes.comment_id] = upvote.length;
+          upvote[map[parseRes.comment_id]] = { comment_id: parseRes.comment_id, vote_value: 1, votes: 1 };
+        }
+
+        setMapComments(map);
+        setCommentsUpvoted(upvote);
+
+        console.log('New Comment Creation -----------------------------------------------------------');
+        console.log(upvote);
+        console.log('New Comment Creation -----------------------------------------------------------');
+
         refreshNewComments(!newComments); //update the page with the new comment
       } catch (error) {
         console.error(error.message);
@@ -314,56 +375,58 @@ const PostView = ({ route, navigation }) => {
   };
 
   //Renders all tags associated with the original post
-  const RenderStyledTags = ({tags}) => {
-  return tags.map(function(tag) {
-    let tagcolor = '';
+  const RenderStyledTags = ({ tags }) => {
+    return tags.map(function (tag) {
+      let tagcolor = '';
 
-    if (tag === 'Muir') {
-      tagcolor = '#7FD85F';
-    } else if (tag === 'Marshall') {
-      tagcolor = '#FA4A4A';
-    } else if (tag === 'Seventh') {
-      tagcolor = '#FA9E4A';
-    } else if (tag === 'Poll') {
-      tagcolor = '#AC5CEB';
-    } else if (tag === 'Question') {
-      tagcolor = '#FF8383';
-    } else if (tag === 'Food') {
-      tagcolor = '#9EE444';
-    } else if (tag === 'Warren') {
-      tagcolor = '#AA5F5F';
-    } else if (tag === 'Revelle') {
-      tagcolor = '#FEDB5F';
-    } else if (tag === 'ERC') {
-      tagcolor = '#2891F2';
-    } else if (tag === 'Social') {
-      tagcolor = '#97E1F9';
-    } else if (tag === 'Sixth') {
-      tagcolor = '#49D3FE';
-    } else {
-      tagcolor = 'gray';
-    }
-    return (
-      <View 
-      key={tag}
-      style={{
+      if (tag === 'Muir') {
+        tagcolor = '#7FD85F';
+      } else if (tag === 'Marshall') {
+        tagcolor = '#FA4A4A';
+      } else if (tag === 'Seventh') {
+        tagcolor = '#FA9E4A';
+      } else if (tag === 'Poll') {
+        tagcolor = '#AC5CEB';
+      } else if (tag === 'Question') {
+        tagcolor = '#FF8383';
+      } else if (tag === 'Food') {
+        tagcolor = '#9EE444';
+      } else if (tag === 'Warren') {
+        tagcolor = '#AA5F5F';
+      } else if (tag === 'Revelle') {
+        tagcolor = '#FEDB5F';
+      } else if (tag === 'ERC') {
+        tagcolor = '#2891F2';
+      } else if (tag === 'Social') {
+        tagcolor = '#97E1F9';
+      } else if (tag === 'Sixth') {
+        tagcolor = '#49D3FE';
+      } else {
+        tagcolor = 'gray';
+      }
+      return (
+        <View
+          key={tag}
+          style={{
             paddingHorizontal: 15,
             borderRadius: 15,
             marginVertical: 10,
             marginRight: 10,
             paddingVertical: 2,
-            backgroundColor: tagcolor}}>
-        <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
-      </View>
-    );
-  });
-}
+            backgroundColor: tagcolor,
+          }}
+        >
+          <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
+        </View>
+      );
+    });
+  };
 
   //Getting comments from the database to show for post
   const getFromDB = async () => {
     const query = 'post_id=' + post.post_id; //sets up query information
     try {
-      // Update server with user's registration information
+      // Get post comments from the database
       const response = await fetch('http://' + serverIp + ':5000/feed/post-comments?' + query, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
@@ -372,24 +435,49 @@ const PostView = ({ route, navigation }) => {
       //The response includes post information, need in json format
       const parseRes = await response.json();
 
+      //Copy useState parameters b/c shouldn't call useState in if statements
+      let map = mapComments;
+      let upvote = commentsUpvoted;
+      let comments = [];
+
       //Updates postData to have post information using useState
-      //temporary if statement just so second view might work, will delete soon
       if (parseRes.data) {
-        SetComments(parseRes.data.comment);
+        comments = parseRes.data.comment;
+        //iterate through the comments to update upvotes array
+        for (const comment of comments) {
+          //comment hasn't been mapped yet, so map it.
+          if (map[comment.comment_id] === undefined) {
+            map[comment.comment_id] = upvote.length;
+          }
+          //update upvoted table
+          upvote[map[comment.comment_id]] = {
+            comment_id: comment.comment_id,
+            vote_value: 0,
+            votes: comment.num_upvotes,
+          };
+        }
       }
+
+      SetComments(comments);
+      setCommentsUpvoted(upvote);
+      setMapComments(map);
+      console.log('Getting Comments -----------------------------------------------------------');
+      console.log(upvote);
+      console.log('Getting Comments -----------------------------------------------------------');
     } catch (error) {
       console.error(error.message);
     }
   };
 
-  //Get from database whether user has upvoted this post before or not
+  //Get from database whether user has upvoted this post/comments before or not
   const getUpvoted = async () => {
+    //posts
     let initialVote = false;
 
     try {
       const query = 'post_id=' + post.post_id + '&user_id=' + userId;
 
-      // Update server with user's registration information
+      // Get whether or not the post has been updated by the user
       const response = await fetch('http://' + serverIp + ':5000/feed/post-votes?' + query, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
@@ -415,19 +503,81 @@ const PostView = ({ route, navigation }) => {
       console.error(error.message);
     }
   };
+  const getCommentsUpvoted = async () => {
+    //Comments
+    try {
+      const query = 'post_id=' + post.post_id + '&user_id=' + userId;
+
+      // Get comments upvoted by this user on this post
+      const response = await fetch('http://' + serverIp + ':5000/feed/comment-votes?' + query, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+
+      // console.log('Initial Comments: ' + JSON.stringify(parseRes));
+
+      // store initial values to update useState
+      let upvote = commentsUpvoted;
+      let map = mapComments;
+
+      if (parseRes === []) {
+        console.log('No Comments Upvoted!');
+      } else {
+        //Populate upvoted table with initial values from database
+        for (const comment of parseRes) {
+          //check if commment index is not mapped and map it
+          if (map[comment.comment_id] === undefined) {
+            map[comment.comment_id] = upvote.length; //Add comment_id to mapping array
+
+            upvote[map[comment.comment_id]] = {
+              comment_id: comment.comment_id,
+              vote_value: comment.vote_value,
+              votes: comment.vote_value === 1 ? 1 : 0,
+            };
+          } else {
+            upvote[map[comment.comment_id]] = {
+              comment_id: comment.comment_id,
+              vote_value: comment.vote_value,
+              votes: upvote[map[comment.comment_id]].votes,
+            };
+          }
+        }
+      }
+
+      //Update hooks
+      setCommentsUpvoted(upvote);
+      setMapComments(map);
+
+      console.log('Getting upvoted Comments -----------------------------------------------------------');
+      console.log(upvote);
+      console.log('Getting upvoted Comments -----------------------------------------------------------');
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
   //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
-    getFromDB();
-    console.log('Comments Refreshed');
+    async function updateComments() {
+      await getFromDB();
+      await getCommentsUpvoted();
+
+      setRefreshComments(!refreshComments); //refresh flatlist
+      console.log('Comments Refreshed');
+    }
+    updateComments();
+    setRefresh(false);
   }, [newComments]);
 
   //triggers on first load
   useEffect(() => {
     async function fetchAuthorizations() {
+      getUserID();
       await getJWT();
-      await getUserID();
-      getUpvoted();
+      await getUpvoted();
     }
 
     fetchAuthorizations();
@@ -451,7 +601,7 @@ const PostView = ({ route, navigation }) => {
 
       const parseRes = await response.json();
 
-      console.log('Update Upvotes: ' + JSON.stringify(parseRes));
+      // console.log('Update Upvotes: ' + JSON.stringify(parseRes));
     } catch (error) {
       console.error(error.message);
     }
@@ -466,14 +616,45 @@ const PostView = ({ route, navigation }) => {
     };
 
     sendToDB('update', body);
-    //Update whether the use upvoted in the database
 
+    //Update whether the use upvoted in the database
     const bodyUpvotes = {
       user_id: userId,
       post_id: post.post_id,
       vote_value: upvoted ? 1 : 0,
     };
     updatePostValue(bodyUpvotes);
+
+    //Comments that were changed by the user, to change in the database
+    const bodyCommentUpvotes = {
+      user_id: userId,
+      post_id: post.post_id,
+      comments: commentsUpvoted,
+    };
+
+    updateCommentValues(bodyCommentUpvotes);
+  };
+
+  //updating the database with whether the user upvoted the comment or not
+  const updateCommentValues = async (body) => {
+    try {
+      const response = await fetch('http://' + serverIp + ':5000/feed/comment-vote', {
+        method: 'POST',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+      console.log(
+        'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
+      );
+      console.log(body);
+      console.log(
+        'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
+      );
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   //When user clicks on icon to update post
@@ -521,55 +702,39 @@ const PostView = ({ route, navigation }) => {
   };
 
   const handleCommentUpvote = (comment_id) => {
-    let upvoted = commentsUpvoted;
-    let upvotes = commentUpvotes;
-    let incrementUpvotes = 0;
+    //Copy useState parameters b/c shouldn't call useState in if statements
+    let map = mapComments;
+    let upvote = commentsUpvoted;
 
-    //If comment was upvoted before, just toggle it. If not, set to false
-    if (upvoted[comment_id]) {
-      upvoted[comment_id] = !upvoted[comment_id];
+    //Set up comment in mapping
+    //comments hasn't been mapped yet, so map it.
+    if (map[comment_id] === undefined) {
+      map[comment_id] = upvote.length;
+    }
+
+    //If comment was upvoted before, just toggle it. If not, set to 1.
+    if (upvote[map[comment_id]] === undefined) {
+      upvote[map[comment_id]] = { comment_id: comment_id, vote_value: 1, votes: 1 };
     } else {
-      upvoted[comment_id] = true;
-    }
-
-    if (upvotes[comment_id] === undefined) {
-      console.log('Was NaN');
-      upvotes[comment_id] = 0;
-    }
-
-    //if true now, upvote was added, if false upvote was removed
-    if (upvoted[comment_id] === true) {
-      upvotes[comment_id]++;
-    } else {
-      upvotes[comment_id]--;
-    }
-
-    console.log(upvotes[comment_id]);
-
-    setCommentsUpvoted(upvoted);
-    setCommentUpvotes(upvotes);
-    setRefreshComments(!refreshComments); //re-renders the components in the flatlist
-  };
-
-  //format the time of the post from the database to display it to the screen
-  const formatTime = (post_age) => {
-    let postAgeDisplay = '';
-
-    //check if it exists b/c sometimes called before objects rendered so is undefined
-    if (post_age) {
-      if (post_age.hours) {
-        postAgeDisplay += post_age.hours + 'h ';
-      }
-      if (post_age.minutes) {
-        postAgeDisplay += post_age.minutes + 'm ';
+      //Flipping vote value to match user input
+      if (upvote[map[comment_id]].vote_value === 0) {
+        upvote[map[comment_id]].vote_value = 1;
+        upvote[map[comment_id]].votes++;
       } else {
-        postAgeDisplay += '1m ';
+        upvote[map[comment_id]].vote_value = 0;
+        upvote[map[comment_id]].votes--;
       }
-
-      postAgeDisplay += 'ago';
     }
 
-    return postAgeDisplay;
+    //Update useState hooks
+    setMapComments(map);
+    setCommentsUpvoted(upvote);
+
+    setRefreshComments(!refreshComments); //re-renders the components in the flatlist
+
+    console.log('Handle Comment Refresh -----------------------------------------------------------');
+    console.log(upvote);
+    console.log('Handle Comment Refresh -----------------------------------------------------------');
   };
 
   return (
@@ -608,7 +773,7 @@ const PostView = ({ route, navigation }) => {
             );
           }
         })()}
-        <EllipsisMenu navigation={navigation} postText={post.post_text} postUser={post.anon_name}/>
+        <EllipsisMenu navigation={navigation} postText={post.post_text} postUser={post.anon_name} />
       </View>
 
       {/* The Original Post's Text */}
@@ -617,8 +782,13 @@ const PostView = ({ route, navigation }) => {
       </View>
 
       {/* Container/View for the Tags associated with this post */}
-      <View style={[styles.postTouchables, {justifyContent: 'flex-start', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5,  }]}>
-        <RenderStyledTags tags={post.tagarray}/>
+      <View
+        style={[
+          styles.postTouchables,
+          { justifyContent: 'flex-start', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5 },
+        ]}
+      >
+        <RenderStyledTags tags={post.tagarray} />
       </View>
       {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
 
@@ -682,11 +852,20 @@ const PostView = ({ route, navigation }) => {
           body = {
             commentText: values.commentText,
             post_id: post.post_id,
-            num_upvotes: 0,
+            num_upvotes: 1,
           };
 
           sendToDB('comment', body);
           values.commentText = '';
+
+          //Comments that were changed by the user, to change in the database
+          const bodyCommentUpvotes = {
+            user_id: userId,
+            post_id: post.post_id,
+            comments: commentsUpvoted,
+          };
+
+          updateCommentValues(bodyCommentUpvotes);
         }}
       >
         {({ handleChange, handleBlur, handleSubmit, values }) => (
