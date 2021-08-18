@@ -2,6 +2,7 @@ const express = require("express"); //import Express
 const router = express(); //create an Express application on the app variable
 const authorization = require("../middleware/authorization");
 const pool = require("../db");
+const bcrypt = require("bcrypt");
 
 //
 
@@ -106,8 +107,17 @@ router.post("/user-tag-selection", async (req, res) => {
     const { postTag } = req.body;
     const { user_id } = req.body;
 
-    //hardcoded author_id cuz idk how to pull on it using req.user
-    // const author_id = "5bae78ef-8641-4d9c-837d-b78fb4c158fb";
+    const selectedTags = await pool.query(
+      "SELECT user_id, ARRAY_AGG(tag_id) as tagArray FROM user_tags WHERE user_id = $1 GROUP BY user_id",
+      [user_id]
+    );
+
+    if (selectedTags) {
+      const DeleteTags = await pool.query(
+        "DELETE FROM user_tags WHERE user_id = $1 RETURNING *;",
+        [user_id]
+      );
+    }
 
     for (const i of postTag) {
       console.log("Console says " + i);
@@ -131,25 +141,6 @@ router.post("/user-tag-selection", async (req, res) => {
   }
 });
 
-router.delete("clear-tag-selection"),
-  async (req, res) => {
-    const user_id = req.user;
-
-    try {
-      const tagDeletion = await pool.query(
-        "DELETE FROM user_tags WHERE user_id = $1",
-        [user_id]
-      );
-
-      res.status(201).json({
-        status: "Delete success",
-      });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).json("Server Error");
-    }
-  };
-
 // This renders a page of posts based upon filtering of tags selected during user creation sorted in ascending order of time posted
 
 //
@@ -160,7 +151,7 @@ router.get("/home-feed", authorization, async (req, res) => {
     // add a date time filter so its only last 24 hrs
     // console.log("This is UID " + user_id);
     const homeFeed = await pool.query(
-      "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, tar.ARRAY_AGG AS tagArray, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id WHERE UT.User_id = $1) AS SB ORDER BY SB.time_posted DESC;",
+      "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, tar.ARRAY_AGG AS tagArray, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id WHERE UT.User_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.time_posted DESC;",
       [user_id]
     );
 
@@ -179,25 +170,6 @@ router.get("/home-feed", authorization, async (req, res) => {
     res.status(500).json("Server Error");
   }
 });
-
-// router.get("/filtered-feed", authorization, async (req, res) => {
-//   try {
-//     //This will select from the 'tagpicker' dropdown within the post fuponctionality
-
-//     var tag = req.body.tagpicker;
-
-//     let sql =
-//       "SELECT p.post_id, p.user_id, p.post_text, p.time_posted, pt.tag_id FROM post AS p JOIN post_tags as pt ON pt.post_id = p.post_id JOIN tags AS t on t.tag_id = pt.tag_id WHERE (t.tag_id = ${tag}) ORDER BY time_posted DESC;";
-
-//     const filteredFeed = await pool.query(sql);
-//     res.status(200).json({
-//       status: "feed filtered",
-//     });
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).send("Server Error");
-//   }
-// });
 
 // update a post
 router.put("/update-post", authorization, async (req, res) => {
@@ -302,7 +274,10 @@ router.get("/post-comments", authorization, async (req, res) => {
     const { post_id } = req.query;
 
     const allComment = await pool.query(
-      "SELECT * FROM comment WHERE post_id=($1)",
+      "SELECT *, AGE(NOW(), time_posted) AS comment_age FROM comment INNER JOIN " +
+        "post_names ON comment.post_id = " +
+        "post_names.post_id WHERE comment.post_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' " +
+        "AND NOW() ORDER BY time_posted DESC;",
       [post_id]
     );
 
@@ -328,7 +303,7 @@ router.get("/post-comments", authorization, async (req, res) => {
 router.get("/all-posts", authorization, async (req, res) => {
   try {
     const allFeed = await pool.query(
-      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age;"
+      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id  INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age;"
     );
 
     /* For future reference, this is how to order by upvotes. */
@@ -349,23 +324,23 @@ router.get("/all-posts", authorization, async (req, res) => {
   }
 });
 
-//INCOMPLETE: This renders home-posts in the past 24 hours sorted in Ascending order
-//This is filtered by the selected tags on profile
-router.get("/home-posts", authorization, async (req, res) => {
+//This renders all the posts a user has submitted in the past 24 hours sorted in Ascending order
+router.get("/user-posts", authorization, async (req, res) => {
   try {
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+    const user_id = req.user;
+    const userFeed = await pool.query(
+      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE (time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AND post.user_id = $1) AS SB ORDER BY SB.post_age;",
+      [user_id]
+    );
 
-//INCOMPLETE: This renders search-posts in the past 24 hours.
-//The user selects < 5 tags for search
-router.get("/search-posts", authorization, async (req, res) => {
-  try {
+    res.status(201).json({
+      data: {
+        post: userFeed.rows,
+      },
+    });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server Error");
+    res.status(500).json("Server Error");
   }
 });
 
@@ -449,6 +424,27 @@ router.post("/post-vote", authorization, async (req, res) => {
   }
 });
 
+//iltering by selecting a singular tag on the main feed
+router.get("/tag-filter", authorization, async (req, res) => {
+  const tag_id = req.body;
+
+  try {
+    const tagFeed = await pool.query(
+      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB WHERE $1 = ANY(SB.tagArray) ORDER BY SB.post_age;",
+      [tag]
+    );
+
+    res.status(201).json({
+      data: {
+        post: tagFeed.rows,
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
+
 // add/undo comment votes
 router.post("/comment-vote", authorization, async (req, res) => {
   const { user_id, comments, post_id } = req.body;
@@ -485,6 +481,79 @@ router.post("/comment-vote", authorization, async (req, res) => {
     res.status(201).json("Complete");
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/edit-user-info", authorization, async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      college,
+      gy,
+      currentPassword,
+    } = req.body;
+    const user_id = req.user;
+    if (firstName && lastName) {
+      const updateUserName = await pool.query(
+        "UPDATE users SET first_name = $1, last_name = $2 WHERE user_id = $3",
+        [firstName, lastName, user_id]
+      );
+    } else if (email) {
+      const updateUserEmail = await pool.query(
+        "UPDATE users SET email = $1 WHERE user_id = $2",
+        [email, user_id]
+      );
+    } else if (password) {
+      //Bcrypt user password
+      const saltRound = 10;
+      const salt = await bcrypt.genSalt(saltRound);
+      const bcryptPassword = await bcrypt.hash(password, salt);
+
+      const dbPassword = await pool.query(
+        "SELECT user_password FROM users WHERE user_id = $1",
+        [user_id]
+      );
+
+      const validPassword = await bcrypt.compare(
+        currentPassword,
+        dbPassword.rows[0].user_password
+      );
+      console.log(validPassword);
+      // const bcryptCurrentPassword = await bcrypt.hash(dbPassword.rows[0].user_password, salt);
+
+      if (validPassword) {
+        const updateUserPassword = await pool.query(
+          "UPDATE users SET user_password = $1 WHERE user_id = $2",
+          [bcryptPassword, user_id]
+        );
+      } else {
+        return res.status(401).json("Current Password is incorrect.");
+      }
+    } else if (college && gy) {
+      const updateUserSchool = await pool.query(
+        "UPDATE users SET college = $1, grad_year = $2 WHERE user_id = $3",
+        [college, gy, user_id]
+      );
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
+
+router.get("/current-password", authorization, async (req, res) => {
+  try {
+    const user_id = req.user;
+    const currentPassword = await pool.query(
+      "SELECT user_password FROM users WHERE user_id = $1",
+      [user_id]
+    );
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
   }
 });
 

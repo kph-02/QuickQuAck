@@ -100,7 +100,7 @@ export const PageTitlePost = styled.Text`
   font-weight: bold;
   color: ${black};
   padding: 90px;
-  right: 125px;
+  right: 145px;
   bottom: 50px;
 `;
 
@@ -143,7 +143,6 @@ export const StyledPostInput = styled.TextInput`
   height: 200px;
   margin-vertical: 3px;
   margin-bottom: 10px;
-  maxlength="8";
   color: ${black};
 `;
 

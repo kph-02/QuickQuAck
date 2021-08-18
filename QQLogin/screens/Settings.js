@@ -9,7 +9,7 @@ const Profile = ({ navigation }) => {
         <View style={{ flexDirection: 'row', marginRight: 100, justifyContent: 'space-evenly' }}>
           <TouchableOpacity
             style={{ marginRight: 60, width: 50, paddingTop: 70 }}
-            onPress={() => navigation.navigate('Profile')}
+            onPress={() => navigation.pop()}
           >
             <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
           </TouchableOpacity>
@@ -22,10 +22,10 @@ const Profile = ({ navigation }) => {
             <Text style={{ marginRight: 235, fontSize: 13 }}>Allow Notifications</Text>
             <Switch trackColor={{ false: '#767577', true: '#FFCC15' }}></Switch>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('TagSelection')} style={styles.buttonContainer}>
             <Text style={{ marginRight: 290, fontSize: 13 }}>Edit Interest Tags</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('UserInfo')} style={styles.buttonContainer}>
             <Text style={{ marginRight: 290, fontSize: 13 }}>Edit Personal Info</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.buttonContainer}>

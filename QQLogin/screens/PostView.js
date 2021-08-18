@@ -101,6 +101,26 @@ const commentExamples = [
   },
 ];
 
+const formatTime = (post_age) => {
+  let postAgeDisplay = '';
+
+  //check if it exists b/c sometimes called before objects rendered so is undefined
+  if (post_age) {
+    if (post_age.hours) {
+      postAgeDisplay += post_age.hours + 'h ';
+    }
+    if (post_age.minutes) {
+      postAgeDisplay += post_age.minutes + 'm ';
+    } else {
+      postAgeDisplay += '1m ';
+    }
+
+    postAgeDisplay += 'ago';
+  }
+
+  return postAgeDisplay;
+};
+
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
@@ -120,6 +140,13 @@ const PostView = ({ route, navigation }) => {
   //This is done so when passed to db, can just iterate array w/o empty values, makes 100000x easier
   const [mapComments, setMapComments] = useState([]);
   const [currIndex, setCurrIndex] = useState(0); //current index to map to
+  const [refresh, setRefresh] = useState(false); //Handle refreshing logic
+
+  const handleRefresh = () => {
+    setRefresh(true); //update animation
+    refreshNewComments(!newComments); //Change variable to trigger useEffect to pull posts from database
+    setRefresh(false);
+  };
 
   /* Definition of Item object, controls what text goes in the comments, and all the content for each comment "box" */
   const Item = ({ item, onPress, backgroundColor, textColor }) => {
@@ -140,7 +167,7 @@ const PostView = ({ route, navigation }) => {
 
           {/* The ... button for each comment */}
           <View>
-            <EllipsisMenu navigation={navigation} />
+            <EllipsisMenu navigation={navigation} postText={item.text} postUser={item.user_id} />
           </View>
         </View>
 
@@ -158,7 +185,7 @@ const PostView = ({ route, navigation }) => {
           }}
         >
           {/* Time posted */}
-          <Text style={[styles.name]}>{item.time_posted} ago</Text>
+          <Text style={[styles.name]}>{formatTime(item.comment_age)} ago</Text>
 
           {/* Upvotes */}
           <TouchableOpacity
@@ -341,40 +368,52 @@ const PostView = ({ route, navigation }) => {
     );
   };
 
-  /* Controls what color each tag is */
-  const StyledTag = ({ style, tag }) => {
-    let tagcolor = '';
+  //Renders all tags associated with the original post
+  const RenderStyledTags = ({ tags }) => {
+    return tags.map(function (tag) {
+      let tagcolor = '';
 
-    if (tag === 'Muir') {
-      tagcolor = '#7FD85F';
-    } else if (tag === 'Marshall') {
-      tagcolor = '#FA4A4A';
-    } else if (tag === 'Seventh') {
-      tagcolor = '#FA9E4A';
-    } else if (tag === 'Poll') {
-      tagcolor = '#AC5CEB';
-    } else if (tag === 'Question') {
-      tagcolor = '#FF8383';
-    } else if (tag === 'Food') {
-      tagcolor = '#9EE444';
-    } else if (tag === 'Warren') {
-      tagcolor = '#AA5F5F';
-    } else if (tag === 'Revelle') {
-      tagcolor = '#FEDB5F';
-    } else if (tag === 'ERC') {
-      tagcolor = '#2891F2';
-    } else if (tag === 'Social') {
-      tagcolor = '#97E1F9';
-    } else if (tag === 'Sixth') {
-      tagcolor = '#49D3FE';
-    } else {
-      tagcolor = '#FFCC15';
-    }
-    return (
-      <View style={[style, { backgroundColor: tagcolor }]}>
-        <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
-      </View>
-    );
+      if (tag === 'Muir') {
+        tagcolor = '#7FD85F';
+      } else if (tag === 'Marshall') {
+        tagcolor = '#FA4A4A';
+      } else if (tag === 'Seventh') {
+        tagcolor = '#FA9E4A';
+      } else if (tag === 'Poll') {
+        tagcolor = '#AC5CEB';
+      } else if (tag === 'Question') {
+        tagcolor = '#FF8383';
+      } else if (tag === 'Food') {
+        tagcolor = '#9EE444';
+      } else if (tag === 'Warren') {
+        tagcolor = '#AA5F5F';
+      } else if (tag === 'Revelle') {
+        tagcolor = '#FEDB5F';
+      } else if (tag === 'ERC') {
+        tagcolor = '#2891F2';
+      } else if (tag === 'Social') {
+        tagcolor = '#97E1F9';
+      } else if (tag === 'Sixth') {
+        tagcolor = '#49D3FE';
+      } else {
+        tagcolor = 'gray';
+      }
+      return (
+        <View
+          key={tag}
+          style={{
+            paddingHorizontal: 15,
+            borderRadius: 15,
+            marginVertical: 10,
+            marginRight: 10,
+            paddingVertical: 2,
+            backgroundColor: tagcolor,
+          }}
+        >
+          <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
+        </View>
+      );
+    });
   };
 
   //Getting comments from the database to show for post
@@ -716,7 +755,7 @@ const PostView = ({ route, navigation }) => {
       <TouchableOpacity
         style={{ marginLeft: 10, width: 50, paddingLeft: 5 }}
         onPress={() => {
-          navigation.navigate('Feed');
+          navigation.pop();
           updatePostAttributes();
         }}
       >
@@ -745,7 +784,7 @@ const PostView = ({ route, navigation }) => {
             );
           }
         })()}
-        <EllipsisMenu navigation={navigation} />
+        <EllipsisMenu navigation={navigation} postText={post.post_text} postUser={post.anon_name} />
       </View>
 
       {/* The Original Post's Text */}
@@ -757,26 +796,10 @@ const PostView = ({ route, navigation }) => {
       <View
         style={[
           styles.postTouchables,
-          {
-            justifyContent: 'flex-start',
-            backgroundColor: 'white',
-            borderTopWidth: 0,
-            borderTopColor: 'white',
-            marginBottom: 10,
-            marginTop: 5,
-          },
+          { justifyContent: 'flex-start', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5 },
         ]}
       >
-        <StyledTag
-          style={{ paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, paddingVertical: 2 }}
-          tag={post.tag_id}
-        />
-        {/* <View style={{backgroundColor: '#FF8383', paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, marginLeft: 10, paddingVertical: 2}}>
-          <Text style={{color: 'white', fontWeight: "normal"}}>{post.tag_id}</Text>
-        </View>
-        <View style={{backgroundColor: '#97E1F9', paddingHorizontal: 15, borderRadius: 15, marginVertical: 10, marginLeft: 10, paddingVertical: 2}}>
-          <Text style={{color: 'white', fontWeight: "normal"}}>{post.tag_id}</Text>
-        </View> */}
+        <RenderStyledTags tags={post.tagarray} />
       </View>
       {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
 
@@ -824,6 +847,8 @@ const PostView = ({ route, navigation }) => {
           keyExtractor={(item) => item.comment_id}
           extraData={refreshComments}
           renderItem={renderItem}
+          refreshing={refresh} //true: shows spinning animation to show loading
+          onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
         />
       </View>
 

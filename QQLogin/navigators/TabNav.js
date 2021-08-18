@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 //Screens
 import Welcome from '../screens/Welcome';
 import Profile from '../screens/Profile';
+import Notifications from '../screens/Notifications';
 import CreatePost from '../screens/CreatePost';
 import Signup from '../screens/Signup';
 import Login from '../screens/Login';
@@ -40,13 +41,13 @@ function MessagesScreen() {
   );
 }
 
-function NotificationsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Sample Notifications Screen!</Text>
-    </View>
-  );
-}
+// function Notifications() {
+//   return (
+//     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+//       <Text>Sample Notifications Screen!</Text>
+//     </View>
+//   );
+// }
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -66,11 +67,12 @@ export default function TabNav() {
           }}
         />
         <Tab.Screen name="Profile" component={Profile} 
-            options={{
+            options={({route}) => ({
                   tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons name="account-circle" color={color} size={26} />
                   ),
-              }}
+                  tabBarVisible: true,
+              })}
         />
         <Tab.Screen name="Messages" component={Messages} 
             options={{
@@ -79,7 +81,7 @@ export default function TabNav() {
                   ),
               }}
         />
-        <Tab.Screen name="Notifications" component={NotificationsScreen} 
+        <Tab.Screen name="Notifications" component={Notifications} 
             options={{
                   tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons name="bell-outline" color={color} size={26} />
