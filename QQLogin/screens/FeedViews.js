@@ -107,21 +107,25 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       <RenderStyledTags tags={item.tagarray} />
     </View>
     {/* The Data of each Post */}
-    <View style={[styles.postTouchables, { marginTop: 0, backgroundColor: 'white' }]}>
+    <View style={{
+      flexDirection: 'row',
+      borderTopColor: '#EFEFEF',
+      borderTopWidth: 1}}>
+    <View style={[styles.postTouchables, { marginLeft: 30, marginTop: 0, backgroundColor: 'white' }]}>
       <View style={[styles.infoRow, { marginRight: 5 }]}>
         {/*number of people who've viewed the post*/}
         <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>0</Text>
       </View>
       <View style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}>
         {/*number of upvotes*/}
         <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_upvotes}</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_upvotes}</Text>
       </View>
       <View style={styles.infoRow}>
         {/*number of comments*/}
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_comments}</Text>
       </View>
       <View style={[styles.infoRow, { marginLeft: 10 }]}>
         {/*Anonymous name of user*/}
@@ -130,6 +134,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       <View style={{ marginLeft: 10 }}>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
       </View>
+    </View>
     </View>
   </TouchableOpacity>
 );
@@ -498,7 +503,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
     borderTopColor: '#EFEFEF',
-    borderTopWidth: 1,
   },
   infoRow: {
     flexDirection: 'row',
