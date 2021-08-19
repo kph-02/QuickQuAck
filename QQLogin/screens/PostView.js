@@ -173,7 +173,7 @@ const PostView = ({ route, navigation }) => {
           }}
         >
           {/* (Anonymous) name of the commenter */}
-          <Text style={[styles.name]}>{item.user_id}</Text>
+          <Text style={[styles.name]}>{item.anon_name_id}</Text>
 
           {/* The ... button for each comment */}
           <View>
@@ -281,6 +281,7 @@ const PostView = ({ route, navigation }) => {
   const sendToDB = async (operation, body) => {
     //Create a comment on the post
     if (operation === 'comment') {
+      
       try {
         const response = await fetch('http://' + serverIp + ':5000/feed/create-comment', {
           method: 'POST',

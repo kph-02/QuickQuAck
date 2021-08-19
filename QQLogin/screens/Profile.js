@@ -22,20 +22,15 @@ const Profile = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-      <Image
-        style={styles.avatar}
-        source={require('./../assets/AnonDuck.jpg')}
-      />
+      <Image style={styles.avatar} source={require('./../assets/AnonDuck.jpg')} />
       <View style={styles.body}>
         <View style={styles.bodyContent}>
           <Text style={styles.name}>Timmy Turner</Text>
-          <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Settings')}>
+          {/* <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Settings')}>
             <Text style={{ marginRight: 300, fontSize: 13 }}>Settings</Text>
             <AntDesign name="right" size={20} color="#BDBDBD" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.buttonContainer}
-            onPress={() => navigation.navigate('Activity')}>
+          </TouchableOpacity> */}
+          <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Activity')}>
             <Text style={{ marginRight: 300, fontSize: 13 }}>Activity</Text>
             <AntDesign name="right" size={20} color="#BDBDBD" />
           </TouchableOpacity>

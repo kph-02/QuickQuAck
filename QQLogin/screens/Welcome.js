@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable} from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
@@ -40,6 +40,9 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import CreatePost from '../screens/CreatePost';
 import FeedViews from './FeedViews';
 import PostMenu from '../components/PostMenu.js';
+import Modal from 'react-native-modal';
+import TagModal from '../components/TagModal';
+
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
@@ -148,6 +151,10 @@ const Welcome = ({ navigation }) => {
   //     />
   //   );
   // };
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleModal = () => {
+    setModalOpen(!modalOpen);
+  };
 
   return (
     <StyledFeedContainer>
@@ -161,7 +168,7 @@ const Welcome = ({ navigation }) => {
          */}
         {/* <PageTitle>Feed</PageTitle> */}
         <Text style={styles.pageTitle}>Feed</Text>
-        <SearchBar
+        {/* <SearchBar
           placeholder="Search Tags"
           // onChangeText={this.updateSearch}
           lightTheme="true"
@@ -176,7 +183,10 @@ const Welcome = ({ navigation }) => {
             borderTopColor: 'transparent'
           }}
           inputContainerStyle={{ borderRadius: 100, height: '100%', width: '100%', backgroundColor: '#F9F9F9' }}
-        />
+        /> */}
+        <StyledButton onPress={() => navigation.navigate('TagModal')}>
+          <Text>Filter</Text>
+        </StyledButton>
       </InnerContainer>
 
       <FeedViews navigation={navigation} />
@@ -191,7 +201,6 @@ const Welcome = ({ navigation }) => {
       <View style={styles.touchableStyle}>
         <PostMenu navigation={navigation} />
       </View>
-      
     </StyledFeedContainer>
   );
 };

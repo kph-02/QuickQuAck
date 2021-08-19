@@ -26,41 +26,42 @@ import TagSettings from '../screens/TagSettings';
 import Map from '../screens/Map';
 import UserInfo from '../screens/UserInfo';
 import UserActivity from '../screens/UserActivity';
+import TagModal from '../components/TagModal';
 
 const Stack = createStackNavigator();
 
 const RootStack = () => {
-    return(
-        <Stack.Navigator
-            initialRouteName="Splash"
-            screenOptions={({route, navigation}) => ({
-            gestureEnabled: true,
-            headerShown: false,
-            headerTransparent: true})
-            }>
-                <Stack.Screen name="Splash" component={Splash} />
-                <Stack.Screen name="Login" component={Login} />
-                <Stack.Screen name="Signup" component={Signup} />
-                <Stack.Screen name="Profile" component={Profile} />
-                <Stack.Screen name="Settings" component={Settings} />
-                <Stack.Screen name="Notifications" component={Notifications} />
-                <Stack.Screen name="TabNav" component={TabNav} />
-                <Stack.Screen name="Create Post" component={CreatePost} />
-                <Stack.Screen name="Post View" component={PostView} />
-                <Stack.Screen name="Feed Views" component={FeedViews} />
-                <Stack.Screen name="Flag Post" component={FlagPost} />
-                <Stack.Screen name="Menu" component={EllipsisMenu} />
-                <Stack.Screen name="Map" component={Map} />
-                <Stack.Screen name="TagSelection" component={TagSelection} />
-                <Stack.Screen name="TagSettings" component={TagSettings} />
-                <Stack.Screen name="Chat" component={ChatRoom} />
-                <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
-                <Stack.Screen name="UserInfo" component={UserInfo} />
-                <Stack.Screen name="Activity" component={UserActivity} />
-
-        </Stack.Navigator>
-       
-    )
-}
+  return (
+    <Stack.Navigator
+      initialRouteName="Splash"
+      screenOptions={({ route, navigation }) => ({
+        gestureEnabled: true,
+        headerShown: false,
+        headerTransparent: true,
+      })}
+    >
+      <Stack.Screen name="Splash" component={Splash} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen name="Notifications" component={Notifications} />
+      <Stack.Screen name="TabNav" component={TabNav} />
+      <Stack.Screen name="Create Post" component={CreatePost} />
+      <Stack.Screen name="Post View" component={PostView} />
+      <Stack.Screen name="Feed Views" component={FeedViews} />
+      <Stack.Screen name="Flag Post" component={FlagPost} />
+      <Stack.Screen name="Menu" component={EllipsisMenu} />
+      <Stack.Screen name="Map" component={Map} />
+      <Stack.Screen name="TagSelection" component={TagSelection} />
+      <Stack.Screen name="TagSettings" component={TagSettings} />
+      <Stack.Screen name="Chat" component={ChatRoom} />
+      <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
+      <Stack.Screen name="UserInfo" component={UserInfo} />
+      <Stack.Screen name="Activity" component={UserActivity} />
+      <Stack.Screen name="TagModal" component={TagModal} />
+    </Stack.Navigator>
+  );
+};
 
 export default RootStack;
