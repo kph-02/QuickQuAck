@@ -46,11 +46,22 @@ router.post("/create-chatroom", authorization, (req,res) => {
 router.get("/user-chatrooms", authorization, async (req, res) => {
     try{
         const user_id = req.user;
-        // const userChatrooms = await pool.query(
-        //     "SELECT * FROM (SELECT DISTINCT ON (chatrooms.chatroom_id) chatrooms.chatroom_id AS chatroom_id"
-        // )
-        
-
+        const userChatrooms = await pool.query(
+            "SELECT * FROM chatrooms WHERE ($1) = ANY (user_ids)",
+            [user_id]
+        );
+        //retrieve user_id of other user that is NOT you
+        // const otherUsers = await pool.query(
+        //     "SELECT users_id FROM (SELECT * FROM chatrooms WHERE ($1) = ANY (user_ids)) WHERE NOT (($1) = ANY (recipient_ids))",
+        //     [user_id]
+        //     //43dff76e-936c-4d8e-90c7-afd407e46b2b
+        // );
+        res.status(201).json({
+            data: {
+                chatroom: userChatrooms.rows,
+                // otherUser: otherUsers.rows[0],
+            }
+        });
     } catch(err){
         console.error(err.message);
         res.status(500).json("Server Error");
