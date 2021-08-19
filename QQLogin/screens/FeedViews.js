@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,44 +11,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
 
 var JWTtoken = ''; //Store JWT for authentication
-// const homeposts = [
-//   {
-//     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-//     user: 'Blue Raccoon',
-//     likes: '2',
-//     body: 'This is a sample post!',
-//   },
-//   {
-//     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-//     user: 'Red Monkey',
-//     likes: '12',
-//     body: "Who's playing at Sun God today at 7pm?",
-//   },
-//   {
-//     id: '58694a0f-3da1-471f-bd96-145571e29d72',
-//     user: 'Purple Unicorn',
-//     likes: '21',
-//     body: 'Which dining hall has the best special today?',
-//   },
-//   {
-//     id: '58894a0f-3da1-471f-bd96-145571e29d82',
-//     user: 'Green Tortoise',
-//     likes: '10',
-//     body: 'Which dining hall has the best special today?',
-//   },
-//   {
-//     id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-//     user: 'Pink Seahorse',
-//     likes: '16',
-//     body: 'What games do you all play?',
-//   },
-//   {
-//     id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-//     user: 'Yellow Squirrel',
-//     likes: '25',
-//     body: 'Test post lol',
-//   },
-// ];
 
 const allposts = [
   {
@@ -74,29 +36,96 @@ const AdjustTextPreview = ({ style, text }) => {
   );
 };
 
+// Renders all tags associated with the post
+const RenderStyledTags = ({tags}) => {
+  return tags.map(function(tag) {
+    let tagcolor = '';
+
+    if (tag === 'Muir') {
+      tagcolor = '#7FD85F';
+    } else if (tag === 'Marshall') {
+      tagcolor = '#FA4A4A';
+    } else if (tag === 'Seventh') {
+      tagcolor = '#FA9E4A';
+    } else if (tag === 'Poll') {
+      tagcolor = '#AC5CEB';
+    } else if (tag === 'Question') {
+      tagcolor = '#FF8383';
+    } else if (tag === 'Food') {
+      tagcolor = '#9EE444';
+    } else if (tag === 'Warren') {
+      tagcolor = '#AA5F5F';
+    } else if (tag === 'Revelle') {
+      tagcolor = '#FEDB5F';
+    } else if (tag === 'ERC') {
+      tagcolor = '#2891F2';
+    } else if (tag === 'Social') {
+      tagcolor = '#97E1F9';
+    } else if (tag === 'Sixth') {
+      tagcolor = '#49D3FE';
+    } else {
+      tagcolor = 'gray';
+    }
+    return (
+      <View 
+      key={tag}
+      style={{
+            paddingHorizontal: 15,
+            borderRadius: 15,
+            marginVertical: 10,
+            marginLeft: 10,
+            paddingVertical: 2,
+            backgroundColor: tagcolor}}>
+        <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
+      </View>
+    );
+  });
+}
+
+// Generates each of the Post previews on the Feed views
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     {/* View for the text preview of each post as shown on the feed */}
     <View style={{ justifyContent: 'center', marginLeft: 25, marginRight: 25 }}>
       <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.post_text} />
-      {/* <Text style={[styles.bodyText, textColor]}>{item.post_text}</Text> */}
+    </View>
+    {/* Tags Info Row */}
+    <View
+      style={[
+        styles.postTouchables,
+        {
+          justifyContent: 'flex-start',
+          backgroundColor: 'white',
+          borderTopWidth: 0,
+          borderTopColor: 'white',
+          marginBottom: 10,
+          marginTop: 5,
+          marginLeft: 15,
+        },
+      ]}
+    >
+      <RenderStyledTags tags={item.tagarray} />
     </View>
     {/* The Data of each Post */}
-    <View style={[styles.postTouchables, { backgroundColor: 'white' }]}>
+    <View style={{
+      flexDirection: 'row',
+      borderTopColor: '#EFEFEF',
+      borderTopWidth: 1}}>
+    <View style={[styles.postTouchables, { marginLeft: 30, marginTop: 0, backgroundColor: 'white' }]}>
       <View style={[styles.infoRow, { marginRight: 5 }]}>
         {/*number of people who've viewed the post*/}
         <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>0</Text>
       </View>
       <View style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}>
         {/*number of upvotes*/}
         <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>21</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_upvotes}</Text>
       </View>
       <View style={styles.infoRow}>
         {/*number of comments*/}
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_comments}</Text>
       </View>
       <View style={[styles.infoRow, { marginLeft: 10 }]}>
         {/*Anonymous name of user*/}
@@ -106,8 +135,10 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
       </View>
     </View>
+    </View>
   </TouchableOpacity>
 );
+
 
 //format the time of the post from the database to display it to the screen
 const formatTime = (post_age) => {
@@ -137,12 +168,14 @@ const FirstRoute = () => {
   const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
   const [update, setUpdate] = useState(false); //Changing will feed to update
+
   const navigation = useNavigation();
 
   //renderItem function for each item passed through
   const renderItem = ({ item }) => {
     const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
     const color = item.post_id === selectedId ? 'white' : 'black';
+  
     return (
       <Item
         //destructure the item
@@ -174,7 +207,6 @@ const FirstRoute = () => {
     }
   };
 
-
   //Communicating with the database to get all the posts
   const getFromDB = async () => {
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
@@ -188,13 +220,15 @@ const FirstRoute = () => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
-
+      // console.log(parseRes);
+      // console.log(parseRes.data.post[0].tagarray);
       /*
        *"post":[
        * {"post_id":,
        * "user_id":,
        * "post_text":,
        * "num_comments":,
+       * "num_upvotes"
        * "time_posted":
        *
        * "anon_name:""
@@ -229,7 +263,7 @@ const FirstRoute = () => {
     setRefresh(true); //update animation
     setUpdate(!update); //Change variable to trigger useEffect to pull posts from database
   };
-  
+
   return (
     // <StyledFeedContainer>
     //     <StatusBar style="black" />
@@ -295,6 +329,7 @@ const SecondRoute = () => {
 
   //Communicating with the database to get all the posts
   const getFromDB = async () => {
+    let post;
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
 
     try {
@@ -313,6 +348,7 @@ const SecondRoute = () => {
        * "user_id":,
        * "post_text":,
        * "num_comments":,
+       * "num_upvotes":,
        * "time_posted":
        *
        * "anon_name:""
@@ -324,10 +360,12 @@ const SecondRoute = () => {
        * milliseconds
        * ]
        * */
-      setAllData(parseRes.data.post);
+      post = parseRes.data.post;
+      
     } catch (error) {
       console.error(error.message);
     }
+    setAllData(post);
   };
 
   //useFocusEffect triggers works like useEffect, but only when this screen is focused
@@ -463,9 +501,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 10,
     borderTopColor: '#EFEFEF',
-    borderTopWidth: 1,
   },
   infoRow: {
     flexDirection: 'row',

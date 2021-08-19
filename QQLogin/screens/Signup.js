@@ -133,6 +133,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('firstName')}
                   value={values.firstName}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -145,6 +146,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('lastName')}
                   value={values.lastName}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -157,6 +159,7 @@ const Signup = ({ navigation }) => {
                   value={values.email}
                   keyboardType="email-address"
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -172,6 +175,7 @@ const Signup = ({ navigation }) => {
                   hidePassword={hidePassword}
                   setHidePassword={setHidePassword}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -183,6 +187,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('dob')}
                   value={values.dob}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -194,6 +199,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('college')}
                   value={values.college}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MyTextInput
@@ -205,6 +211,7 @@ const Signup = ({ navigation }) => {
                   onBlur={handleBlur('gy')}
                   value={values.gy}
                   selectionColor="#FFCC15"
+                  style={{ color: 'black' }}
                 />
 
                 <MsgBox>By clicking Sign Up, you agree to Quick QuAck's Terms & Conditions.</MsgBox>

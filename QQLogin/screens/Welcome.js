@@ -40,6 +40,9 @@ import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import CreatePost from '../screens/CreatePost';
 import FeedViews from './FeedViews';
 import PostMenu from '../components/PostMenu.js';
+import Modal from 'react-native-modal';
+import TagModal from '../components/TagModal';
+
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
@@ -148,50 +151,56 @@ const Welcome = ({ navigation }) => {
   //     />
   //   );
   // };
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleModal = () => {
+    setModalOpen(!modalOpen);
+  };
 
   return (
     <StyledFeedContainer>
       {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
       <StatusBar style="black" />
       <InnerContainer>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Map')}
-         style = {styles.mapTouchableStyle}
-        >
-        <Image source={require('./../assets/map.png')} style={styles.mapIcon} />
-       
+        <TouchableOpacity onPress={() => navigation.navigate('Map')} style={styles.mapTouchableStyle}>
+          <Image source={require('./../assets/map.png')} style={styles.mapIcon} />
         </TouchableOpacity>
         {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
          */}
         {/* <PageTitle>Feed</PageTitle> */}
         <Text style={styles.pageTitle}>Feed</Text>
-        <SearchBar
+        {/* <SearchBar
           placeholder="Search Tags"
           // onChangeText={this.updateSearch}
           lightTheme="true"
           containerStyle={{
             width: '90%',
-            height: height * 0.07,
+            height: height * 0.09,
             alignItems: 'center',
-            marginTop: height * 0.02,
+            marginTop: height * 0.01,
             borderRadius: 100,
-            backgroundColor: '#F2F2F2',
+            backgroundColor: '#FFFFFF',
+            borderBottomColor: 'transparent',
+            borderTopColor: 'transparent'
           }}
           inputContainerStyle={{ borderRadius: 100, height: '100%', width: '100%', backgroundColor: '#F9F9F9' }}
-        />
+        /> */}
+        <StyledButton onPress={() => navigation.navigate('TagModal')}>
+          <Text>Filter</Text>
+        </StyledButton>
       </InnerContainer>
 
       <FeedViews navigation={navigation} />
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         activeOpacity={0.5}
         onPress={() => navigation.navigate('Create Post')}
         style={styles.touchableStyle}
       >
         <Image source={require('./../assets/create_post_button.png')} style={styles.floatingButtonStyle} />
-      </TouchableOpacity>
-
-      <PostMenu navigation={navigation} />
+      </TouchableOpacity> */}
+      <View style={styles.touchableStyle}>
+        <PostMenu navigation={navigation} />
+      </View>
     </StyledFeedContainer>
   );
 };
@@ -246,7 +255,7 @@ const styles = StyleSheet.create({
     height: 30,
     right: 40,
     top: 12,
-    resizeMode : 'contain',
+    resizeMode: 'contain',
     // backgroundColor: '#B0C400',
   },
 });

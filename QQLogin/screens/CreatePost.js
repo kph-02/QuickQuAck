@@ -7,7 +7,8 @@ import { serverIp } from './Login.js';
 import Poll from '../components/Poll.js';
 //formik
 import { Formik } from 'formik';
-
+import { Switch } from 'react-native-switch';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 //icons
 
 import { Octicons, Ionicons } from '@expo/vector-icons';
@@ -17,7 +18,7 @@ import {
   PageLogo,
   PageTitle,
   SubTitle,
-  StyledFormArea,
+  StyledViewPostContainer,
   StyledInputLabel,
   StyledTextInput,
   StyledButton,
@@ -40,13 +41,14 @@ import {
   TagDropdown,
   StyledPostArea1,
   StyledPostArea2,
+  PageTitleFlag,
 } from './../components/styles';
-import { Button, View, Modal, StyleSheet } from 'react-native';
+import { Button, View, Modal, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import { Picker } from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
 import { TextInput } from 'react-native-gesture-handler';
-
+import Map from '../screens/Map';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
@@ -63,6 +65,7 @@ const CreatePost = ({ route, navigation }) => {
     postText: '',
     postTag: [] /*Initialize as first value in tags drop-down*/,
     num_comments: 0 /*0 comments to begin with, updated when new comments added */,
+    num_upvotes: 0,
   });
 
   var JWTtoken = '';
@@ -73,15 +76,15 @@ const CreatePost = ({ route, navigation }) => {
   //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
   const onChange = (name, value) => {
     setInputs({ ...inputs, [name]: value });
+    
     // console.log(inputs);
   };
 
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
     e.preventDefault(); //prevent refresh
-
     //Check if the post has content, if not, prevent submission and notify
-    if (inputs.postText) {
+    if (inputs.postText && inputs.postTag.length != 0) {
       sendToDB(postType.post_type, inputs);
 
       if (postType.post_type === 'Update') {
@@ -96,7 +99,7 @@ const CreatePost = ({ route, navigation }) => {
         }
       }
     } else {
-      alert('Can not submit an empty post!');
+      alert('Can not submit a post without content or tags!');
     }
   };
 
@@ -138,7 +141,9 @@ const CreatePost = ({ route, navigation }) => {
       const updateBody = {
         postText: body.postText,
         post_id: postType.post_id,
+        postTag: body.postTag,
       };
+
       try {
         // console.log('Sent Token:      ' + JWTtoken);
         // Send post info to DB
@@ -189,6 +194,33 @@ const CreatePost = ({ route, navigation }) => {
     }
   }, []);
 
+  // const [location, setLocation] = useState({
+  //   errorMessage: '',
+  //   location: {
+  //     latitude: 32.880213553722704,
+  //     longitude: -117.23399204377725,
+  //   },
+  // });
+
+  // getLocationAsync = async () => {
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== 'granted') {
+  //     setLocation({
+  //       errorMessage: 'Permission to access location was denied',
+  //     });
+  //     return;
+  //   }
+
+  //   let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
+  //   const { latitude, longitude } = location.coords;
+  //   this.getGeocodeAsync({ latitude, longitude });
+  //   setLocation({ location: { latitude, longitude } });
+  // };
+
+  const HideKeyboard = ({ children }) => (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>{children}</TouchableWithoutFeedback>
+  );
+
   return (
     <Modal
       transparent={true}
@@ -197,16 +229,100 @@ const CreatePost = ({ route, navigation }) => {
       animationType="slide"
       onRequestClose={() => navigation.pop()}
     >
-      <StyledContainer>
+      <StyledViewPostContainer>
         <StatusBar style="black" />
-        <InnerPostContainer>
-          <ExtraBackView>
+
+        {/* Back Button */}
+        <TextLink
+          onPress={() => navigation.pop()}
+          style={{ marginLeft: 10, width: 55, paddingHorizontal: 5, bottom: 20 }}
+        >
+          <TextPostContent>Back</TextPostContent>
+        </TextLink>
+
+        {/* Page Title with the Post/Update button across from it */}
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: 35,
+            width: '100%',
+            justifyContent: 'space-between',
+            paddingBottom: 20,
+          }}
+        >
+          <PageTitleFlag style={{ marginLeft: 15, fontSize: 22 }}>
+            {postType.post_type === 'Update' ? 'Update Post' : 'New Post'}
+          </PageTitleFlag>
+          <TouchableOpacity onPress={onPressButton} style={{ marginRight: 15 }}>
+            <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
+          </TouchableOpacity>
+        </View>
+
+        {/* Section/Container for Anonymous Username */}
+        <View
+          style={{
+            backgroundColor: 'white',
+            paddingVertical: 10,
+            borderTopColor: '#DADADA',
+            borderTopWidth: 1,
+            paddingHorizontal: 15,
+          }}
+        >
+          <MultiSelect
+            hideSubmitButton
+            items={items}
+            uniqueKey="name"
+            // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
+            // onSelectedItemsChange={console.log(postTag)}
+
+            selectedItems={selectedItems}
+            onSelectedItemsChange={onSelectedItemsChange}
+            // onToggleList = {console.log(moo)}
+            selectedItemIconColor={yellow}
+            selectedItemTextColor={black}
+            tagBorderColor={yellow}
+            tagTextColor={black}
+            textInputProps={{ editable: false }}
+            searchInputPlaceholderText=""
+            searchIcon={false}
+          />
+        </View>
+
+        {/* Section/Container for Text input for the Post */}
+        <View
+          style={{
+            alignItems: 'stretch',
+            backgroundColor: 'white',
+            paddingVertical: 10,
+            borderTopColor: '#DADADA',
+            borderTopWidth: 1,
+          }}
+        >
+          <MyTextInput
+            placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll title'}
+            name="postText"
+            style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }}
+            placeholderTextColor={darkgray}
+            onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
+            value={postText}
+            selectionColor="#FFCC15" //implement a max length
+            maxLength={250}
+            multiline
+          />
+          <Poll Type={postType.post_type} />
+          {/* <Button
+            title="test" 
+            onPress= {() => console.log(Map.getLocationAsync())} /> */}
+        </View>
+
+        {/* <InnerPostContainer> */}
+        {/* <ExtraBackView>
             <TextLink onPress={() => navigation.pop()}>
               <TextPostContent>Back</TextPostContent>
             </TextLink>
-          </ExtraBackView>
-          <ExtraPostView>
-            <TextLink onPress={onPressButton} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}>
+          </ExtraBackView> */}
+        {/* <ExtraPostView style={{backgroundColor: 'yellow'}}>
+            <TextLink onPress={onPressButton} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }} style={{backgroundColor: 'pink'}}>
               <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
             </TextLink>
           </ExtraPostView>
@@ -248,9 +364,9 @@ const CreatePost = ({ route, navigation }) => {
             textInputProps={{ editable: false }}
             searchInputPlaceholderText=""
             searchIcon={false}
-          ></MultiSelect>
-        </TagDropdown>
-      </StyledContainer>
+          />
+        </TagDropdown> */}
+      </StyledViewPostContainer>
     </Modal>
   );
 };
@@ -258,8 +374,11 @@ const CreatePost = ({ route, navigation }) => {
 const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, ...props }) => {
   return (
     <View>
-      <StyledInputLabel> {label} </StyledInputLabel>
-      <StyledPostInput {...props} />
+      {/* <StyledInputLabel> {label} </StyledInputLabel> */}
+      <StyledPostInput
+        {...props}
+        style={{ maxHeight: 150, padding: 0, marginVertical: 0, borderRadius: 0, marginBottom: 0 }}
+      />
       {isPassword && (
         <RightIcon
           onPress={() => {

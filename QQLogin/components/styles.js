@@ -100,7 +100,7 @@ export const PageTitlePost = styled.Text`
   font-weight: bold;
   color: ${black};
   padding: 90px;
-  right: 125px;
+  right: 145px;
   bottom: 50px;
 `;
 
@@ -143,7 +143,6 @@ export const StyledPostInput = styled.TextInput`
   height: 200px;
   margin-vertical: 3px;
   margin-bottom: 10px;
-  maxlength="8";
   color: ${black};
 `;
 
@@ -309,6 +308,17 @@ const MapIcon = styled.TouchableOpacity`
   marginTop: -5,
   position: 'absolute',
 `;
+
+export const MapContainer = styled.View`
+  flex: 5;
+  background-color: ${primary};
+`;
+
+export const TopMapContainer = styled.View`
+  flex: 1;
+  background-color: ${primary};
+`;
+
 export const SignInButton = ({ onPress }) => (
   <RoundedTouchableOpacitySignIn onPress={onPress}>
     <ButtonText>Sign Up</ButtonText>

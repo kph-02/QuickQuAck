@@ -11,15 +11,18 @@ const { SlideInMenu } = renderers;
 const PostMenu = ({ navigation }) => {
   return (
     <Menu renderer={SlideInMenu}>
+      {/* Two menu options: Text post and Poll post */}
+
       {/* Slide-in Menu from the bottom is triggered by the Floating button in feed button */}
-      <MenuTrigger>
-        <Image source={require('./../assets/create_post_button.png')} style={styles.touchableStyle} />
+      <MenuTrigger  customStyles={triggerStyles}>
+        <Image source={require('./../assets/create_post_button.png')} style={styles.floatingButtonStyle} />
       </MenuTrigger>
 
-      {/* Two menu options: Text post and Poll post */}
       <MenuOptions>
         {/* Title */}
-        <MenuOption style={styles.titleContainer}>
+        <MenuOption
+        disableTouchable = {true}
+         style={styles.titleContainer}>
           <Text style={styles.text}>Post to QuickQuAck</Text>
         </MenuOption>
 
@@ -89,14 +92,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   touchableStyle: {
-    position: 'absolute',
     width: width * 0.18,
     height: width * 0.18,
     alignItems: 'center',
     justifyContent: 'center',
     right: 15,
-    bottom: 15,
+    top: 1,
+  },
+  floatingButtonStyle: {
+    resizeMode: 'contain',
+    width: width * 0.18,
+    height: width * 0.18,
   },
 });
+
+const triggerStyles = {
+  TriggerTouchableComponent: TouchableHighlight,
+  triggerTouchable: {
+    activeOpacity: 0.6,
+    style: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: width * 0.16,
+      height: width * 0.16,
+      borderRadius: 100,
+    },
+  },
+};
 
 export default PostMenu;

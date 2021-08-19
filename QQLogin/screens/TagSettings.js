@@ -44,7 +44,7 @@ const getUserId = async () => {
   }
 };
 
-const TagSelection = ({ navigation }) => {
+const TagSettings = ({ navigation }) => {
   // Use State hooks
   const [selectedItems, setSelectedItems] = useState([]);
   //Getting user input
@@ -71,7 +71,7 @@ const TagSelection = ({ navigation }) => {
     //Check if the post has content, if not, prevent submission and notify
     if (inputs.postTag.length != 0) {
       sendToDB(inputs);
-      navigation.navigate('Login');
+      navigation.navigate('Profile');
     } else {
       alert('Please select at least one tag.');
     }
@@ -181,4 +181,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TagSelection;
+export default TagSettings;

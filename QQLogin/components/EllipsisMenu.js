@@ -1,17 +1,83 @@
 import React, { useState, Component } from 'react';
-import { Dimensions, Platform, StyleSheet, Text, Alert } from 'react-native';
+import { Dimensions, Platform, StyleSheet, Text, Alert, TouchableHighlight } from 'react-native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, renderers } from 'react-native-popup-menu';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { serverIp } from '../screens/Login.js';
 
 const { SlideInMenu } = renderers;
 
-const EllipsisMenu = ({ navigation }) => {
+const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, JWTtoken }) => {
+  const { post_id, post_text } = post;
+
+  //When user clicks on icon to update post
+  const updatePost = () => {
+    const postType = {
+      post_type: 'Update',
+      post_text: postText,
+      post_id: postId,
+    };
+    navigation.navigate('Create Post', { postType });
+  };
+
+  //When user clicks on icon to delete post
+  const deletePost = () => {
+    Alert.alert('Delete Post?', 'Would you like to delete this post?', [
+      //Delete post from DB
+      {
+        text: 'Yes',
+        onPress: () => {
+          sendToDB();
+          navigation.pop();
+          alert('Post Deleted');
+        },
+      },
+      { text: 'No' },
+    ]);
+  };
+
+  const sendToDB = async () => {
+    const body = { postId: post_id };
+    try {
+      const response = await fetch('http://' + serverIp + ':5000/feed/delete-post', {
+        method: 'DELETE',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      // console.log('DELETE: ' + JSON.stringify(parseRes));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const deleteComment = async () => {
+    try {
+      const response = await fetch('http://' + serverIp + ':5000/feed/delete-comment', {
+        method: 'DELETE',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment_id: comment_id }),
+      });
+
+      const parseRes = await response.json();
+
+      if (parseRes.status) {
+        alert('Comment deleted successfully!');
+        navigation.pop();
+      } else {
+        console.log(parseRes);
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
   return (
     <Menu renderer={SlideInMenu}>
       {/* Slide-in Menu from the bottom is triggered by the Ellipsis (...) button */}
-      <MenuTrigger>
+      <MenuTrigger customStyles={triggerStyles}>
         <MaterialCommunityIcons name="dots-horizontal" color="#BDBDBD" size={height * 0.035} />
       </MenuTrigger>
 
@@ -31,7 +97,10 @@ const EllipsisMenu = ({ navigation }) => {
         </MenuOption>
 
         {/* Flag as Inappropriate */}
-        <MenuOption onSelect={() => navigation.navigate('Flag Post')} style={{ paddingVertical: 10 }}>
+        <MenuOption
+          onSelect={() => navigation.navigate('Flag Post', { post: postText, user: postUser })}
+          style={{ paddingVertical: 10 }}
+        >
           <Text style={styles.text}>Flag as inappropriate</Text>
         </MenuOption>
 
@@ -47,6 +116,36 @@ const EllipsisMenu = ({ navigation }) => {
         >
           <Text style={styles.text}>Block posts from this user</Text>
         </MenuOption>
+        {/* Show Update Post if user is Original Poster */}
+        {(() => {
+          if (postOwner) {
+            return (
+              <MenuOption onSelect={updatePost} style={{ paddingVertical: 10 }}>
+                <Text style={styles.text}>Update Post</Text>
+              </MenuOption>
+            );
+          }
+        })()}
+        {/* Show Delete Post if user is  Original Poster */}
+        {(() => {
+          if (postOwner) {
+            return (
+              <MenuOption onSelect={deletePost} style={{ paddingVertical: 10 }}>
+                <Text style={styles.text}>Delete Post</Text>
+              </MenuOption>
+            );
+          }
+        })()}
+        {/* Show Delete Comment if user is Original Commentor */}
+        {(() => {
+          if (commentOwner) {
+            return (
+              <MenuOption onSelect={deleteComment} style={{ paddingVertical: 10 }}>
+                <Text style={styles.text}>Delete Comment</Text>
+              </MenuOption>
+            );
+          }
+        })()}
       </MenuOptions>
     </Menu>
   );
@@ -80,5 +179,17 @@ const styles = StyleSheet.create({
     fontSize: height * 0.019,
   },
 });
+
+const triggerStyles = {
+  TriggerTouchableComponent: TouchableHighlight,
+  triggerTouchable: {
+    activeOpacity: 0.6,
+    style: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 100,
+    },
+  },
+};
 
 export default EllipsisMenu;

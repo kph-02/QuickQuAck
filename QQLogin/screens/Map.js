@@ -1,21 +1,18 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, Image, Button } from 'react-native';
+import { StyleSheet, View, Platform, Text, Image, Button, StatusBar, Dimensions, TouchableOpacity } from 'react-native';
 import MapView, { Heatmap, PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps';
-
+import { MapContainer, TopMapContainer } from './../components/styles';
 import * as Location from 'expo-location';
-import * as Permissions from 'expo-permissions';
+import { AntDesign } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
-export default class Map extends Component {
-  //   static navigationOptions = {
-  //     title: 'New York',
-  //   };
-
+class Maps extends Component {
   //State
   state = {
     location: {
-        latitude: 32.880213553722704,
-        longitude: -117.23399204377725,
-
+      latitude: 32.880213553722704,
+      longitude: -117.23399204377725,
     },
     geocode: null,
     errorMessage: '',
@@ -46,12 +43,23 @@ export default class Map extends Component {
 
   // Next, the function will use expo-location getCurrentPositionAsync function to get the location data.
 
+  // postMarkers = () => {
+  //   return this.state.reports.map((post) => <Marker
+  //     key={post.id}
+  //     coordinate={{ latitude: post.lat, longitude: post.lon }}
+  //     title={post.location}
+  //     description={post.post_id}
+  //   >
+  //   </Marker >)
+  // }
+
   getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       this.setState({
         errorMessage: 'Permission to access location was denied',
       });
+      return;
     }
 
     let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
@@ -69,46 +77,63 @@ export default class Map extends Component {
   //Requesting permissions to access location as soon as map is opened
   componentDidMount() {
     this.getLocationAsync();
-    console.log(this.state.geocode)
+    console.log(this.state.location);
+    // console.log(this.state.geocode);
   }
 
   render() {
+    const { navigation } = this.props;
+    const markerKhosla = require('./../assets/coleslaw.jpg');
     return (
-      <View style={styles.container}>
+      <View>
+        <StatusBar translucent={true} backgroundColor="transparent" barStyle="dark-content" />
         <MapView
           mapType="standard"
           customMapStyle={this.mapStyle}
           loadingEnabled={true}
           scrollEnabled={true}
-          showsCompass={true}
           showsUserLocation={true}
           provider={null}
           ref={(map) => (this._map = map)}
           style={styles.map}
           region={{
-              latitude: this.state.location.latitude,
-              longitude: this.state.location.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }
-          }
+            latitude: this.state.location.latitude,
+            longitude: this.state.location.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
         >
-
-          <Marker coordinate={{ latitude: 32.88232190507297, longitude: -117.23403495912069 }}>
+          <Marker pinColor="#FFCC15" coordinate={{ latitude: 32.88232190507297, longitude: -117.23403495912069 }}>
             <Callout>
-              <Text>bro what </Text>
+              <Text>Why can't I step on the seal?</Text>
             </Callout>
           </Marker>
-          <Marker draggable coordinate={{ latitude: 32.88122376973488, longitude: -117.23757610041588 }}>
+          <Marker pinColor="#FFCC15" draggable coordinate={{ latitude: 32.88122376973488, longitude: -117.23757610041588 }}>
             <Callout>
-              <Text>Woweee</Text>
+              <Text>what if we... studied together... on geisel 8th floor.. aha ha.. just kidding.. unless..?</Text>
             </Callout>
           </Marker>
+          <Marker pinColor="#FFCC15" draggable coordinate={{ latitude: 32.87971535134385, longitude: -117.23555259895977 }}>
+            <Callout>
+              <Text>Not gonna lie, Tapex has the best food on campus.</Text>
+            </Callout>
+          </Marker>
+ 
         </MapView>
+        <TouchableOpacity activeOpacity={0.5} onPress={() => navigation.pop()} style={styles.touchableStyle}>
+          <Image source={require('./../assets/backbo.png')} style={styles.floatingButtonStyle} />
+        </TouchableOpacity>
       </View>
     );
   }
 }
+
+export default function Map(props) {
+  const navigation = useNavigation();
+  return <Maps {...props} navigation={navigation} />;
+}
+
+const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   container: {
@@ -116,9 +141,30 @@ const styles = StyleSheet.create({
   },
   map: {
     height: '100%',
+    zIndex: -1,
+    elevation: -1,
   },
+
   duck: {
     width: 100,
     top: 10,
+  },
+
+  touchableStyle: {
+    position: 'absolute',
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 20,
+    top: 50,
+    zIndex: 1,
+    elevation: 1,
+  },
+  floatingButtonStyle: {
+    resizeMode: 'cover',
+    width: width * 0.18,
+    height: width * 0.18,
+    zIndex: 1,
   },
 });

@@ -1,13 +1,17 @@
-CREATE DATABASE Main;
-
 /*CREATE DATABASE Users; 
 CREATE DATABASE Posts;
 CREATE DATABASE Chats;*/
 
 /* Install/Setup UUID as needed: (command below)*/
 
+    -- post_location geography(point),
+
+-- create extension if not exists "postgis"; 
+
+
+CREATE DATABASE Main;
+
 create extension if not exists "uuid-ossp"; 
-create extension if not exists "postgis"; 
 
 CREATE TABLE users (
     user_id uuid NOT NULL PRIMARY KEY DEFAULT
@@ -25,14 +29,13 @@ CREATE TABLE users (
     revealed_users uuid[]
 ); 
 
-
 CREATE TABLE post (
     post_id BIGSERIAL,
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
     num_comments INTEGER NOT NULL,
+    num_upvotes INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- post_location geography(point),
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT post_unique UNIQUE (post_id)
@@ -41,6 +44,7 @@ CREATE TABLE post (
 CREATE TABLE comment (
     comment_id BIGSERIAL,
     post_id INTEGER NOT NULL,
+    num_upvotes INTEGER NOT NULL,
     user_id uuid NOT NULL,
     text VARCHAR(100) NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -49,15 +53,6 @@ CREATE TABLE comment (
     CONSTRAINT FK_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
 );
 
-/*CREATE TYPE voting AS ENUM (
-    'like',
-    'dislike'
-);*/
-
-/*
-SELECT x, (ENUM_RANGE(NULL::voting))[x] 
-    FROM generate_series(-1, 1) x
-*/
 
 CREATE TABLE post_votes (
     user_id uuid NOT NULL,
@@ -79,26 +74,24 @@ CREATE TABLE comment_votes(
   CONSTRAINT fk_post FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE
 );
 
--- storage of all the tags
 
 CREATE TABLE tags (
     tag_id VARCHAR(10) NOT NULL,
     PRIMARY KEY (tag_id)
 );
 
-
--- insert into this table to connect tags to posts 
--- connecting a tag to a post
-
 CREATE TABLE post_tags (
     tag_id VARCHAR(10) NOT NULL,
     post_id INTEGER NOT NULL,
+<<<<<<< HEAD
     CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
     FOREIGN KEY(post_id) REFERENCES post(post_id),
+=======
+    CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE,
+>>>>>>> origin
     PRIMARY KEY (post_id, tag_id)
 );
-
--- connecting tags to a user 
 
 CREATE TABLE user_tags (
     user_id uuid NOT NULL,
@@ -108,12 +101,10 @@ CREATE TABLE user_tags (
     FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
---Correct?
 CREATE TABLE anon_names (
     anon_name_id VARCHAR(25) NOT NULL,
     PRIMARY KEY(anon_name_id)
 );
-
 
 CREATE TABLE post_names (
     user_id uuid NOT NULL,
@@ -125,6 +116,7 @@ CREATE TABLE post_names (
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+<<<<<<< HEAD
 CREATE TABLE poll (
     poll_id BIGSERIAL,
     user_id uuid NOT NULL,
@@ -163,3 +155,16 @@ CREATE TABLE poll_votes (
     CONSTRAINT FK_poll_id FOREIGN KEY(poll_id) REFERENCES poll(poll_id) ON DELETE CASCADE,
     CONSTRAINT FK_choice_id FOREIGN KEY(choice_id) REFERENCES poll_choices(choice_id) ON DELETE CASCADE
 );
+=======
+INSERT INTO tags (tag_id) VALUES ('Revelle');
+INSERT INTO tags (tag_id) VALUES ('Muir');
+INSERT INTO tags (tag_id) VALUES ('Warren');
+INSERT INTO tags (tag_id) VALUES ('ERC');
+INSERT INTO tags (tag_id) VALUES ('Marshall');
+INSERT INTO tags (tag_id) VALUES ('Sixth');
+INSERT INTO tags (tag_id) VALUES ('Seventh');
+INSERT INTO tags (tag_id) VALUES ('Food');
+INSERT INTO tags (tag_id) VALUES ('Social');
+INSERT INTO tags (tag_id) VALUES ('Poll');
+INSERT INTO tags (tag_id) VALUES ('Question');
+>>>>>>> origin
