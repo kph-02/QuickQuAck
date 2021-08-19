@@ -17,6 +17,41 @@ Update Post(PUT)
 Update Comment(PUT)
 Upvote/Downvote a post (POST)
 */
+const randomNameGenerator = () => {
+  const nameAdjectives = [
+    "Red",
+    "Orange",
+    "Yellow",
+    "Green",
+    "Blue",
+    "Purple",
+    "Pink",
+    "Gray",
+    "Turquoise",
+    "Brown",
+  ];
+  const nameAnimals = [
+    "Dog",
+    "Cat",
+    "Raccoon",
+    "Giraffe",
+    "Elephant",
+    "Panda",
+    "Koala",
+    "Rabbit",
+    "Turtle",
+    "Fox",
+  ];
+
+  const adjIndex = parseInt(Math.random() * 10);
+  const animalIndex = parseInt(Math.random() * 10);
+
+  let anonAdj = nameAdjectives[adjIndex];
+  let anonAnimal = nameAnimals[animalIndex];
+  const anonName = anonAdj + " " + anonAnimal;
+
+  return anonName;
+};
 
 router.post("/create-post", authorization, async (req, res) => {
   try {
@@ -43,37 +78,8 @@ router.post("/create-post", authorization, async (req, res) => {
       );
     }
 
-    const nameAdjectives = [
-      "Red",
-      "Orange",
-      "Yellow",
-      "Green",
-      "Blue",
-      "Purple",
-      "Pink",
-      "Gray",
-      "Turquoise",
-      "Brown",
-    ];
-    const nameAnimals = [
-      "Dog",
-      "Cat",
-      "Raccoon",
-      "Giraffe",
-      "Elephant",
-      "Panda",
-      "Koala",
-      "Rabbit",
-      "Turtle",
-      "Fox",
-    ];
-
-    const adjIndex = parseInt(Math.random() * 10);
-    const animalIndex = parseInt(Math.random() * 10);
-
-    let anonAdj = nameAdjectives[adjIndex];
-    let anonAnimal = nameAnimals[animalIndex];
-    const anonName = anonAdj + " " + anonAnimal;
+    
+    const anonName = randomNameGenerator();
 
     const createAnonName = await pool.query(
       "INSERT INTO anon_names (anon_name_id) VALUES ($1) ON CONFLICT DO NOTHING;",
@@ -240,6 +246,22 @@ router.post("/create-comment", authorization, async (req, res) => {
       [newComment.rows[0].comment_id, user_id, post_id, 1]
     );
 
+    const anonName = randomNameGenerator();
+
+
+    const createAnonName = await pool.query(
+      "INSERT INTO anon_names (anon_name_id) VALUES ($1) ON CONFLICT DO NOTHING;",
+      [anonName]
+    );
+
+    const commentName = await pool.query(
+      "INSERT INTO post_names (user_id, anon_name_id, post_id) SELECT * FROM " 
+      + "(SELECT CAST( $1 AS uuid) AS user_id, $2 AS anon_name_id, CAST( $3 AS INTEGER) "
+      + "AS post_id) AS tmp WHERE NOT EXISTS ( SELECT user_id, post_id FROM post_names "
+      + "WHERE user_id= CAST( $1 AS uuid) AND post_id = $3 LIMIT 1);", 
+      [user_id, anonName, post_id]
+    );
+
     res.status(201).json({
       status: "Comment Success",
       comment_id: newComment.rows[0].comment_id,
@@ -274,10 +296,12 @@ router.get("/post-comments", authorization, async (req, res) => {
     const { post_id } = req.query;
 
     const allComment = await pool.query(
-      "SELECT *, AGE(NOW(), time_posted) AS comment_age FROM comment INNER JOIN " +
-        "post_names ON comment.post_id = " +
-        "post_names.post_id WHERE comment.post_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' " +
-        "AND NOW() ORDER BY time_posted DESC;",
+      "SELECT comment_id, comment.post_id, num_upvotes, text, comment.user_id, " 
+      + "anon_name_id, time_posted, AGE(NOW(), time_posted) AS comment_age FROM "
+      + "comment INNER JOIN post_names ON comment.post_id = post_names.post_id "
+      + "AND comment.user_id = post_names.user_id WHERE comment.post_id = $1 AND "
+      + "time_posted BETWEEN NOW() - INTERVAL'24 HOURS'  AND NOW() ORDER BY "
+      + "num_upvotes DESC;",
       [post_id]
     );
 

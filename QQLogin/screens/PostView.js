@@ -173,7 +173,7 @@ const PostView = ({ route, navigation }) => {
           }}
         >
           {/* (Anonymous) name of the commenter */}
-          <Text style={[styles.name]}>{item.user_id}</Text>
+          <Text style={[styles.name]}>{item.anon_name_id}</Text>
 
           {/* The ... button for each comment */}
           <View>
@@ -195,7 +195,7 @@ const PostView = ({ route, navigation }) => {
           }}
         >
           {/* Time posted */}
-          <Text style={[styles.name]}>{formatTime(item.comment_age)} ago</Text>
+          <Text style={[styles.name]}>{formatTime(item.comment_age)}</Text>
 
           {/* Upvotes */}
           <TouchableOpacity
