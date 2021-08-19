@@ -106,6 +106,22 @@ router.post("/create-post", authorization, async (req, res) => {
   }
 });
 
+//Getting User Information to display in profile page
+router.get("/user-information", authorization, async (req, res) => {
+  const { user_id } = req.query;
+
+  try {
+    const userInformation = await pool.query(
+      "SELECT * FROM users WHERE user_id = $1",
+      [user_id]
+    );
+
+    res.status(201).json(userInformation.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.post("/user-tag-selection", async (req, res) => {
   try {
     //Reading information contained in post

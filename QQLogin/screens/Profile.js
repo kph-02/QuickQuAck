@@ -1,8 +1,55 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { serverIp } from './Login';
 
 const Profile = ({ navigation }) => {
+  var JWTtoken = '';
+  var userId = '';
+  var userInformation;
+
+  const [userName, setUserName] = useState();
+
+  const getUserID = async () => {
+    await AsyncStorage.getItem('user_id').then((user_id) => {
+      userId = user_id;
+    });
+  };
+
+  const getJWTtoken = async () => {
+    await AsyncStorage.getItem('token').then((token) => {
+      JWTtoken = token;
+    });
+  };
+
+  //Runs once upon rendering components
+  useEffect(() => {
+    const getUserInformation = async () => {
+      await getUserID();
+      await getJWTtoken();
+      await getFromDB();
+      setUserName(userInformation.first_name + '' + userInformation.last_name);
+    };
+
+    getUserInformation();
+  }, []);
+
+  //Get user information from the database
+  const getFromDB = async () => {
+    const query = 'user_id=' + userId;
+    try {
+      const response = await fetch('http://' + serverIp + ':5000/feed/user-information?' + query, {
+        method: 'GET',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+      });
+
+      userInformation = await response.json();
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -25,7 +72,7 @@ const Profile = ({ navigation }) => {
       <Image style={styles.avatar} source={require('./../assets/AnonDuck.jpg')} />
       <View style={styles.body}>
         <View style={styles.bodyContent}>
-          <Text style={styles.name}>Timmy Turner</Text>
+          <Text style={styles.name}>{userName}</Text>
           {/* <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Settings')}>
             <Text style={{ marginRight: 300, fontSize: 13 }}>Settings</Text>
             <AntDesign name="right" size={20} color="#BDBDBD" />
