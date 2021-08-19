@@ -1,16 +1,42 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { StyleSheet, Switch, Text, View, Image, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 
 const Profile = ({ navigation }) => {
+  const initialLocationState = {
+    location: {
+      latitude: 32.880213553722704,
+      longitude: -117.23399204377725,
+    },
+    // geocode: null,
+    errorMessage: '',
+  };
+
+  const [locationPermission, setLocationPermission] = useState(initialLocationState);
+  // const [status, setStatus] = useState(status);
+
+  getLocationAsync = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      setLocationPermission({
+        errorMessage: 'Permission to access location was denied',
+      });
+      return;
+    }
+    let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
+    const { latitude, longitude } = location.coords;
+    // this.getGeocodeAsync({ latitude, longitude });
+    setLocationPermission({ location: { latitude, longitude } });
+  };
+
   return (
     <View style={styles.container}>
+      {/* TOS Modal */}
+      {/* End of modal */}
       <View style={styles.header}>
         <View style={{ flexDirection: 'row', marginRight: 100, justifyContent: 'space-evenly' }}>
-          <TouchableOpacity
-            style={{ marginRight: 60, width: 50, paddingTop: 70 }}
-            onPress={() => navigation.pop()}
-          >
+          <TouchableOpacity style={{ marginRight: 60, width: 50, paddingTop: 70 }} onPress={() => navigation.pop()}>
             <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
           </TouchableOpacity>
           <Text style={styles.headline}>Settings</Text>
@@ -28,7 +54,7 @@ const Profile = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.navigate('UserInfo')} style={styles.buttonContainer}>
             <Text style={{ marginRight: 290, fontSize: 13 }}>Edit Personal Info</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity onPress={() => console.log(getLocationAsync())} style={styles.buttonContainer}>
             <Text style={{ marginRight: 265, fontSize: 13 }}>Location Permissions</Text>
           </TouchableOpacity>
           <TouchableOpacity

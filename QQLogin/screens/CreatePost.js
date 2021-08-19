@@ -76,6 +76,7 @@ const CreatePost = ({ route, navigation }) => {
   //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
   const onChange = (name, value) => {
     setInputs({ ...inputs, [name]: value });
+    
     // console.log(inputs);
   };
 
@@ -214,11 +215,9 @@ const CreatePost = ({ route, navigation }) => {
   //   setLocation({ location: { latitude, longitude } });
   // };
 
-const HideKeyboard = ({ children }) => (
-  <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-    {children}
-  </TouchableWithoutFeedback>
-);
+  const HideKeyboard = ({ children }) => (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>{children}</TouchableWithoutFeedback>
+  );
 
   return (
     <Modal
@@ -229,7 +228,6 @@ const HideKeyboard = ({ children }) => (
       onRequestClose={() => navigation.pop()}
     >
       <StyledViewPostContainer>
-        
         <StatusBar style="black" />
 
         {/* Back Button */}

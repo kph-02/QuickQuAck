@@ -448,14 +448,35 @@ router.post("/post-vote", authorization, async (req, res) => {
   }
 });
 
-//iltering by selecting a singular tag on the main feed
-router.get("/tag-filter", authorization, async (req, res) => {
-  const tag_id = req.body;
+//filtering by selecting a singular tag on the main feed
+// router.get("/tag-filter", authorization, async (req, res) => {
+//   const tag_id = req.body;
 
+//   try {
+//     const tagFeed = await pool.query(
+//       "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB WHERE $1 = ANY(SB.tagArray) ORDER BY SB.post_age;",
+//       [tag_id]
+//     );
+
+//     res.status(201).json({
+//       data: {
+//         post: tagFeed.rows,
+//       },
+//     });
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).json("Server Error");
+//   }
+// });
+router.post("/tag-filter", authorization, async (req, res) => {
   try {
+    const { postTag } = req.body;
+    console.log("This is the tag_id variable");
+    console.log(postTag.toString());
+
     const tagFeed = await pool.query(
       "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB WHERE $1 = ANY(SB.tagArray) ORDER BY SB.post_age;",
-      [tag]
+      [postTag.toString()]
     );
 
     res.status(201).json({
