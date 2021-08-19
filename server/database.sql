@@ -123,3 +123,43 @@ INSERT INTO tags (tag_id) VALUES ('Food');
 INSERT INTO tags (tag_id) VALUES ('Social');
 INSERT INTO tags (tag_id) VALUES ('Poll');
 INSERT INTO tags (tag_id) VALUES ('Question');
+
+
+CREATE TABLE chatrooms (
+    chatroom_id BIGSERIAL,
+    user_ids uuid[] NOT NULL,
+    recent_anon_names text[],
+    chat_initiator uuid,
+    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (chatroom_id)
+);
+
+CREATE TABLE messages (
+    message_id BIGSERIAL,
+    chatroom_id BIGSERIAL,
+    text VARCHAR (255) NOT NULL,
+    user_id uuid NOT NULL,
+    anon_name_id VARCHAR(25) NOT NULL,
+    read_by uuid[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id),
+    FOREIGN KEY (chatroom_id) REFERENCES chatrooms(chatroom_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (anon_name_id) REFERENCES anon_names(anon_name_id)
+);
+
+CREATE TABLE read_by (
+    read_by_user_id uuid,
+    read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE test_messages (
+    message_id BIGSERIAL,
+    text VARCHAR (255) NOT NULL,
+    user_id uuid NOT NULL,
+    read_by uuid[],
+    PRIMARY KEY (message_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
