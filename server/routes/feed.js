@@ -393,4 +393,136 @@ router.post("/comment-vote", authorization, async (req, res) => {
   }
 });
 
+// create a poll (cannot edit once created)
+router.post("/create-poll", authorization, async (req, res) => {
+  try {
+    const { pollOptions, pollTag, num_comments } = req.body;
+    const author_id = req.user;
+
+    const newPoll = await pool.query(
+      "INSERT INTO poll (poll_options, user_id, num_comments) VALUES ($1, $2, $3) RETURNING *;", [postText, author_id, num_comments]);
+
+    const pollID = newPoll.rows[0].poll_id;
+
+    for (const i of pollTag) {
+      console.log("Console says " + i);
+      const pollTags = await pool.query(
+        "INSERT INTO poll_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
+        [postID, i]
+      );
+    }
+
+    const nameAdjectives = [
+      "Red",
+      "Orange",
+      "Yellow",
+      "Green",
+      "Blue",
+      "Purple",
+      "Pink",
+      "Gray",
+      "Turquoise",
+      "Brown",
+    ];
+    const nameAnimals = [
+      "Dog",
+      "Cat",
+      "Raccoon",
+      "Giraffe",
+      "Elephant",
+      "Panda",
+      "Koala",
+      "Rabbit",
+      "Turtle",
+      "Fox",
+    ];
+
+    const adjIndex = parseInt(Math.random() * 10);
+    const animalIndex = parseInt(Math.random() * 10);
+
+    let anonAdj = nameAdjectives[adjIndex];
+    let anonAnimal = nameAnimals[animalIndex];
+    const anonName = anonAdj + " " + anonAnimal;
+
+    const createAnonName = await pool.query(
+      "INSERT INTO anon_names (anon_name_id) VALUES ($1) ON CONFLICT DO NOTHING;",
+      [anonName]
+    );
+
+    const postName = await pool.query(
+      "INSERT INTO post_names (user_id, anon_name_id, post_id) VALUES ($1, $2, $3) RETURNING *;",
+      [author_id, anonName, postID]
+    );
+
+    ///postTags is declared in a loop so it is not defined here
+
+    res.status(201).json({
+      status: "Post Success",
+      data: {
+        post: newPost.rows[0],
+        tags: postTags.rows[0],
+        anonName: postName.rows[0],
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
+
+// get all poll questions
+router.get("/get-poll-questions", authorization, async (req, res) => {
+  try {
+    const pollQuestions = await pool.query("SELECT * FROM poll");
+    res.status(201).send({ pollQuestions });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+})
+
+// get all votes from a single poll
+router.get("/get-poll-votes", authorization, async (req, res) => {
+  try {
+    const { poll_id } = req.body;
+    const pollVotes = await pool.query("SELECT * FROM poll_votes WHERE (poll_id = $1)", [poll_id]);
+    res.status(201).json({ pollVotes });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// delete a poll
+router.delete("/delete-poll", authorization, async (req, res) => {
+  try {
+    const { poll_id } = req.body;
+    const deletedPoll = await pool.query("DELETE FROM poll WHERE (poll_id = $1)", [poll_id]);
+    res.status(201).send("Success");
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// vote on a poll
+router.post("/post-poll-vote", authorization, async (req, res) => {
+  try {
+    const { poll_id, choice_id } = req.body;
+    const { user_id } = req.user;
+    const exactDuplicate = await pool.query("SELECT * FROM poll_votes WHERE (user_id = $1 AND poll_id = $2 AND choice_id = $3)", [user_id, poll_id, choice_id]);
+        if (exactDuplicate.rows.length > 0) {
+            const deleteVote = await pool.query("DELETE FROM post_votes WHERE (user_id = $1 AND post_id = $2 AND vote_value = $3)", [user_id, post_id, vote_value]);
+        }
+        else {
+          try {
+              const insertVote = await pool.query("INSERT INTO post_votes VALUES($1, $2, $3) RETURNING *",
+              [user_id, post_id, vote_value]);
+          } catch (err) {
+              const updateVote = await pool.query("UPDATE post_votes SET vote_value = $1 WHERE (user_id = $2 AND post_id = $3) RETURNING *", [vote_value, user_id, post_id]);
+          }
+        }
+      res.status(201).send("Complete");
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
 module.exports = router;
