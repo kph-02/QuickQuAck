@@ -281,7 +281,6 @@ const PostView = ({ route, navigation }) => {
   const sendToDB = async (operation, body) => {
     //Create a comment on the post
     if (operation === 'comment') {
-      
       try {
         const response = await fetch('http://' + serverIp + ':5000/feed/create-comment', {
           method: 'POST',
@@ -327,7 +326,6 @@ const PostView = ({ route, navigation }) => {
         const parseRes = await response.json();
 
         // console.log('UPDATE: ' + JSON.stringify(parseRes));
-
       } catch (error) {
         console.error(error.message);
       }
@@ -575,12 +573,14 @@ const PostView = ({ route, navigation }) => {
   //triggers on first load
   useEffect(() => {
     async function fetchAuthorizations() {
-      getUserID();
+      await getUserID();
       await getJWT();
       await getUpvoted();
     }
 
     fetchAuthorizations();
+    console.log('User: ' + userId);
+    console.log('Post: ' + JSON.stringify(post));
   }, []);
 
   /* Controls the look of each "item", or comment in this context */
@@ -634,7 +634,6 @@ const PostView = ({ route, navigation }) => {
 
     updateCommentValues(bodyCommentUpvotes);
     console.log('Updated Post/Comment attributes');
-
   };
 
   //updating the database with whether the user upvoted the comment or not
@@ -657,33 +656,6 @@ const PostView = ({ route, navigation }) => {
     } catch (error) {
       console.error(error.message);
     }
-  };
-
-  //When user clicks on icon to update post
-  const updatePost = () => {
-    const postType = {
-      post_type: 'Update',
-      post_text: post.post_text,
-      post_id: post.post_id,
-    };
-    navigation.navigate('Create Post', { postType });
-    updatePostAttributes();
-  };
-
-  //When user clicks on icon to delete post
-  const deletePost = () => {
-    Alert.alert('Delete Post?', 'Would you like to delete this post?', [
-      //Delete post from DB
-      {
-        text: 'Yes',
-        onPress: () => {
-          sendToDB('delete', { postId: post.post_id });
-          navigation.pop();
-          alert('Post Deleted');
-        },
-      },
-      { text: 'No' },
-    ]);
   };
 
   //handles functionality for when user upvotes a post
@@ -756,8 +728,14 @@ const PostView = ({ route, navigation }) => {
 
       {/* The ... button above the original post's text */}
       <View style={{ alignSelf: 'flex-end', marginRight: 20, flexDirection: 'row' }}>
-        <EllipsisMenu navigation={navigation} postText={post.post_text} postUser={post.anon_name} 
-        postOwner={ userId === post.user_id ? true : false} postId={post.post_id} JWTtoken={JWTtoken}/>
+        <EllipsisMenu
+          navigation={navigation}
+          postText={post.post_text}
+          postUser={post.anon_name}
+          postOwner={userId === post.user_id ? true : false}
+          postId={post.post_id}
+          JWTtoken={JWTtoken}
+        />
       </View>
 
       {/* The Original Post's Text */}

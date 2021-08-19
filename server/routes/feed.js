@@ -78,7 +78,6 @@ router.post("/create-post", authorization, async (req, res) => {
       );
     }
 
-    
     const anonName = randomNameGenerator();
 
     const createAnonName = await pool.query(
@@ -157,7 +156,7 @@ router.get("/home-feed", authorization, async (req, res) => {
     // add a date time filter so its only last 24 hrs
     // console.log("This is UID " + user_id);
     const homeFeed = await pool.query(
-      "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, tar.ARRAY_AGG AS tagArray, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id WHERE UT.User_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.time_posted DESC;",
+      "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, P.user_id, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, tar.ARRAY_AGG AS tagArray, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id WHERE UT.User_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.time_posted DESC;",
       [user_id]
     );
 
@@ -207,29 +206,25 @@ router.put("/update-post", authorization, async (req, res) => {
     }
 
     //If post tags were altered, update here
-    if(postTag){
-
+    if (postTag) {
       //First remove all tags associated with the post
-      try{
-      const removeTags = await pool.query("DELETE FROM post_tags WHERE post_id = $1",
-      [post_id]
-    );
-      }
-      catch(err){
-
+      try {
+        const removeTags = await pool.query(
+          "DELETE FROM post_tags WHERE post_id = $1",
+          [post_id]
+        );
+      } catch (err) {
         console.log(err.message);
       }
 
       //Re-insert tags associated with the updated post
       for (const i of postTag) {
-
-        try{
-        const postTags = await pool.query(
-          "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
-          [post_id, i]
-        );
-        }
-        catch(err){
+        try {
+          const postTags = await pool.query(
+            "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
+            [post_id, i]
+          );
+        } catch (err) {
           console.log(err.message);
         }
         // console.log(i);
@@ -278,17 +273,16 @@ router.post("/create-comment", authorization, async (req, res) => {
 
     const anonName = randomNameGenerator();
 
-
     const createAnonName = await pool.query(
       "INSERT INTO anon_names (anon_name_id) VALUES ($1) ON CONFLICT DO NOTHING;",
       [anonName]
     );
 
     const commentName = await pool.query(
-      "INSERT INTO post_names (user_id, anon_name_id, post_id) SELECT * FROM " 
-      + "(SELECT CAST( $1 AS uuid) AS user_id, $2 AS anon_name_id, CAST( $3 AS INTEGER) "
-      + "AS post_id) AS tmp WHERE NOT EXISTS ( SELECT user_id, post_id FROM post_names "
-      + "WHERE user_id= CAST( $1 AS uuid) AND post_id = $3 LIMIT 1);", 
+      "INSERT INTO post_names (user_id, anon_name_id, post_id) SELECT * FROM " +
+        "(SELECT CAST( $1 AS uuid) AS user_id, $2 AS anon_name_id, CAST( $3 AS INTEGER) " +
+        "AS post_id) AS tmp WHERE NOT EXISTS ( SELECT user_id, post_id FROM post_names " +
+        "WHERE user_id= CAST( $1 AS uuid) AND post_id = $3 LIMIT 1);",
       [user_id, anonName, post_id]
     );
 
@@ -326,12 +320,12 @@ router.get("/post-comments", authorization, async (req, res) => {
     const { post_id } = req.query;
 
     const allComment = await pool.query(
-      "SELECT comment_id, comment.post_id, num_upvotes, text, comment.user_id, " 
-      + "anon_name_id, time_posted, AGE(NOW(), time_posted) AS comment_age FROM "
-      + "comment INNER JOIN post_names ON comment.post_id = post_names.post_id "
-      + "AND comment.user_id = post_names.user_id WHERE comment.post_id = $1 AND "
-      + "time_posted BETWEEN NOW() - INTERVAL'24 HOURS'  AND NOW() ORDER BY "
-      + "num_upvotes DESC;",
+      "SELECT comment_id, comment.post_id, num_upvotes, text, comment.user_id, " +
+        "anon_name_id, time_posted, AGE(NOW(), time_posted) AS comment_age FROM " +
+        "comment INNER JOIN post_names ON comment.post_id = post_names.post_id " +
+        "AND comment.user_id = post_names.user_id WHERE comment.post_id = $1 AND " +
+        "time_posted BETWEEN NOW() - INTERVAL'24 HOURS'  AND NOW() ORDER BY " +
+        "num_upvotes DESC;",
       [post_id]
     );
 
