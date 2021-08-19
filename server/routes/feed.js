@@ -534,12 +534,14 @@ router.post("/comment-vote", authorization, async (req, res) => {
 
   try {
     for (const i of comments) {
+      console.log(i);
+
       //If vote value is given, update here
       if (!(i.vote_value === undefined)) {
         try {
           const insertVote = await pool.query(
-            "INSERT INTO comment_votes VALUES($1, $2, $3) RETURNING *",
-            [user_id, i.comment_id, i.vote_value]
+            "INSERT INTO comment_votes VALUES($1, $2, $3, $4) RETURNING *",
+            [user_id, i.comment_id, post_id, i.vote_value]
           );
         } catch (err) {
           const updateVote = await pool.query(

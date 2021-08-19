@@ -22,6 +22,8 @@ import { serverIp } from './Login.js';
 var JWTtoken = '';
 var userId = '';
 
+//Set to true to see debug messages
+var debugComments = false;
 //formik
 import { Formik, Field, Form } from 'formik';
 
@@ -310,10 +312,11 @@ const PostView = ({ route, navigation }) => {
         setMapComments(map);
         setCommentsUpvoted(upvote);
 
-        // console.log('New Comment Creation -----------------------------------------------------------');
-        // console.log(upvote);
-        // console.log('New Comment Creation -----------------------------------------------------------');
-
+        if (debugComments === true) {
+          console.log('New Comment Creation -----------------------------------------------------------');
+          console.log(upvote);
+          console.log('New Comment Creation -----------------------------------------------------------');
+        }
         refreshNewComments(!newComments); //update the page with the new comment
       } catch (error) {
         console.error(error.message);
@@ -465,9 +468,11 @@ const PostView = ({ route, navigation }) => {
       SetComments(comments);
       setCommentsUpvoted(upvote);
       setMapComments(map);
-      // console.log('Getting Comments -----------------------------------------------------------');
-      // console.log(upvote);
-      // console.log('Getting Comments -----------------------------------------------------------');
+      if (debugComments === true) {
+        console.log('Getting Comments -----------------------------------------------------------');
+        console.log(upvote);
+        console.log('Getting Comments -----------------------------------------------------------');
+      }
     } catch (error) {
       console.error(error.message);
     }
@@ -555,9 +560,11 @@ const PostView = ({ route, navigation }) => {
       setCommentsUpvoted(upvote);
       setMapComments(map);
 
-      // console.log('Getting upvoted Comments -----------------------------------------------------------');
-      // console.log(upvote);
-      // console.log('Getting upvoted Comments -----------------------------------------------------------');
+      if (debugComments === true) {
+        console.log('Getting upvoted Comments -----------------------------------------------------------');
+        console.log(upvote);
+        console.log('Getting upvoted Comments -----------------------------------------------------------');
+      }
     } catch (error) {
       console.error(error.message);
     }
@@ -657,13 +664,15 @@ const PostView = ({ route, navigation }) => {
       });
 
       const parseRes = await response.json();
-      // console.log(
-      //   'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
-      // );
-      // console.log(body);
-      // console.log(
-      //   'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
-      // );
+      if (debugComments === true) {
+        console.log(
+          'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
+        );
+        console.log(body);
+        console.log(
+          'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
+        );
+      }
     } catch (error) {
       console.error(error.message);
     }
@@ -717,9 +726,11 @@ const PostView = ({ route, navigation }) => {
 
     setRefreshComments(!refreshComments); //re-renders the components in the flatlist
 
-    // console.log('Handle Comment Refresh -----------------------------------------------------------');
-    // console.log(upvote);
-    // console.log('Handle Comment Refresh -----------------------------------------------------------');
+    if (debugComments === true) {
+      console.log('Handle Comment Refresh -----------------------------------------------------------');
+      console.log(upvote);
+      console.log('Handle Comment Refresh -----------------------------------------------------------');
+    }
   };
 
   return (
