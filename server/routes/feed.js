@@ -312,24 +312,6 @@ router.post("/create-comment", authorization, async (req, res) => {
   }
 });
 
-// update a comment
-router.put("/update-comment", authorization, async (req, res) => {
-  try {
-    const { commentText, comment_id } = req.body;
-
-    const updateText = await pool.query(
-      "UPDATE comment SET text = $1 where comment_id = $2",
-      [commentText, comment_id]
-    );
-
-    res.status(201).json({
-      status: "Update Success",
-    });
-  } catch (err) {
-    res.status(500).json("Server error");
-  }
-});
-
 //Get comments from given post_id as a query parameter
 router.get("/post-comments", authorization, async (req, res) => {
   try {
@@ -421,11 +403,27 @@ router.delete("/delete-comment", authorization, async (req, res) => {
       status: "Deleted comment",
     });
   } catch (err) {
-    res.status(500).send("Server error");
+    res.status(500).json("Server error");
   }
 });
 
 // edit a comment
+router.put("/update-comment", authorization, async (req, res) => {
+  try {
+    const { commentText, comment_id } = req.body;
+
+    const updateText = await pool.query(
+      "UPDATE comment SET text = $1 where comment_id = $2",
+      [commentText, comment_id]
+    );
+
+    res.status(201).json({
+      status: "Update Success",
+    });
+  } catch (err) {
+    res.status(500).json("Server error");
+  }
+});
 
 // get post votes
 router.get("/post-votes", authorization, async (req, res) => {

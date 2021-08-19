@@ -177,7 +177,13 @@ const PostView = ({ route, navigation }) => {
 
           {/* The ... button for each comment */}
           <View>
-            <EllipsisMenu navigation={navigation} postText={item.text} postUser={item.user_id} />
+            <EllipsisMenu
+              navigation={navigation}
+              post={post}
+              commentOwner={userId === item.user_id ? true : false}
+              comment_id={item.comment_id}
+              JWTtoken={JWTtoken}
+            />
           </View>
         </View>
 
@@ -579,9 +585,14 @@ const PostView = ({ route, navigation }) => {
     }
 
     fetchAuthorizations();
-    console.log('User: ' + userId);
-    console.log('Post: ' + JSON.stringify(post));
   }, []);
+
+  //update values when screens change
+  useFocusEffect(
+    React.useCallback(() => {
+      updatePostAttributes();
+    }, [navigation]),
+  );
 
   /* Controls the look of each "item", or comment in this context */
   const renderItem = ({ item }) => {
@@ -730,10 +741,8 @@ const PostView = ({ route, navigation }) => {
       <View style={{ alignSelf: 'flex-end', marginRight: 20, flexDirection: 'row' }}>
         <EllipsisMenu
           navigation={navigation}
-          postText={post.post_text}
-          postUser={post.anon_name}
+          post={post}
           postOwner={userId === post.user_id ? true : false}
-          postId={post.post_id}
           JWTtoken={JWTtoken}
         />
       </View>
