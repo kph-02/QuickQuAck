@@ -393,9 +393,6 @@ router.post("/comment-vote", authorization, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-
-=======
 // create a poll (cannot edit once created)
 router.post("/create-poll", authorization, async (req, res) => {
   try {
@@ -527,6 +524,5 @@ router.post("/post-poll-vote", authorization, async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 });
->>>>>>> e10eba6aa35a829fd12bbbe59c5da2b5a48a7165
 
 module.exports = router;
