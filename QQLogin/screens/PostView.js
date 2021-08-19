@@ -281,6 +281,7 @@ const PostView = ({ route, navigation }) => {
   const sendToDB = async (operation, body) => {
     //Create a comment on the post
     if (operation === 'comment') {
+      
       try {
         const response = await fetch('http://' + serverIp + ':5000/feed/create-comment', {
           method: 'POST',
