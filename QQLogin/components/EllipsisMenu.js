@@ -4,10 +4,57 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger, renderers } from 'react-nat
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { serverIp } from '../screens/Login.js';
+
 
 const { SlideInMenu } = renderers;
 
-const EllipsisMenu = ({ navigation, postText, postUser }) => {
+const EllipsisMenu = ({ navigation, postText, postUser, postOwner, postId, JWTtoken }) => {
+
+  //When user clicks on icon to update post
+  const updatePost = () => {
+    const postType = {
+      post_type: 'Update',
+      post_text: postText,
+      post_id: postId,
+    };
+    navigation.navigate('Create Post', { postType });
+  };
+
+  //When user clicks on icon to delete post
+  const deletePost = () => {
+    Alert.alert('Delete Post?', 'Would you like to delete this post?', [
+      //Delete post from DB
+      {
+        text: 'Yes',
+        onPress: () => {
+          sendToDB();
+          navigation.pop();
+          alert('Post Deleted');
+        },
+      },
+      { text: 'No' },
+    ]);
+  };
+
+  const sendToDB = async () => {
+
+    const body = {postId: postId};
+    try {
+      const response = await fetch('http://' + serverIp + ':5000/feed/delete-post', {
+        method: 'DELETE',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      console.log('DELETE: ' + JSON.stringify(parseRes));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   return (
     <Menu renderer={SlideInMenu}>
       {/* Slide-in Menu from the bottom is triggered by the Ellipsis (...) button */}
@@ -47,6 +94,22 @@ const EllipsisMenu = ({ navigation, postText, postUser }) => {
         >
           <Text style={styles.text}>Block posts from this user</Text>
         </MenuOption>
+        {(() => {
+          if (postOwner) {
+            return (        
+            <MenuOption onSelect={updatePost} style={{ paddingVertical: 10 }}>
+              <Text style={styles.text}>Update Post</Text>
+            </MenuOption>);
+          }
+        })()}
+        {(() => {
+          if (postOwner) {
+            return (        
+            <MenuOption onSelect={deletePost} style={{ paddingVertical: 10 }}>
+              <Text style={styles.text}>Delete Post</Text>
+            </MenuOption>);
+          }
+        })()}
       </MenuOptions>
     </Menu>
   );

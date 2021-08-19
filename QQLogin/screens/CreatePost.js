@@ -140,7 +140,9 @@ const CreatePost = ({ route, navigation }) => {
       const updateBody = {
         postText: body.postText,
         post_id: postType.post_id,
+        postTag: body.postTag,
       };
+
       try {
         // console.log('Sent Token:      ' + JWTtoken);
         // Send post info to DB

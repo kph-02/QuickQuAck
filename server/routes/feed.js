@@ -120,12 +120,12 @@ router.post("/user-tag-selection", async (req, res) => {
     }
 
     for (const i of postTag) {
-      console.log("Console says " + i);
+      // console.log("Console says " + i);
       const postTags = await pool.query(
         "INSERT INTO user_tags (tag_id, user_id) VALUES ($2, $1) RETURNING *;",
         [user_id, i]
       );
-      console.log(i);
+      // console.log(i);
     }
 
     ///postTags is declared in a loop so it is not defined here
@@ -174,7 +174,7 @@ router.get("/home-feed", authorization, async (req, res) => {
 // update a post
 router.put("/update-post", authorization, async (req, res) => {
   try {
-    const { post_id, postText, num_comments, num_upvotes } = req.body;
+    const { post_id, postText, num_comments, num_upvotes, postTag } = req.body;
 
     //Only update if postText is not empty
     if (postText) {
@@ -198,6 +198,36 @@ router.put("/update-post", authorization, async (req, res) => {
         "UPDATE post SET num_upvotes = $1 where post_id = $2",
         [num_upvotes, post_id]
       );
+    }
+
+    //If post tags were altered, update here
+    if(postTag){
+
+      //First remove all tags associated with the post
+      try{
+      const removeTags = await pool.query("DELETE FROM post_tags WHERE post_id = $1",
+      [post_id]
+    );
+      }
+      catch(err){
+
+        console.log(err.message);
+      }
+
+      //Re-insert tags associated with the updated post
+      for (const i of postTag) {
+
+        try{
+        const postTags = await pool.query(
+          "INSERT INTO post_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
+          [post_id, i]
+        );
+        }
+        catch(err){
+          console.log(err.message);
+        }
+        // console.log(i);
+      }
     }
 
     res.status(201).json({
@@ -286,7 +316,7 @@ router.get("/post-comments", authorization, async (req, res) => {
     // ("SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
     // "'24 HOURS' AND NOW() ORDER BY votevalue DESC;");
 
-    console.log(allComment.rows);
+    // console.log(allComment.rows);
 
     res.status(201).json({
       data: {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   Dimensions,
   StyleSheet,
@@ -195,7 +195,7 @@ const PostView = ({ route, navigation }) => {
           }}
         >
           {/* Time posted */}
-          <Text style={[styles.name]}>{formatTime(item.comment_age)} ago</Text>
+          <Text style={[styles.name]}>{formatTime(item.comment_age)}</Text>
 
           {/* Upvotes */}
           <TouchableOpacity
@@ -304,9 +304,9 @@ const PostView = ({ route, navigation }) => {
         setMapComments(map);
         setCommentsUpvoted(upvote);
 
-        console.log('New Comment Creation -----------------------------------------------------------');
-        console.log(upvote);
-        console.log('New Comment Creation -----------------------------------------------------------');
+        // console.log('New Comment Creation -----------------------------------------------------------');
+        // console.log(upvote);
+        // console.log('New Comment Creation -----------------------------------------------------------');
 
         refreshNewComments(!newComments); //update the page with the new comment
       } catch (error) {
@@ -327,7 +327,6 @@ const PostView = ({ route, navigation }) => {
 
         // console.log('UPDATE: ' + JSON.stringify(parseRes));
 
-        //NEED TO UPDATE CURRENT VIEW
       } catch (error) {
         console.error(error.message);
       }
@@ -344,7 +343,7 @@ const PostView = ({ route, navigation }) => {
 
         const parseRes = await response.json();
 
-        // console.log('DELETE: ' + JSON.stringify(parseRes));
+        console.log('DELETE: ' + JSON.stringify(parseRes));
 
         navigation.navigate('Feed');
       } catch (error) {
@@ -461,9 +460,9 @@ const PostView = ({ route, navigation }) => {
       SetComments(comments);
       setCommentsUpvoted(upvote);
       setMapComments(map);
-      console.log('Getting Comments -----------------------------------------------------------');
-      console.log(upvote);
-      console.log('Getting Comments -----------------------------------------------------------');
+      // console.log('Getting Comments -----------------------------------------------------------');
+      // console.log(upvote);
+      // console.log('Getting Comments -----------------------------------------------------------');
     } catch (error) {
       console.error(error.message);
     }
@@ -551,9 +550,9 @@ const PostView = ({ route, navigation }) => {
       setCommentsUpvoted(upvote);
       setMapComments(map);
 
-      console.log('Getting upvoted Comments -----------------------------------------------------------');
-      console.log(upvote);
-      console.log('Getting upvoted Comments -----------------------------------------------------------');
+      // console.log('Getting upvoted Comments -----------------------------------------------------------');
+      // console.log(upvote);
+      // console.log('Getting upvoted Comments -----------------------------------------------------------');
     } catch (error) {
       console.error(error.message);
     }
@@ -633,6 +632,8 @@ const PostView = ({ route, navigation }) => {
     };
 
     updateCommentValues(bodyCommentUpvotes);
+    console.log('Updated Post/Comment attributes');
+
   };
 
   //updating the database with whether the user upvoted the comment or not
@@ -645,13 +646,13 @@ const PostView = ({ route, navigation }) => {
       });
 
       const parseRes = await response.json();
-      console.log(
-        'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
-      );
-      console.log(body);
-      console.log(
-        'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
-      );
+      // console.log(
+      //   'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
+      // );
+      // console.log(body);
+      // console.log(
+      //   'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
+      // );
     } catch (error) {
       console.error(error.message);
     }
@@ -732,9 +733,9 @@ const PostView = ({ route, navigation }) => {
 
     setRefreshComments(!refreshComments); //re-renders the components in the flatlist
 
-    console.log('Handle Comment Refresh -----------------------------------------------------------');
-    console.log(upvote);
-    console.log('Handle Comment Refresh -----------------------------------------------------------');
+    // console.log('Handle Comment Refresh -----------------------------------------------------------');
+    // console.log(upvote);
+    // console.log('Handle Comment Refresh -----------------------------------------------------------');
   };
 
   return (
@@ -754,26 +755,8 @@ const PostView = ({ route, navigation }) => {
 
       {/* The ... button above the original post's text */}
       <View style={{ alignSelf: 'flex-end', marginRight: 20, flexDirection: 'row' }}>
-        {/* If user is original poster, options to edit and delete will appear */}
-        {(() => {
-          if (userId === post.user_id) {
-            return (
-              <TouchableOpacity onPress={updatePost}>
-                <Image source={require('./../assets/edit_post_icon.png')} style={styles.editPost} />
-              </TouchableOpacity>
-            );
-          }
-        })()}
-        {(() => {
-          if (userId === post.user_id) {
-            return (
-              <TouchableOpacity onPress={deletePost}>
-                <Image source={require('./../assets/trash_icon.png')} style={styles.trashPost} />
-              </TouchableOpacity>
-            );
-          }
-        })()}
-        <EllipsisMenu navigation={navigation} postText={post.post_text} postUser={post.anon_name} />
+        <EllipsisMenu navigation={navigation} postText={post.post_text} postUser={post.anon_name} 
+        postOwner={ userId === post.user_id ? true : false} postId={post.post_id} JWTtoken={JWTtoken}/>
       </View>
 
       {/* The Original Post's Text */}
