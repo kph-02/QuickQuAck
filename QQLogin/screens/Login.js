@@ -100,8 +100,6 @@ const Login = ({ navigation }) => {
         storeUserID(parseRes.user_id);
         navigation.navigate('TabNav', { Screen: 'Feed' });
       }
-      //Store to local storage
-      //storedToken(parseRes.token);
     } catch (error) {
       console.error(error.message);
     }
