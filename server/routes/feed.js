@@ -744,7 +744,7 @@ router.get("/get-poll-votes", authorization, async (req, res) => {
 router.delete("/delete-poll", authorization, async (req, res) => {
   try {
     const { poll_id } = req.body;
-    const deletedPoll = await pool.query("DELETE FROM poll WHERE (poll_id = $1)", [poll_id]);
+    const deletedPoll = await pool.query("DELETE FROM poll WHERE (poll_id = $1",[poll_id]);
     res.status(201).send("Success");
   } catch (err) {
     res.status(500).send({ error: err.message });
@@ -754,21 +754,17 @@ router.delete("/delete-poll", authorization, async (req, res) => {
 // vote on a poll
 router.post("/post-poll-vote", authorization, async (req, res) => {
   try {
-    const { poll_id, choice_id } = req.body;
-    const { user_id } = req.user;
-    const exactDuplicate = await pool.query("SELECT * FROM poll_votes WHERE (user_id = $1 AND poll_id = $2 AND choice_id = $3)", [user_id, poll_id, choice_id]);
-        if (exactDuplicate.rows.length > 0) {
-            const deleteVote = await pool.query("DELETE FROM post_votes WHERE (user_id = $1 AND post_id = $2 AND vote_value = $3)", [user_id, post_id, vote_value]);
-        }
-        else {
-          try {
-              const insertVote = await pool.query("INSERT INTO post_votes VALUES($1, $2, $3) RETURNING *",
-              [user_id, post_id, vote_value]);
-          } catch (err) {
-              const updateVote = await pool.query("UPDATE post_votes SET vote_value = $1 WHERE (user_id = $2 AND post_id = $3) RETURNING *", [vote_value, user_id, post_id]);
-          }
-        }
-      res.status(201).send("Complete");
+    const { poll_id, choice_id, user_id } = req.body;
+    try {
+      const insertPollVote = await pool.query(
+        "INSERT INTO poll_votes VALUES($1, $2, $3) RETURNING *", [poll_id, choice_id, user_id]
+      );
+    // means that vote option has already been selected 
+    } catch (err) {
+        const deletePollVote = await pool.query("DELETE FROM poll_votes WHERE (poll_id = $1, user_id = $2)", [poll_id, user_id]);
+        const insertNewPollVote = await pool.query("INSERT INTO poll_votes VALUES($1, $2, $3) RETURNING *", [poll_id, choice_id, user_id]);
+        res.status(201).send("Complete");
+    }
   } catch (err) {
     res.status(500).send({ error: err.message });
   }

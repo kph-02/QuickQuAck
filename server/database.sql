@@ -116,7 +116,6 @@ CREATE TABLE post_names (
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-<<<<<<< HEAD
 CREATE TABLE poll (
     poll_id BIGSERIAL,
     user_id uuid NOT NULL,
@@ -147,7 +146,6 @@ CREATE TABLE poll_choices (
 );
 
 CREATE TABLE poll_votes (
-    vote INTEGER,
     user_id uuid NOT NULL,
     choice_id TEXT NOT NULL,
     poll_id BIGSERIAL,
@@ -155,7 +153,7 @@ CREATE TABLE poll_votes (
     CONSTRAINT FK_poll_id FOREIGN KEY(poll_id) REFERENCES poll(poll_id) ON DELETE CASCADE,
     CONSTRAINT FK_choice_id FOREIGN KEY(choice_id) REFERENCES poll_choices(choice_id) ON DELETE CASCADE
 );
-=======
+
 INSERT INTO tags (tag_id) VALUES ('Revelle');
 INSERT INTO tags (tag_id) VALUES ('Muir');
 INSERT INTO tags (tag_id) VALUES ('Warren');
@@ -167,4 +165,3 @@ INSERT INTO tags (tag_id) VALUES ('Food');
 INSERT INTO tags (tag_id) VALUES ('Social');
 INSERT INTO tags (tag_id) VALUES ('Poll');
 INSERT INTO tags (tag_id) VALUES ('Question');
->>>>>>> origin
