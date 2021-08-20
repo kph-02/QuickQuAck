@@ -18,6 +18,6 @@ app.use("/dashboard", require("./routes/dashboard"));
 app.use("/feed", require("./routes/feed"));
 
 
-app.listen(3000, () => {
+app.listen(5000, () => {
     console.log("server is running on port 5000");
 });
