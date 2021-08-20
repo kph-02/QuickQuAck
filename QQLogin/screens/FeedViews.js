@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { View, StyleSheet, Dimensions, StatusBar, Text, TouchableOpacity, FlatList, ScrollView, Animated } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,6 +11,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
 
 var JWTtoken = ''; //Store JWT for authentication
+
+var onScr = null;
+
+var scrET = null;
+
+var animatedOffset = null;
 
 const allposts = [
   {
@@ -95,7 +101,6 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         styles.postTouchables,
         {
           justifyContent: 'flex-start',
-          backgroundColor: 'white',
           borderTopWidth: 0,
           borderTopColor: 'white',
           marginBottom: 10,
@@ -107,35 +112,44 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       <RenderStyledTags tags={item.tagarray} />
     </View>
     {/* The Data of each Post */}
-    <View style={{
+    {/* <View style={{
+      backgroundColor: 'pink',
       flexDirection: 'row',
       borderTopColor: '#EFEFEF',
-      borderTopWidth: 1}}>
-    <View style={[styles.postTouchables, { marginLeft: 30, marginTop: 0, backgroundColor: 'white' }]}>
-      <View style={[styles.infoRow, { marginRight: 5 }]}>
+      borderTopWidth: 1}}> */}
+    {/* backgroundColor: 'pink'  */}
+    <View style={[styles.postTouchables, {justifyContent:'space-between', marginLeft: 20, marginRight: 25, marginTop: 0,}]}>
+      {/* <View style={[styles.infoRow, { marginRight: 5 }]}> */}
         {/*number of people who've viewed the post*/}
-        <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
+        {/* <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>0</Text>
-      </View>
-      <View style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}>
+      </View> */}
+      {/* marginRight: 15,  backgroundColor: 'yellow'*/}
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         {/*number of upvotes*/}
-        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29 }} />
+        {/* backgroundColor: 'lightskyblue' */}
+        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29, }} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_upvotes}</Text>
       </View>
-      <View style={styles.infoRow}>
-        {/*number of comments*/}
+
+       {/*Number of Comments*/}
+       {/* {backgroundColor: 'lavender'} */}
+      <View style={[styles.infoRow, ]}>
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_comments}</Text>
       </View>
-      <View style={[styles.infoRow, { marginLeft: 10 }]}>
-        {/*Anonymous name of user*/}
+      {/*Anonymous name of user*/}
+      {/* { marginLeft: 10 } {backgroundColor: 'yellow'}*/}
+      <View style={[styles.infoRow, ]}>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.anon_name}</Text>
       </View>
-      <View style={{ marginLeft: 10 }}>
+      {/* Age of Post */}
+      {/* style={{backgroundColor: 'aquamarine'}} */}
+      <View>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
       </View>
     </View>
-    </View>
+    {/* </View> */}
   </TouchableOpacity>
 );
 
@@ -162,7 +176,7 @@ const formatTime = (post_age) => {
 };
 
 // HOME feed (home posts)
-const FirstRoute = () => {
+const FirstRoute = ({scrollEventThrottle, onScroll}) => {
   //useStates can only be defined within functions
   const [postData, setPostData] = useState([]); //Store post data from the Database
   const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
@@ -278,6 +292,8 @@ const FirstRoute = () => {
         renderItem={renderItem}
         refreshing={refresh} //true: shows spinning animation to show loading
         onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
+        onScroll={onScroll}
+        scrollEventThrottle={scrollEventThrottle}
       />
     </View>
     // </StyledFeedContainer>
@@ -285,7 +301,7 @@ const FirstRoute = () => {
 };
 
 // ALL feed (all posts)
-const SecondRoute = () => {
+const SecondRoute = ({scrollEventThrottle, onScroll}) => {
   const [allData, setAllData] = useState([]); //Store post data from the Database
   const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
@@ -400,6 +416,8 @@ const SecondRoute = () => {
         renderItem={renderItem}
         refreshing={refresh} //true: shows spinning animation to show loading
         onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
+        onScroll={onScroll}
+        scrollEventThrottle={scrollEventThrottle}
       />
     </View>
     // </StyledFeedContainer>
@@ -408,10 +426,21 @@ const SecondRoute = () => {
 
 const initialLayout = { width: Dimensions.get('window').width };
 
-const renderScene = SceneMap({
-  home: FirstRoute,
-  all: SecondRoute,
-});
+// const renderScene = SceneMap({
+//   home: FirstRoute,
+//   all: SecondRoute,
+// });
+
+const renderScene = ({ route }) => {
+  switch(route.key) {
+    case 'home':
+      return <FirstRoute scrollEventThrottle={scrET} onScroll={onScr}/>;
+    case 'all':
+      return <SecondRoute scrollEventThrottle={scrET} onScroll={onScr}/>;
+    default:
+      return null;
+  }
+}
 
 const renderTabBar = (props) => (
   <TabBar
@@ -423,12 +452,24 @@ const renderTabBar = (props) => (
   />
 );
 
-export default function FeedViews({ navigation }) {
+export default function FeedViews({ navigation, scrollEventThrottle, onScroll, offset }) {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     { key: 'home', title: 'Home' },
     { key: 'all', title: 'All' },
   ]);
+  onScr = onScroll;
+  scrET = scrollEventThrottle;
+  animatedOffset = offset;
+
+  // console.log(offset);
+  // console.log(animatedOffset);
+
+  // console.log(onScroll);
+  // console.log(scrollEventThrottle);
+  
+  // console.log(onScr);
+  // console.log(scrET);
 
   return (
     <TabView
@@ -508,6 +549,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     //alignContent: 'space-around',
     alignItems: 'center',
-    marginRight: 10,
+    // marginRight: 10,
   },
 });

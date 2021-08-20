@@ -36,6 +36,11 @@ export const StyledFeedContainer = styled.View`
   background-color: ${primary};
 `;
 
+export const StyledFeedTestContainer = styled.View`
+  padding-top: ${StatusBarHeight + 30}px;
+  background-color: ${primary};
+`;
+
 export const StyledViewPostContainer = styled.View`
   flex: 1;
   padding-top: ${StatusBarHeight + 20}px;
@@ -44,6 +49,11 @@ export const StyledViewPostContainer = styled.View`
 
 export const InnerContainer = styled.View`
   flex: 1;
+  width: 100%;
+  align-items: center;
+  background-color: ${primary};
+`;
+export const HeaderContainer = styled.View`
   width: 100%;
   align-items: center;
   background-color: ${primary};
@@ -204,6 +214,22 @@ export const StyledButton2 = styled.TouchableOpacity`
   border-radius: 100px;
   top: 25px;
 `;
+
+export const StyledButton3 = styled.TouchableOpacity`
+  padding: 12px 24px;
+  background-color: ${yellow};
+  justify-content: center;
+  align-items: center;
+  margin-vertical: 10px;
+  height: 30px;
+  border-radius: 100px;
+`;
+
+  // display: flex;
+  // flex-direction: column;
+  // position: absolute;
+  // left: 40px;
+  // top: 8px;
 
 export const ButtonText = styled.Text`
   color: ${black};

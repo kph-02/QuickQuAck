@@ -14,6 +14,9 @@ import Login from '../screens/Login';
 import { createStackNavigator } from '@react-navigation/stack';
 import FeedViews from '../screens/FeedViews';
 import Messages from '../screens/Messages';
+import FeedTest from '../screens/FeedTest';
+import SettingsTest from '../screens/SettingsTest';
+import UserActivity from '../screens/UserActivity';
 
 // const FeedStack = createStackNavigator();
 // function FeedStackScreen() {
@@ -59,14 +62,14 @@ export default function TabNav() {
     inactiveColor="#BDBDBD"
     barStyle={{backgroundColor: '#FFFFFF',  borderTopColor: '#DEE2E6', borderTopWidth: 0.5}} 
     labeled={true}>
-        <Tab.Screen name="Feed" component={Welcome} 
+        <Tab.Screen name="Feed" component={FeedTest} 
              options={{
               tabBarIcon: ({ color, size }) => (
                   <MaterialCommunityIcons name="home" color={color} size={26} />
               ),
           }}
         />
-        <Tab.Screen name="Profile" component={Profile} 
+        <Tab.Screen name="My Activity" component={UserActivity} 
             options={({route}) => ({
                   tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons name="account-circle" color={color} size={26} />
@@ -81,7 +84,7 @@ export default function TabNav() {
                   ),
               }}
         />
-        <Tab.Screen name="Settings" component={Settings} 
+        <Tab.Screen name="Settings" component={SettingsTest} 
             options={{
                   tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons name="cog" color={color} size={26} />

@@ -29,7 +29,7 @@ const Profile = ({ navigation }) => {
       await getUserID();
       await getJWTtoken();
       await getFromDB();
-      setUserName(userInformation.first_name + '' + userInformation.last_name);
+      setUserName(userInformation.first_name + ' ' + userInformation.last_name);
     };
 
     getUserInformation();

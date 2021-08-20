@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
@@ -32,6 +33,8 @@ import {
   TextLink,
   TextLinkContent,
   ExtraViewRight,
+  StyledButton3,
+  HeaderContainer,
 } from './../components/styles';
 
 import { Button, View } from 'react-native';
@@ -160,13 +163,10 @@ const Welcome = ({ navigation }) => {
     <StyledFeedContainer>
       {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
       <StatusBar style="black" />
-      <InnerContainer>
+      <HeaderContainer style={{backgroundColor: 'white'}}>
         <TouchableOpacity onPress={() => navigation.navigate('Map')} style={styles.mapTouchableStyle}>
           <Image source={require('./../assets/map.png')} style={styles.mapIcon} />
         </TouchableOpacity>
-        {/* <PageLogo resizeMode = 'contain' source={require('./../assets/login.png')} />
-         */}
-        {/* <PageTitle>Feed</PageTitle> */}
         <Text style={styles.pageTitle}>Feed</Text>
         {/* <SearchBar
           placeholder="Search Tags"
@@ -184,20 +184,13 @@ const Welcome = ({ navigation }) => {
           }}
           inputContainerStyle={{ borderRadius: 100, height: '100%', width: '100%', backgroundColor: '#F9F9F9' }}
         /> */}
-        <StyledButton onPress={() => navigation.navigate('TagModal')}>
-          <Text>Filter</Text>
-        </StyledButton>
-      </InnerContainer>
+        <StyledButton3 onPress={() => navigation.navigate('TagModal')}>
+          <ButtonText>Filter</ButtonText>
+        </StyledButton3>
+      </HeaderContainer>
 
       <FeedViews navigation={navigation} />
 
-      {/* <TouchableOpacity
-        activeOpacity={0.5}
-        onPress={() => navigation.navigate('Create Post')}
-        style={styles.touchableStyle}
-      >
-        <Image source={require('./../assets/create_post_button.png')} style={styles.floatingButtonStyle} />
-      </TouchableOpacity> */}
       <View style={styles.touchableStyle}>
         <PostMenu navigation={navigation} />
       </View>

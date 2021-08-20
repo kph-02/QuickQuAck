@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //Used to communicate with server
 import { serverIp } from './Login.js';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
 //Store JWT for authentication
 var JWTtoken = ''; 
@@ -267,20 +268,21 @@ const UserActivity = ({ navigation }) => {
   };
 
   return (
-    <StyledFeedContainer>
-      {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
+    // Note: marginBottom for StyledFeedContainer is to offset createMaterialBottomTabNavigator,
+    // need to obtain height of this.
+    <StyledFeedContainer style={{marginBottom: 36}}>
       <StatusBar style="black" />
       {/* Header Content */}
       <View style={styles.headerContainer}>
-          <Text style={styles.headline}>Activity</Text>
+          <Text style={styles.headline}>My Activity</Text>
       </View>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={{ marginLeft: 25, paddingHorizontal: 5, marginTop: 80, position: 'absolute'}}
         onPress={() => navigation.pop()}>
             <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       {/* FlatList of User's Posts */}
-      <View style={{ backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
+      <View style={{backgroundColor: '#EFEFEF',  paddingTop: 2.5, paddingBottom: 36}}>
           <FlatList
             numColumns={1}
             horizontal={false}
@@ -340,7 +342,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    backgroundColor: 'white',
     marginBottom: 10,
     marginTop: 5,
     marginHorizontal: 30,
@@ -356,16 +357,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 40,
     fontWeight: 'bold',
-    color: '#000000',
-    marginTop: 0,
-    alignSelf: 'center',
-    justifyContent: 'center',
+    // color: '#000000',
+    color: '#FFCC15',
+    textShadowColor: '#DEE2E6',
+    // textShadowColor: '#FFCC15',
+    textShadowOffset: {width: 1, height: 1},
+    textShadowRadius: 0.5,
+    bottom: 8,
   },
   headerContainer:{
     justifyContent: 'center', 
     paddingBottom: 20, 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#EFEFEF'
+    // backgroundColor: 'pink',
+    // borderBottomWidth: 1, 
+    // borderBottomColor: '#EFEFEF'
   }
 });
 

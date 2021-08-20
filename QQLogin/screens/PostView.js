@@ -49,11 +49,10 @@ import {
   ButtonText,
   MsgBox,
   Line,
-  ExtraView,
-  ExtraText,
   TextLink,
   TextLinkContent,
   ExtraViewRight,
+  TextPostContent,
 } from './../components/styles';
 
 import { Button, View, TextInput } from 'react-native';
@@ -203,7 +202,7 @@ const PostView = ({ route, navigation }) => {
           }}
         >
           {/* Time posted */}
-          <Text style={[styles.name]}>{formatTime(item.comment_age)}</Text>
+          <Text style={[styles.dataRow]}>{formatTime(item.comment_age)}</Text>
 
           {/* Upvotes */}
           <TouchableOpacity
@@ -225,7 +224,7 @@ const PostView = ({ route, navigation }) => {
                   : '#BDBDBD',
               }}
             />
-            <Text style={[styles.name, { marginHorizontal: 0 }]}>
+            <Text style={[styles.dataRow]}>
               {commentsUpvoted[mapComments[item.comment_id]].votes
                 ? commentsUpvoted[mapComments[item.comment_id]].votes
                 : 0}
@@ -736,55 +735,57 @@ const PostView = ({ route, navigation }) => {
   return (
     /* Style for the entire screen, controls how children are aligned */
     <StyledViewPostContainer>
-      {/* Back Button */}
-      <TouchableOpacity
-        style={{ marginLeft: 10, width: 50, paddingLeft: 5 }}
-        onPress={() => {
-          navigation.pop();
-          updatePostAttributes();
-        }}
-      >
-        <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
-      </TouchableOpacity>
+      <StatusBar style="black" />
+      <View style={{paddingTop: 5, marginHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between'}}>
+        {/* Back Button */}
+        <TouchableOpacity
+          style={{width: 55, paddingHorizontal: 5}}
+          onPress={() => {
+            navigation.pop();
+            updatePostAttributes();
+          }}
+        >
+          <TextPostContent>Back</TextPostContent>
+          {/* <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text> */}
+        </TouchableOpacity>
+        {/* The ... button above the original post's text */}
+        <View style={{ alignSelf: 'flex-end', marginRight: 5}}>
+          <EllipsisMenu
+            navigation={navigation}
+            post={post}
+            postOwner={userId === post.user_id ? true : false}
+            JWTtoken={JWTtoken}
+          />
+        </View>
+      </View>
       <StatusBar style="black" />
 
-      {/* The ... button above the original post's text */}
-      <View style={{ alignSelf: 'flex-end', marginRight: 20, flexDirection: 'row' }}>
-        <EllipsisMenu
-          navigation={navigation}
-          post={post}
-          postOwner={userId === post.user_id ? true : false}
-          JWTtoken={JWTtoken}
-        />
-      </View>
-
       {/* The Original Post's Text */}
-      <View style={styles.postBox}>
-        <AdjustLabel fontSize={50} text={post.post_text} style={styles.ogPostText} numberOfLines={8} />
+      <View style={[styles.postBox, {marginTop: 10}]}>
+        <AdjustLabel fontSize={30} text={post.post_text} style={styles.ogPostText} numberOfLines={8} />
       </View>
 
       {/* Container/View for the Tags associated with this post */}
       <View
         style={[
           styles.postTouchables,
-          { justifyContent: 'flex-start', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5 },
+          { justifyContent: 'flex-start', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5},
         ]}
       >
         <RenderStyledTags tags={post.tagarray} />
       </View>
-      {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
 
-      {/* </View> */}
-      <View style={styles.postTouchables}>
-        <View style={[styles.infoRow, { marginRight: 5 }]}>
+      {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
+      <View style={[styles.postTouchables, {justifyContent: 'space-between'}]}>
+        {/* <View style={[styles.infoRow, { marginRight: 5 }]}>
           <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
-          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
-        </View>
+          <Text style={[styles.dataRow, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
+        </View> */}
         {/* Upvote button */}
         <TouchableOpacity
           title="Upvote"
           onPress={handleUpvote}
-          style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}
+          style={{ marginRight: 5, flexDirection: 'row', alignItems: 'center' }}
         >
           <MaterialCommunityIcons
             name="chevron-up"
@@ -792,20 +793,20 @@ const PostView = ({ route, navigation }) => {
             size={35}
             style={{ width: 29 }}
           />
-          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{upvotes}</Text>
+          <Text style={[styles.dataRow, { }]}>{upvotes}</Text>
         </TouchableOpacity>
         {/* Number of comments */}
         <View style={styles.infoRow}>
           <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{comments.length}</Text>
+          <Text style={[styles.dataRow, { }]}>{comments.length}</Text>
         </View>
         {/* Name of poster */}
-        <View style={[styles.infoRow, { marginLeft: 10 }]}>
-          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{post.anon_name}</Text>
+        <View style={[styles.infoRow, ]}>
+          <Text style={[styles.dataRow, { }]}>{post.anon_name}</Text>
         </View>
         {/* time posted */}
-        <View style={{ marginLeft: 10 }}>
-          <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(post.post_age)}</Text>
+        <View style={{}}>
+          <Text style={[styles.dataRow, { }]}>{formatTime(post.post_age)}</Text>
         </View>
       </View>
 
@@ -895,13 +896,14 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   postBox: {
-    flex: 1,
+    // flex: 1,
     // flexGrow: 1,
     // flexBasis: height * 0.04,
     alignItems: 'center',
     //justifyContent: 'center',
     marginLeft: 35,
-    marginRight: 20,
+    marginRight: 35,
+    // marginRight: 20,
   },
   postTouchables: {
     // flex: 0.4,
@@ -909,7 +911,7 @@ const styles = StyleSheet.create({
     //justifyContent: 'center',
     flexDirection: 'row',
     marginLeft: 35,
-    marginRight: 20,
+    marginRight: 35,
   },
   ogPostText: {
     // fontSize: height * 0.025,
@@ -924,6 +926,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000',
     marginHorizontal: 20,
+  },
+  dataRow: {
+    fontSize: height * 0.02,
+    fontWeight: '600',
+    color: '#BDBDBD',
   },
   commentBox: {
     flex: 1,

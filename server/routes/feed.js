@@ -116,7 +116,7 @@ router.get("/user-information", authorization, async (req, res) => {
       [user_id]
     );
 
-    res.status(201).json(userInformation.rows);
+    res.status(201).json(userInformation.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

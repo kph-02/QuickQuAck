@@ -3,7 +3,7 @@ import { StyleSheet, Switch, Text, View, Image, TouchableOpacity } from 'react-n
 import { AntDesign } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 
-const Profile = ({ navigation }) => {
+const Settings = ({ navigation }) => {
   const initialLocationState = {
     location: {
       latitude: 32.880213553722704,
@@ -80,7 +80,7 @@ const Profile = ({ navigation }) => {
   );
 };
 
-export default Profile;
+export default Settings;
 
 const styles = StyleSheet.create({
   header: {
