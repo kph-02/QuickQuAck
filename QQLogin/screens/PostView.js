@@ -110,8 +110,7 @@ const formatTime = (post_age) => {
   if (post_age) {
     if (post_age.hours) {
       postAgeDisplay += post_age.hours + 'h ';
-    }
-    if (post_age.minutes) {
+    } else if (post_age.minutes) {
       postAgeDisplay += post_age.minutes + 'm ';
     } else {
       postAgeDisplay += '1m ';
@@ -243,8 +242,7 @@ const PostView = ({ route, navigation }) => {
     if (post_age) {
       if (post_age.hours) {
         postAgeDisplay += post_age.hours + 'h ';
-      }
-      if (post_age.minutes) {
+      } else if (post_age.minutes) {
         postAgeDisplay += post_age.minutes + 'm ';
       } else {
         postAgeDisplay += '1m ';
@@ -838,17 +836,21 @@ const PostView = ({ route, navigation }) => {
             num_upvotes: 1,
           };
 
-          sendToDB('comment', body);
-          values.commentText = '';
+          if (body.commentText === '') {
+            alert("Can't submit empty comment!");
+          } else {
+            sendToDB('comment', body);
+            values.commentText = '';
 
-          //Comments that were changed by the user, to change in the database
-          const bodyCommentUpvotes = {
-            user_id: userId,
-            post_id: post.post_id,
-            comments: commentsUpvoted,
-          };
+            //Comments that were changed by the user, to change in the database
+            const bodyCommentUpvotes = {
+              user_id: userId,
+              post_id: post.post_id,
+              comments: commentsUpvoted,
+            };
 
-          updateCommentValues(bodyCommentUpvotes);
+            updateCommentValues(bodyCommentUpvotes);
+          }
         }}
       >
         {({ handleChange, handleBlur, handleSubmit, values }) => (

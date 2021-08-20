@@ -33,6 +33,7 @@ const Settings = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* TOS Modal */}
+
       {/* End of modal */}
       <View style={styles.header}>
         <View style={{ flexDirection: 'row', marginRight: 100, justifyContent: 'space-evenly' }}>

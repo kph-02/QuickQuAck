@@ -43,8 +43,8 @@ const AdjustTextPreview = ({ style, text }) => {
 };
 
 // Renders all tags associated with the post
-const RenderStyledTags = ({tags}) => {
-  return tags.map(function(tag) {
+const RenderStyledTags = ({ tags }) => {
+  return tags.map(function (tag) {
     let tagcolor = '';
 
     if (tag === 'Muir') {
@@ -73,20 +73,22 @@ const RenderStyledTags = ({tags}) => {
       tagcolor = 'gray';
     }
     return (
-      <View 
-      key={tag}
-      style={{
-            paddingHorizontal: 15,
-            borderRadius: 15,
-            marginVertical: 10,
-            marginLeft: 10,
-            paddingVertical: 2,
-            backgroundColor: tagcolor}}>
+      <View
+        key={tag}
+        style={{
+          paddingHorizontal: 15,
+          borderRadius: 15,
+          marginVertical: 10,
+          marginLeft: 10,
+          paddingVertical: 2,
+          backgroundColor: tagcolor,
+        }}
+      >
         <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
       </View>
     );
   });
-}
+};
 
 // Generates each of the Post previews on the Feed views
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
@@ -111,48 +113,34 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
     >
       <RenderStyledTags tags={item.tagarray} />
     </View>
+
     {/* The Data of each Post */}
-    {/* <View style={{
-      backgroundColor: 'pink',
-      flexDirection: 'row',
-      borderTopColor: '#EFEFEF',
-      borderTopWidth: 1}}> */}
-    {/* backgroundColor: 'pink'  */}
     <View style={[styles.postTouchables, {justifyContent:'space-between', marginLeft: 20, marginRight: 25, marginTop: 0,}]}>
-      {/* <View style={[styles.infoRow, { marginRight: 5 }]}> */}
-        {/*number of people who've viewed the post*/}
-        {/* <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>0</Text>
-      </View> */}
-      {/* marginRight: 15,  backgroundColor: 'yellow'*/}
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        
         {/*number of upvotes*/}
-        {/* backgroundColor: 'lightskyblue' */}
         <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29, }} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_upvotes}</Text>
       </View>
 
        {/*Number of Comments*/}
-       {/* {backgroundColor: 'lavender'} */}
-      <View style={[styles.infoRow, ]}>
+      <View style={[styles.infoRow]}>
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_comments}</Text>
       </View>
+
       {/*Anonymous name of user*/}
-      {/* { marginLeft: 10 } {backgroundColor: 'yellow'}*/}
-      <View style={[styles.infoRow, ]}>
+      <View style={[styles.infoRow]}>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.anon_name}</Text>
       </View>
+
       {/* Age of Post */}
-      {/* style={{backgroundColor: 'aquamarine'}} */}
       <View>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
       </View>
     </View>
-    {/* </View> */}
   </TouchableOpacity>
 );
-
 
 //format the time of the post from the database to display it to the screen
 const formatTime = (post_age) => {
@@ -162,8 +150,7 @@ const formatTime = (post_age) => {
   if (post_age) {
     if (post_age.hours) {
       postAgeDisplay += post_age.hours + 'h ';
-    }
-    if (post_age.minutes) {
+    } else if (post_age.minutes) {
       postAgeDisplay += post_age.minutes + 'm ';
     } else {
       postAgeDisplay += '1m ';
@@ -189,7 +176,7 @@ const FirstRoute = ({scrollEventThrottle, onScroll}) => {
   const renderItem = ({ item }) => {
     const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
     const color = item.post_id === selectedId ? 'white' : 'black';
-  
+
     return (
       <Item
         //destructure the item
@@ -377,7 +364,6 @@ const SecondRoute = ({scrollEventThrottle, onScroll}) => {
        * ]
        * */
       post = parseRes.data.post;
-      
     } catch (error) {
       console.error(error.message);
     }

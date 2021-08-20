@@ -19,6 +19,9 @@ const serverIp = '192.168.0.153';
 // const serverIp = '192.168.50.115';
 // const serverIp = '192.168.1.51';
 // const serverIp = '100.83.38.217';
+// const serverIp = '10.128.124.246';
+const serverIp = ' 10.128.124.246/25';
+
 import {
   StyledContainer,
   InnerContainer,
@@ -100,8 +103,6 @@ const Login = ({ navigation }) => {
         storeUserID(parseRes.user_id);
         navigation.navigate('TabNav', { Screen: 'Feed' });
       }
-      //Store to local storage
-      //storedToken(parseRes.token);
     } catch (error) {
       console.error(error.message);
     }

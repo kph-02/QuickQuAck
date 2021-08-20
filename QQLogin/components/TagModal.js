@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, Touchable } from 'react-native';
 //formik
@@ -196,8 +196,8 @@ const TagModal = ({ navigation }) => {
     { id: '{Food}', name: 'Food' },
     { id: '{Social}', name: 'Social' },
   ];
-
   const [selectedItems, setSelectedItems] = useState([]);
+
   const [postData, setPostData] = useState([]); //Store post data from the Database
   const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
@@ -206,16 +206,23 @@ const TagModal = ({ navigation }) => {
   const handleModal = () => {
     setModalOpen(!modalOpen);
   };
-  //   const navigation = useNavigation();
   const [inputs, setInputs] = useState({
     //Values needed to create post (../server/routes/feed.js)
     postTag: [] /*Initialize as first value in tags drop-down*/,
   });
+  const { postTag } = inputs;
+
+  useEffect(() => {
+    setInputs({ ...inputs, postTag: selectedItems });
+  }, [selectedItems]);
+
+  useEffect(() => {
+    sendToDB(inputs);
+  }, [inputs]);
 
   var JWTtoken = '';
 
   //Stores values to update input fields from user
-  const { postTag } = inputs;
 
   //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
   const onChange = (name, value) => {
@@ -224,20 +231,17 @@ const TagModal = ({ navigation }) => {
   };
 
   const onSelectedItemsChange = (selectedItems) => {
-    // Set Selected Items
-    // if (selectedItems.length > 1) {
-    //   return;
-    // }
     setSelectedItems(selectedItems);
-    setInputs({ ...inputs, postTag: selectedItems });
+    // const itemz = selectedItems;
+    // console.log('This is itemz');
+    // console.log(itemz);
+    // console.log('This is selectedItems after the state update');
+    // console.log(selectedItems);
+    // console.log('This is postTag before the state update');
     // console.log(postTag);
-
-    sendToDB(inputs);
-
-    // console.log(inputs.postTag.toString());
-    // if (inputs.postTag.length != 0) {
-    //   sendToDB(inputs);
-    // }
+    // setInputs({ ...inputs, postTag: itemz });
+    // console.log('This is postTag after setInputs');
+    // console.log(inputs;
   };
 
   //renderItem function for each item passed through
