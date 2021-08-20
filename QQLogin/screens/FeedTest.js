@@ -4,11 +4,7 @@ import { Dimensions, StyleSheet, Text, Button, View, FlatList, TouchableOpacity,
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
 import {
-  StyledFeedContainer,
   Colors,
-  ButtonText,
-  StyledButton3,
-  HeaderContainer,
 } from './../components/styles';
 
 import FeedViews from './FeedViews';
@@ -20,28 +16,6 @@ import AnimatedHeader from '../components/AnimatedHeader';
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 const FeedTest = ({ navigation }) => {
-  const [hidePassword, setHidePassword] = useState(true);
-
-  const [agree, setAgree] = useState(false);
-
-  const [selectedId, setSelectedId] = useState(null);
-
-  const items = [
-    //list of items for the select list
-    { id: '{Revelle}', name: 'Revelle' },
-    { id: '{Muir}', name: 'Muir' },
-    { id: '{Marshall}', name: 'Marshall' },
-    { id: '{Warren}', name: 'Warren' },
-    { id: '{ERC}', name: 'ERC' },
-    { id: '{Sixth}', name: 'Sixth' },
-    { id: '{Seventh}', name: 'Seventh' },
-    { id: '{Question}', name: 'Question' },
-    { id: '{Poll}', name: 'Poll' },
-    { id: '{Food}', name: 'Food' },
-    { id: '{Social}', name: 'Social' },
-  ];
-
-  const [selectedItems, setSelectedItems] = useState([]);
   
   const [modalOpen, setModalOpen] = useState(false);
   const handleModal = () => {
