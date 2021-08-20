@@ -53,21 +53,11 @@ const FeedTest = ({ navigation }) => {
   return (
     <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} forceInset={{ top: 'always' }}>
-        {/* <StyledFeedContainer> */}
-            <AnimatedHeader animatedValue={offset} navigation={navigation}/>
             
-            {/* HEADER STUFF */}
-            {/* <HeaderContainer style={{backgroundColor: 'pink'}}>
-                <TouchableOpacity onPress={() => navigation.navigate('Map')} style={styles.mapTouchableStyle}>
-                    <Image source={require('./../assets/map.png')} style={styles.mapIcon} />
-                </TouchableOpacity>
-                <Text style={styles.pageTitle}>Feed</Text>
-                <StyledButton3 onPress={() => navigation.navigate('TagModal')}>
-                    <ButtonText>Filter</ButtonText>
-                </StyledButton3>
-            </HeaderContainer> */}
+            {/* The Animated Header */}
+            <AnimatedHeader animatedValue={offset} navigation={navigation}/>
 
-            {/* THE LITERAL FEEDS */}
+            {/* The Feeds */}
             <FeedViews 
                 navigation={navigation} 
                 scrollEventThrottle={16}
@@ -78,11 +68,10 @@ const FeedTest = ({ navigation }) => {
                 offset={offset}
             />
 
-            {/* THE CREATE POST FLOATING BUTTON */}
+            {/* The Create Post Floating Button */}
             <View style={styles.touchableStyle}>
                 <PostMenu navigation={navigation} />
             </View>
-        {/* </StyledFeedContainer> */}
         </SafeAreaView>
     </SafeAreaProvider>
   );

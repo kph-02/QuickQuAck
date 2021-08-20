@@ -4,7 +4,6 @@ import { AntDesign } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login';
 import * as Location from 'expo-location';
-import { ButtonText, StyledButton, StyledLogoutButton } from '../components/styles';
 
 const SettingsTest = ({ navigation }) => {
   var JWTtoken = '';
@@ -87,28 +86,19 @@ const SettingsTest = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Settings Header */}
       <View style={styles.header}>
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-          {/* <TouchableOpacity
-            style={{ marginRight: 70, width: 50, paddingTop: 70 }}
-            onPress={() => navigation.navigate('Feed')}
-          >
-            <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFFFFF' }}>Back</Text>
-          </TouchableOpacity> */}
           <Text style={styles.headline}>Settings</Text>
-          {/* <TouchableOpacity
-            style={{ marginLeft: 60, width: 60, paddingTop: 70 }}
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFFFFF' }}>Logout</Text>
-          </TouchableOpacity> */}
         </View>
       </View>
       <Image style={styles.avatar} source={require('./../assets/AnonDuck.jpg')} />
+
       {/* User's Name */}
       <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 45}}>
            <Text style={styles.name}>{userName}</Text>
       </View>
+
       {/* Settings Options/Selections */}
       <View style={[styles.bodyContent]}>
          <View style={styles.divider}/>
@@ -143,40 +133,19 @@ const SettingsTest = ({ navigation }) => {
             <AntDesign name="right" size={20} color="#BDBDBD" style={{paddingHorizontal: 10}}/>
           </TouchableOpacity>
           <View style={styles.divider}/>
-          {/* <TouchableOpacity
-            style={{
-              marginTop: 10,
-              height: 60,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '120%',
-              backgroundColor: '#FFFFFF',
-              borderTopColor: '#DEE2E6',
-              borderTopWidth: 1,
-              borderBottomColor: '#DEE2E6',
-              borderBottomWidth: 1,
-            }}
-          > */}
            <TouchableOpacity style={[styles.buttonContainer]}>
             <Text style={{fontSize: 15 }}>Terms and Conditions</Text>
           </TouchableOpacity>
           <View style={styles.divider}/>
+          
           {/* Logout Button */}
-        {/* <StyledLogoutButton onPress={() => navigation.navigate('Login')}>
-            <ButtonText>Logout</ButtonText>
-        </StyledLogoutButton> */}
-        <TouchableOpacity 
-            onPress={() => navigation.navigate('Login')}
-            style={{backgroundColor: '#FFCC15', width: width * 0.8, height: 50, justifyContent: 'center', alignItems: 'center', marginTop: height * 0.05, borderRadius: 100}}>
-            <Text style={styles.buttonText}>Logout</Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+              onPress={() => navigation.navigate('Login')}
+              style={styles.logoutButton}>
+              <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
         </View>
-
-        
-
       </View>
-    // </View>
   );
 };
 
@@ -249,5 +218,14 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       fontSize: 20,
       textAlign: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#FFCC15', 
+    width: width * 0.8, 
+    height: 50, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginTop: height * 0.05, 
+    borderRadius: 100
   }
 });
