@@ -58,3 +58,5 @@ Install the expo go app and make sure you are connected to the same internet net
 For the most part, the app will automatically refresh when you save any changes to files that the app is running. However, more often than not, the changes don't go into effect, so you will need to force refresh the application. For iOS devices, you can hold down with three finger to pull up a menu that will allow you to refresh the app.
 
 Also, once you have opened the project once, you can just open the Expo Go app and will see your project under recent projects. You can just navigate to here and click on that while the host is running the application instead of scanning the QR code everytime.
+
+### How to Set Up an SDSC Cloud Server Instance
