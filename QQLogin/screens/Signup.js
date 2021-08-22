@@ -60,7 +60,7 @@ const Signup = ({ navigation }) => {
   const sendToDB = async (body) => {
     try {
       // Update server with user's registration information
-      const response = await fetch('http://' + serverIp + ':5000/auth/register', {
+      const response = await fetch('http://' + serverIp + '/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

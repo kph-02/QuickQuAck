@@ -288,7 +288,7 @@ const PostView = ({ route, navigation }) => {
     //Create a comment on the post
     if (operation === 'comment') {
       try {
-        const response = await fetch('http://' + serverIp + ':5000/feed/create-comment', {
+        const response = await fetch('http://' + serverIp + '/feed/create-comment', {
           method: 'POST',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -324,7 +324,7 @@ const PostView = ({ route, navigation }) => {
     //Update the current post
     if (operation === 'update') {
       try {
-        const response = await fetch('http://' + serverIp + ':5000/feed/update-post', {
+        const response = await fetch('http://' + serverIp + '/feed/update-post', {
           method: 'PUT',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -341,7 +341,7 @@ const PostView = ({ route, navigation }) => {
     //Delete the current post
     if (operation === 'delete') {
       try {
-        const response = await fetch('http://' + serverIp + ':5000/feed/delete-post', {
+        const response = await fetch('http://' + serverIp + '/feed/delete-post', {
           method: 'DELETE',
           headers: { token: JWTtoken, 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -432,7 +432,7 @@ const PostView = ({ route, navigation }) => {
     const query = 'post_id=' + post.post_id; //sets up query information
     try {
       // Get post comments from the database
-      const response = await fetch('http://' + serverIp + ':5000/feed/post-comments?' + query, {
+      const response = await fetch('http://' + serverIp + '/feed/post-comments?' + query, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
       });
@@ -485,7 +485,7 @@ const PostView = ({ route, navigation }) => {
       const query = 'post_id=' + post.post_id + '&user_id=' + userId;
 
       // Get whether or not the post has been updated by the user
-      const response = await fetch('http://' + serverIp + ':5000/feed/post-votes?' + query, {
+      const response = await fetch('http://' + serverIp + '/feed/post-votes?' + query, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
       });
@@ -516,7 +516,7 @@ const PostView = ({ route, navigation }) => {
       const query = 'post_id=' + post.post_id + '&user_id=' + userId;
 
       // Get comments upvoted by this user on this post
-      const response = await fetch('http://' + serverIp + ':5000/feed/comment-votes?' + query, {
+      const response = await fetch('http://' + serverIp + '/feed/comment-votes?' + query, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
       });
@@ -609,7 +609,7 @@ const PostView = ({ route, navigation }) => {
   //Updates database with whether this user upvoted post or not
   const updatePostValue = async (body) => {
     try {
-      const response = await fetch('http://' + serverIp + ':5000/feed/post-vote', {
+      const response = await fetch('http://' + serverIp + '/feed/post-vote', {
         method: 'POST',
         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -655,7 +655,7 @@ const PostView = ({ route, navigation }) => {
   //updating the database with whether the user upvoted the comment or not
   const updateCommentValues = async (body) => {
     try {
-      const response = await fetch('http://' + serverIp + ':5000/feed/comment-vote', {
+      const response = await fetch('http://' + serverIp + '/feed/comment-vote', {
         method: 'POST',
         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

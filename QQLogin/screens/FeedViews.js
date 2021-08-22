@@ -216,7 +216,7 @@ const FirstRoute = () => {
 
     try {
       // Gets all of the post information from the database for the feed
-      const response = await fetch('http://' + serverIp + ':5000/feed/home-feed', {
+      const response = await fetch('http://' + serverIp + '/feed/home-feed', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
       });
@@ -337,7 +337,7 @@ const SecondRoute = () => {
 
     try {
       // Gets all of the post information from the database for the feed
-      const response = await fetch('http://' + serverIp + ':5000/feed/all-posts', {
+      const response = await fetch('http://' + serverIp + '/feed/all-posts', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
       });
