@@ -287,7 +287,7 @@ const TagModal = ({ navigation }) => {
     try {
       // console.log('Sent Token:      ' + JWTtoken);
       // Send post info to DB
-      const response = await fetch('http://' + serverIp + ':5000/feed/tag-filter', {
+      const response = await fetch('http://' + serverIp + '/feed/tag-filter', {
         method: 'POST',
         headers: { token: JWTtoken, 'content-type': 'application/json' },
         body: JSON.stringify(body),
