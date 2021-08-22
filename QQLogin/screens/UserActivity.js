@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, View} from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert, View } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyledFeedContainer, InnerContainer, Colors } from './../components/styles';
@@ -12,11 +12,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
 
 //Store JWT for authentication
-var JWTtoken = ''; 
+var JWTtoken = '';
 
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
-
 
 //Limits the number of lines and characters that can be shown on each of the post previews on the feed.
 const AdjustTextPreview = ({ style, text }) => {
@@ -28,8 +27,8 @@ const AdjustTextPreview = ({ style, text }) => {
 };
 
 // Renders all tags associated with the post
-const RenderStyledTags = ({tags}) => {
-  return tags.map(function(tag) {
+const RenderStyledTags = ({ tags }) => {
+  return tags.map(function (tag) {
     let tagcolor = '';
 
     if (tag === 'Muir') {
@@ -58,33 +57,35 @@ const RenderStyledTags = ({tags}) => {
       tagcolor = 'gray';
     }
     return (
-      <View 
-      key={tag}
-      style={{
-            paddingHorizontal: 15,
-            borderRadius: 15,
-            marginVertical: 10,
-            marginRight: 10,
-            paddingVertical: 2,
-            backgroundColor: tagcolor}}>
+      <View
+        key={tag}
+        style={{
+          paddingHorizontal: 15,
+          borderRadius: 15,
+          marginVertical: 10,
+          marginRight: 10,
+          paddingVertical: 2,
+          backgroundColor: tagcolor,
+        }}
+      >
         <Text style={{ color: 'white', fontWeight: 'normal' }}>{tag}</Text>
       </View>
     );
   });
-}
+};
 
 //Generates each Post item for the Flatlist
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     {/* View for the text preview of each post as shown on the feed */}
-    <View style={{justifyContent: 'center', marginHorizontal: 30, paddingTop: 20 }}>
+    <View style={{ justifyContent: 'center', marginHorizontal: 30, paddingTop: 20 }}>
       <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.post_text} />
     </View>
     {/* Tags Info Row */}
     <View style={[styles.tagsRow]}>
       <RenderStyledTags tags={item.tagarray} />
     </View>
-    <View style={{borderColor: '#F4F4F4', borderWidth: 1}}/>
+    <View style={{ borderColor: '#F4F4F4', borderWidth: 1 }} />
     {/* The Data of each Post */}
     <View style={[styles.postTouchables]}>
       <View style={[styles.infoRow]}>
@@ -92,9 +93,14 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
       </View>
-      <View style={[styles.infoRow, {justifyContent: 'flex-start', marginRight: 5}]}>
+      <View style={[styles.infoRow, { justifyContent: 'flex-start', marginRight: 5 }]}>
         {/*number of upvotes*/}
-        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={34} style={{ alignItems: 'center', width: 29}} />
+        <MaterialCommunityIcons
+          name="chevron-up"
+          color="#BDBDBD"
+          size={34}
+          style={{ alignItems: 'center', width: 29 }}
+        />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_upvotes}</Text>
       </View>
       <View style={[styles.infoRow]}>
@@ -135,7 +141,6 @@ const formatTime = (post_age) => {
 };
 
 const UserActivity = ({ navigation }) => {
-
   const [agree, setAgree] = useState(false);
 
   const checkboxHandler = () => {
@@ -173,13 +178,13 @@ const UserActivity = ({ navigation }) => {
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
   const [update, setUpdate] = useState(false); //Changing will feed to update
 
-//   const navigation = useNavigation();
+  //   const navigation = useNavigation();
 
   //renderItem function for each item passed through
   const renderItem = ({ item }) => {
     const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
     const color = item.post_id === selectedId ? 'white' : 'black';
-  
+
     return (
       <Item
         //destructure the item
@@ -217,7 +222,7 @@ const UserActivity = ({ navigation }) => {
 
     try {
       // Gets all of the post information from the database for the feed
-      const response = await fetch('http://' + serverIp + ':5000/feed/user-posts', {
+      const response = await fetch('http://' + serverIp + '/feed/user-posts', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
       });
@@ -253,7 +258,7 @@ const UserActivity = ({ navigation }) => {
   // whenever the page is loaded
   useFocusEffect(
     React.useCallback(() => {
-      console.log('User\'s Activity Feed Refreshed');
+      console.log("User's Activity Feed Refreshed");
       getFromDB();
       setRefresh(false); //End refresh animation
       setSelectedId(null); //reset Selected Id
@@ -272,25 +277,26 @@ const UserActivity = ({ navigation }) => {
       <StatusBar style="black" />
       {/* Header Content */}
       <View style={styles.headerContainer}>
-          <Text style={styles.headline}>Activity</Text>
+        <Text style={styles.headline}>Activity</Text>
       </View>
       <TouchableOpacity
-        style={{ marginLeft: 25, paddingHorizontal: 5, marginTop: 80, position: 'absolute'}}
-        onPress={() => navigation.pop()}>
-            <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
+        style={{ marginLeft: 25, paddingHorizontal: 5, marginTop: 80, position: 'absolute' }}
+        onPress={() => navigation.pop()}
+      >
+        <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
       </TouchableOpacity>
       {/* FlatList of User's Posts */}
       <View style={{ backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
-          <FlatList
-            numColumns={1}
-            horizontal={false}
-            data={postData} /*postData to display*/
-            keyExtractor={(item) => item.post_id}
-            extraData={selectedId}
-            renderItem={renderItem}
-            refreshing={refresh} //true: shows spinning animation to show loading
-            onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
-          />
+        <FlatList
+          numColumns={1}
+          horizontal={false}
+          data={postData} /*postData to display*/
+          keyExtractor={(item) => item.post_id}
+          extraData={selectedId}
+          renderItem={renderItem}
+          refreshing={refresh} //true: shows spinning animation to show loading
+          onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
+        />
       </View>
     </StyledFeedContainer>
   );
@@ -334,7 +340,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderTopColor: '#EFEFEF',
     marginTop: 0,
-    marginHorizontal: 30,  
+    marginHorizontal: 30,
   },
   tagsRow: {
     alignItems: 'center',
@@ -361,12 +367,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
   },
-  headerContainer:{
-    justifyContent: 'center', 
-    paddingBottom: 20, 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#EFEFEF'
-  }
+  headerContainer: {
+    justifyContent: 'center',
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EFEFEF',
+  },
 });
 
 export default UserActivity;

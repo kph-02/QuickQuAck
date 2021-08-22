@@ -71,7 +71,7 @@ const UserInfo = ({ navigation }) => {
     password: '',
     college: '',
     gy: '',
-    currentPassword:'',
+    currentPassword: '',
   };
 
   const [inputs, setInputs] = useState(initialState);
@@ -80,7 +80,7 @@ const UserInfo = ({ navigation }) => {
     setInputs({ ...initialState });
   };
 
-  const { firstName, lastName, email, password, college, gy, currentPassword} = inputs;
+  const { firstName, lastName, email, password, college, gy, currentPassword } = inputs;
 
   //Getting JWT from local storage, must exist otherwise user can't be on this page
   const getJWT = async () => {
@@ -103,14 +103,13 @@ const UserInfo = ({ navigation }) => {
     try {
       console.log(inputs);
       // Update server with user's  information
-      const response = await fetch('http://' + serverIp + ':5000/feed/edit-user-info', {
+      const response = await fetch('http://' + serverIp + '/feed/edit-user-info', {
         method: 'PUT',
         headers: { token: JWTtoken, 'content-type': 'application/json' },
         body: JSON.stringify(body),
       });
 
       // const parseRes = await response.json();
-
 
       // console.log(parseRes);
     } catch (error) {

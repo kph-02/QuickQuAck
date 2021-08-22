@@ -57,7 +57,7 @@ const TagSelection = ({ navigation }) => {
   //   var JWTtoken = '';
 
   //Stores values to update input fields from user
-  const { postTag, user_id} = inputs;
+  const { postTag, user_id } = inputs;
 
   //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
   const onChange = (name, value) => {
@@ -98,7 +98,7 @@ const TagSelection = ({ navigation }) => {
     try {
       // console.log('Sent Token:      ' + JWTtoken);
       // Send post info to DB
-      const response = await fetch('http://' + serverIp + ':5000/feed/user-tag-selection', {
+      const response = await fetch('http://' + serverIp + '/feed/user-tag-selection', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),
@@ -131,7 +131,7 @@ const TagSelection = ({ navigation }) => {
     // Set Selected Items
     // if (selectedItems.length > 3) {return}
     setSelectedItems(selectedItems);
-    setInputs({ ...inputs, postTag: selectedItems, user_id : userId });
+    setInputs({ ...inputs, postTag: selectedItems, user_id: userId });
   };
 
   getUserId();

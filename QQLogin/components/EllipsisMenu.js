@@ -41,7 +41,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
     const body = { postId: post_id };
 
     try {
-      const response = await fetch('http://' + serverIp + ':5000/feed/delete-post', {
+      const response = await fetch('http://' + serverIp + '/feed/delete-post', {
         method: 'DELETE',
         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -57,7 +57,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
 
   const deleteComment = async () => {
     try {
-      const response = await fetch('http://' + serverIp + ':5000/feed/delete-comment', {
+      const response = await fetch('http://' + serverIp + '/feed/delete-comment', {
         method: 'DELETE',
         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ comment_id: comment_id }),

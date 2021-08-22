@@ -76,7 +76,7 @@ const CreatePost = ({ route, navigation }) => {
   //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
   const onChange = (name, value) => {
     setInputs({ ...inputs, [name]: value });
-    
+
     // console.log(inputs);
   };
 
@@ -123,7 +123,7 @@ const CreatePost = ({ route, navigation }) => {
       try {
         // console.log('Sent Token:      ' + JWTtoken);
         // Send post info to DB
-        const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
+        const response = await fetch('http://' + serverIp + '/feed/create-post', {
           method: 'POST',
           headers: { token: JWTtoken, 'content-type': 'application/json' },
           body: JSON.stringify(body),
@@ -147,7 +147,7 @@ const CreatePost = ({ route, navigation }) => {
       try {
         // console.log('Sent Token:      ' + JWTtoken);
         // Send post info to DB
-        const response = await fetch('http://' + serverIp + ':5000/feed/update-post', {
+        const response = await fetch('http://' + serverIp + '/feed/update-post', {
           method: 'PUT',
           headers: { token: JWTtoken, 'content-type': 'application/json' },
           body: JSON.stringify(updateBody),
