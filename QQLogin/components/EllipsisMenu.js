@@ -15,8 +15,8 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
   const updatePost = () => {
     const postType = {
       post_type: 'Update',
-      post_text: postText,
-      post_id: postId,
+      post_text: post_text,
+      post_id: post_id,
     };
     navigation.navigate('Create Post', { postType });
   };
@@ -39,8 +39,9 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
 
   const sendToDB = async () => {
     const body = { postId: post_id };
+
     try {
-      const response = await fetch('http://' + serverIp + ':5000/feed/delete-post', {
+      const response = await fetch('http://' + serverIp + '/feed/delete-post', {
         method: 'DELETE',
         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -56,7 +57,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
 
   const deleteComment = async () => {
     try {
-      const response = await fetch('http://' + serverIp + ':5000/feed/delete-comment', {
+      const response = await fetch('http://' + serverIp + '/feed/delete-comment', {
         method: 'DELETE',
         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ comment_id: comment_id }),
@@ -74,6 +75,32 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
       console.log(err.message);
     }
   };
+
+  const blockUser = async () => {
+    const body = { userID: post.user_id };
+
+    try {
+      // const query = 'user_id=' + post.user_id; //sets up query information
+      console.log('this is userId ');
+      console.log(body);
+
+      console.log(post.user_id);
+
+      const response = await fetch('http://' + serverIp + ':5000/feed/block-user', {
+        method: 'PUT',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      console.log('parseRes');
+
+      const parseRes = await response.json();
+
+      console.log(parseRes);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   return (
     <Menu renderer={SlideInMenu}>
       {/* Slide-in Menu from the bottom is triggered by the Ellipsis (...) button */}
@@ -84,18 +111,23 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
       {/* Three menu options: Send Message, Flag as inappropriate, Block Posts from User */}
       <MenuOptions style={{ paddingBottom: 25, paddingTop: 8 }}>
         {/* Send Message */}
-        <MenuOption
-          style={{ paddingVertical: 10 }}
-          onSelect={() => {
-            Alert.alert('Send Message to User?', 'Would you like to send a message to this user?', [
-              { text: 'Yes', onPress: () => console.log('User Pressed Yes') },
-              { text: 'No', onPress: () => console.log('User Pressed No') },
-            ]);
-          }}
-        >
-          <Text style={styles.text}>Send Message</Text>
-        </MenuOption>
-
+        {(() => {
+          if (!postOwner && !commentOwner) {
+            return (
+              <MenuOption
+                style={{ paddingVertical: 10 }}
+                onSelect={() => {
+                  Alert.alert('Send Message to User?', 'Would you like to send a message to this user?', [
+                    { text: 'Yes', onPress: () => console.log('User Pressed Yes') },
+                    { text: 'No', onPress: () => console.log('User Pressed No') },
+                  ]);
+                }}
+              >
+                <Text style={styles.text}>Send Message</Text>
+              </MenuOption>
+            );
+          }
+        })()}
         {/* Flag as Inappropriate */}
         <MenuOption
           onSelect={() => navigation.navigate('Flag Post', { post: postText, user: postUser })}
@@ -105,17 +137,30 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
         </MenuOption>
 
         {/* Block Posts from User */}
-        <MenuOption
-          style={{ paddingVertical: 10 }}
-          onSelect={() => {
-            Alert.alert('Block Posts from User?', 'Would you like to block posts from this user?', [
-              { text: 'Yes', onPress: () => console.log('User Pressed Yes') },
-              { text: 'No', onPress: () => console.log('User Pressed No') },
-            ]);
-          }}
-        >
-          <Text style={styles.text}>Block posts from this user</Text>
-        </MenuOption>
+        {(() => {
+          if (!postOwner && !commentOwner) {
+            return (
+              <MenuOption
+                style={{ paddingVertical: 10 }}
+                onSelect={() => {
+                  Alert.alert('Block Posts from User?', 'Would you like to block posts from this user?', [
+                    {
+                      text: 'Yes',
+                      onPress: () => {
+                        blockUser();
+                        navigation.pop();
+                        console.log('User Pressed Yes');
+                      },
+                    },
+                    { text: 'No', onPress: () => console.log('User Pressed No') },
+                  ]);
+                }}
+              >
+                <Text style={styles.text}>Block posts from this user</Text>
+              </MenuOption>
+            );
+          }
+        })()}
         {/* Show Update Post if user is Original Poster */}
         {(() => {
           if (postOwner) {

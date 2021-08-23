@@ -169,12 +169,29 @@ router.get("/home-feed", authorization, async (req, res) => {
   const user_id = req.user;
 
   try {
-    // add a date time filter so its only last 24 hrs
-    // console.log("This is UID " + user_id);
-    const homeFeed = await pool.query(
-      "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, P.user_id, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, tar.ARRAY_AGG AS tagArray, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id WHERE UT.User_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.time_posted DESC;",
+    //This checks to see if there are any blocked users.
+    const blockedList = await pool.query(
+      "SELECT array_length(blocked_users, 1) FROM users WHERE user_id = $1;",
       [user_id]
     );
+
+    const blockedListUsers = await pool.query(
+      "SELECT blocked_users FROM users WHERE user_id = $1;",
+      [user_id]
+    );
+
+    // console.log(blockedList.rows[0].array_length);
+    if (blockedList.rows[0].array_length != null) {
+      var homeFeed = await pool.query(
+        "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, P.user_id, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, tar.ARRAY_AGG AS tagArray, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id WHERE UT.User_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW() AND P.user_id != all ($2)) AS SB ORDER BY SB.time_posted DESC;",
+        [user_id, blockedListUsers.rows[0].blocked_users]
+      );
+    } else {
+      var homeFeed = await pool.query(
+        "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, P.user_id, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, tar.ARRAY_AGG AS tagArray, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id WHERE UT.User_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.time_posted DESC;",
+        [user_id]
+      );
+    }
 
     // const homeFeed = await pool.query(
     //   "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id WHERE UT.User_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.time_posted DESC;",
@@ -316,17 +333,40 @@ router.post("/create-comment", authorization, async (req, res) => {
 router.get("/post-comments", authorization, async (req, res) => {
   try {
     const { post_id } = req.query;
-
-    const allComment = await pool.query(
-      "SELECT comment_id, comment.post_id, num_upvotes, text, comment.user_id, " +
-        "anon_name_id, time_posted, AGE(NOW(), time_posted) AS comment_age FROM " +
-        "comment INNER JOIN post_names ON comment.post_id = post_names.post_id " +
-        "AND comment.user_id = post_names.user_id WHERE comment.post_id = $1 AND " +
-        "time_posted BETWEEN NOW() - INTERVAL'24 HOURS'  AND NOW() ORDER BY " +
-        "num_upvotes DESC;",
-      [post_id]
+    const user_id = req.user;
+    //This checks to see if there are any blocked users.
+    const blockedList = await pool.query(
+      "SELECT array_length(blocked_users, 1) FROM users WHERE user_id = $1;",
+      [user_id]
     );
 
+    const blockedListUsers = await pool.query(
+      "SELECT blocked_users FROM users WHERE user_id = $1;",
+      [user_id]
+    );
+
+    if (blockedList.rows[0].array_length != null) {
+      var allComment = await pool.query(
+        "SELECT comment_id, comment.post_id, num_upvotes, text, comment.user_id, " +
+          "anon_name_id, time_posted, AGE(NOW(), time_posted) AS comment_age FROM " +
+          "comment INNER JOIN post_names ON comment.post_id = post_names.post_id " +
+          "AND comment.user_id = post_names.user_id WHERE comment.post_id = $1 AND " +
+          "time_posted BETWEEN NOW() - INTERVAL'24 HOURS'  AND NOW() AND " +
+          "comment.user_id != all ($2) ORDER BY " +
+          "num_upvotes DESC;",
+        [post_id, blockedListUsers.rows[0].blocked_users]
+      );
+    } else {
+      var allComment = await pool.query(
+        "SELECT comment_id, comment.post_id, num_upvotes, text, comment.user_id, " +
+          "anon_name_id, time_posted, AGE(NOW(), time_posted) AS comment_age FROM " +
+          "comment INNER JOIN post_names ON comment.post_id = post_names.post_id " +
+          "AND comment.user_id = post_names.user_id WHERE comment.post_id = $1 AND " +
+          "time_posted BETWEEN NOW() - INTERVAL'24 HOURS'  AND NOW() ORDER BY " +
+          "num_upvotes DESC;",
+        [post_id]
+      );
+    }
     /* For future reference, this is how to order by upvotes. */
     // const allFeed = await pool.query
     // ("SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
@@ -348,10 +388,29 @@ router.get("/post-comments", authorization, async (req, res) => {
 //This renders all-posts in the past 24 hours sorted in Ascending order
 router.get("/all-posts", authorization, async (req, res) => {
   try {
-    const allFeed = await pool.query(
-      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id  INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age;"
+    const user_id = req.user;
+
+    const blockedList = await pool.query(
+      "SELECT array_length(blocked_users, 1) FROM users WHERE user_id = $1;",
+      [user_id]
     );
 
+    const blockedListUsers = await pool.query(
+      "SELECT blocked_users FROM users WHERE user_id = $1;",
+      [user_id]
+    );
+
+    // console.log(blockedListUsers.rows[0].blocked_users);
+    if (blockedList.rows[0].array_length != null) {
+      var allFeed = await pool.query(
+        "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW() AND post.user_id != all ($1)) AS SB ORDER BY SB.post_age;",
+        [blockedListUsers.rows[0].blocked_users]
+      );
+    } else {
+      var allFeed = await pool.query(
+        "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id  INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age;"
+      );
+    }
     /* For future reference, this is how to order by upvotes. */
     // const allFeed = await pool.query
     // ("SELECT * FROM post WHERE time_posted BETWEEN NOW() - INTERVAL" +
@@ -456,6 +515,8 @@ router.get("/comment-votes", authorization, async (req, res) => {
 // add/undo post vote
 router.post("/post-vote", authorization, async (req, res) => {
   try {
+    console.log(req.body);
+
     const { user_id, post_id, vote_value } = req.body;
     // if the same vote from the same person on the same post exists
     const exactDuplicate = await pool.query(
@@ -512,11 +573,30 @@ router.post("/tag-filter", authorization, async (req, res) => {
     console.log("This is the tag_id variable");
     console.log(postTag.toString());
 
-    const tagFeed = await pool.query(
-      "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB WHERE $1 = ANY(SB.tagArray) ORDER BY SB.post_age;",
-      [postTag.toString()]
+    const user_id = req.user;
+
+    const blockedList = await pool.query(
+      "SELECT array_length(blocked_users, 1) FROM users WHERE user_id = $1;",
+      [user_id]
     );
 
+    const blockedListUsers = await pool.query(
+      "SELECT blocked_users FROM users WHERE user_id = $1;",
+      [user_id]
+    );
+
+    // console.log(blockedListUsers.rows[0].blocked_users);
+    if (blockedList.rows[0].array_length != null) {
+      var tagFeed = await pool.query(
+        "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW() AND post.user_id != ALL($2)) AS SB WHERE $1 = ANY(SB.tagArray) ORDER BY SB.post_age;",
+        [postTag.toString(), blockedListUsers.rows[0].blocked_users]
+      );
+    } else {
+      var tagFeed = await pool.query(
+        "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB WHERE $1 = ANY(SB.tagArray) ORDER BY SB.post_age;",
+        [postTag.toString()]
+      );
+    }
     res.status(201).json({
       data: {
         post: tagFeed.rows,
@@ -635,6 +715,170 @@ router.get("/current-password", authorization, async (req, res) => {
     const currentPassword = await pool.query(
       "SELECT user_password FROM users WHERE user_id = $1",
       [user_id]
+    );
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
+
+// create a poll (cannot edit once created)
+router.post("/create-poll", authorization, async (req, res) => {
+  try {
+    const { pollOptions, pollTag, num_comments } = req.body;
+    const author_id = req.user;
+
+    const newPoll = await pool.query(
+      "INSERT INTO poll (poll_options, user_id, num_comments) VALUES ($1, $2, $3) RETURNING *;",
+      [postText, author_id, num_comments]
+    );
+
+    const pollID = newPoll.rows[0].poll_id;
+
+    for (const i of pollTag) {
+      console.log("Console says " + i);
+      const pollTags = await pool.query(
+        "INSERT INTO poll_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
+        [postID, i]
+      );
+    }
+
+    const nameAdjectives = [
+      "Red",
+      "Orange",
+      "Yellow",
+      "Green",
+      "Blue",
+      "Purple",
+      "Pink",
+      "Gray",
+      "Turquoise",
+      "Brown",
+    ];
+    const nameAnimals = [
+      "Dog",
+      "Cat",
+      "Raccoon",
+      "Giraffe",
+      "Elephant",
+      "Panda",
+      "Koala",
+      "Rabbit",
+      "Turtle",
+      "Fox",
+    ];
+
+    const adjIndex = parseInt(Math.random() * 10);
+    const animalIndex = parseInt(Math.random() * 10);
+
+    let anonAdj = nameAdjectives[adjIndex];
+    let anonAnimal = nameAnimals[animalIndex];
+    const anonName = anonAdj + " " + anonAnimal;
+
+    const createAnonName = await pool.query(
+      "INSERT INTO anon_names (anon_name_id) VALUES ($1) ON CONFLICT DO NOTHING;",
+      [anonName]
+    );
+
+    const postName = await pool.query(
+      "INSERT INTO post_names (user_id, anon_name_id, post_id) VALUES ($1, $2, $3) RETURNING *;",
+      [author_id, anonName, postID]
+    );
+
+    ///postTags is declared in a loop so it is not defined here
+
+    res.status(201).json({
+      status: "Post Success",
+      data: {
+        post: newPost.rows[0],
+        tags: postTags.rows[0],
+        anonName: postName.rows[0],
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
+
+// get all poll questions
+router.get("/get-poll-questions", authorization, async (req, res) => {
+  try {
+    const pollQuestions = await pool.query("SELECT * FROM poll");
+    res.status(201).send({ pollQuestions });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// get all votes from a single poll
+router.get("/get-poll-votes", authorization, async (req, res) => {
+  try {
+    const { poll_id } = req.body;
+    const pollVotes = await pool.query(
+      "SELECT * FROM poll_votes WHERE (poll_id = $1)",
+      [poll_id]
+    );
+    res.status(201).json({ pollVotes });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// delete a poll
+router.delete("/delete-poll", authorization, async (req, res) => {
+  try {
+    const { poll_id } = req.body;
+    const deletedPoll = await pool.query(
+      "DELETE FROM poll WHERE (poll_id = $1",
+      [poll_id]
+    );
+    res.status(201).send("Success");
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// vote on a poll
+router.post("/post-poll-vote", authorization, async (req, res) => {
+  try {
+    const { poll_id, choice_id, user_id } = req.body;
+    try {
+      const insertPollVote = await pool.query(
+        "INSERT INTO poll_votes VALUES($1, $2, $3) RETURNING *",
+        [poll_id, choice_id, user_id]
+      );
+      // means that vote option has already been selected
+    } catch (err) {
+      const deletePollVote = await pool.query(
+        "DELETE FROM poll_votes WHERE (poll_id = $1, user_id = $2)",
+        [poll_id, user_id]
+      );
+      const insertNewPollVote = await pool.query(
+        "INSERT INTO poll_votes VALUES($1, $2, $3) RETURNING *",
+        [poll_id, choice_id, user_id]
+      );
+      res.status(201).send("Complete");
+    }
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+router.put("/block-user", authorization, async (req, res) => {
+  let { userID } = req.body;
+  const userID2 = req.user;
+
+  userID = "{" + userID + "}";
+
+  console.log(req.body);
+  console.log("Please");
+  console.log(userID);
+  console.log("Blocking user: " + userID + " from user: " + userID2);
+  try {
+    const addToBlockList = await pool.query(
+      "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
+      [userID, userID2]
     );
   } catch (err) {
     console.error(err.message);

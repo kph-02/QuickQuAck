@@ -1,8 +1,7 @@
 import React, { useState, Component } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {CheckBox} from 'react-native-elements';
-
+import { CheckBox } from 'react-native-elements';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
@@ -12,7 +11,7 @@ import { Formik } from 'formik';
 
 //icons
 
-import {Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 import {
   StyledViewPostContainer,
@@ -57,18 +56,18 @@ const FlagPost = ({ route, navigation }) => {
   const [selectedValue, setSelectedValue] = useState(true);
   const [modalOpen, setModalOpen] = useState(true);
 
-  const {post, user} = route.params;
+  const { post, user } = route.params;
 
   //Hooks and initial states for the Selectors
   const [checkboxState, setCheckboxState] = useState([
-   { label: 'Bullying / Harassment', value: 'harassment', checked: false },
-   { label: 'Inappropriate Content', value: 'inappropriate', checked: false },
-   { label: 'Discrimination / Hate Speech', value: 'hate', checked: false },
-   { label: 'Invasion of Privacy', value: 'privacy', checked: false },
-   { label: 'Trolling', value: 'trolling', checked: false },
-   { label: 'Spam', value: 'spam', checked: false },
-   { label: 'Other', value: 'other', checked: false },
- ]);
+    { label: 'Bullying / Harassment', value: 'harassment', checked: false },
+    { label: 'Inappropriate Content', value: 'inappropriate', checked: false },
+    { label: 'Discrimination / Hate Speech', value: 'hate', checked: false },
+    { label: 'Invasion of Privacy', value: 'privacy', checked: false },
+    { label: 'Trolling', value: 'trolling', checked: false },
+    { label: 'Spam', value: 'spam', checked: false },
+    { label: 'Other', value: 'other', checked: false },
+  ]);
 
   //Getting user input
   const [inputs, setInputs] = useState({
@@ -121,7 +120,7 @@ const FlagPost = ({ route, navigation }) => {
     try {
       // console.log('Sent Token:      ' + JWTtoken);
       // Update server with user's registration information
-      const response = await fetch('http://' + serverIp + ':5000/feed/create-post', {
+      const response = await fetch('http://' + serverIp + '/feed/create-post', {
         method: 'POST',
         headers: { token: JWTtoken, 'content-type': 'application/json' },
         body: JSON.stringify(body),
@@ -142,18 +141,18 @@ const FlagPost = ({ route, navigation }) => {
         return {
           ...selector,
           checked: false,
-        }
+        };
       if (i === index) {
         const item = {
           ...selector,
-          checked: !selector.checked
-        }
-        return item
+          checked: !selector.checked,
+        };
+        return item;
       }
-      return selector
-    })
+      return selector;
+    });
     setCheckboxState(newValue);
-  }
+  };
 
   return (
     <Modal
@@ -167,51 +166,61 @@ const FlagPost = ({ route, navigation }) => {
         <StatusBar style="black" />
 
         {/* Back Button */}
-        <TextLink onPress={() => navigation.pop()} style={{marginLeft: 10, width: 55, paddingHorizontal: 5}}>
-            <TextPostContent>Back</TextPostContent>
+        <TextLink onPress={() => navigation.pop()} style={{ marginLeft: 10, width: 55, paddingHorizontal: 5 }}>
+          <TextPostContent>Back</TextPostContent>
         </TextLink>
-        
+
         {/* Flag as Inappropriate Title, with the Flag button across from it */}
-        <View style={{flexDirection: 'row', marginTop: 45, width: '100%', alignContent: 'space-between', paddingBottom: 20}}>
-            <PageTitleFlag style={{marginLeft: 15, fontSize: 22}}>Flag as inappropriate?</PageTitleFlag>
-            <TouchableOpacity onPress={onPressButton} style={{marginLeft: 115}}>
-                <TextPostContent>Flag</TextPostContent>
-            </TouchableOpacity>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: 45,
+            width: '100%',
+            alignContent: 'space-between',
+            paddingBottom: 20,
+          }}
+        >
+          <PageTitleFlag style={{ marginLeft: 15, fontSize: 22 }}>Flag as inappropriate?</PageTitleFlag>
+          <TouchableOpacity onPress={onPressButton} style={{ marginLeft: 115 }}>
+            <TextPostContent>Flag</TextPostContent>
+          </TouchableOpacity>
         </View>
-        
+
         {/* Section/Container for Anonymous Username */}
-        <View style={{backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1}}>
-          <Text style={{marginLeft: 15, color: 'black', fontSize: 14}}>{user}</Text>
+        <View style={{ backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1 }}>
+          <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }}>{user}</Text>
         </View>
 
         {/* Section/Container for Text in the Post/Comment to be reported */}
-        <View style={{backgroundColor: 'white', paddingVertical: 15 , borderTopColor: '#DADADA', borderTopWidth: 1}}>
-          <Text style={{marginLeft: 15, color: 'black', fontSize: 14}} numberOfLines={1}>{post}</Text>
+        <View style={{ backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1 }}>
+          <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }} numberOfLines={1}>
+            {post}
+          </Text>
         </View>
 
         {/* Section to separate Post/Comment data from Selectors */}
-        <View style={{backgroundColor: '#DADADA', paddingVertical: 15, borderTopColor: '#DADADA'}}>
-          <Text style={{marginLeft: 15, color: 'black', fontSize: 14}}>This post falls under:</Text>
+        <View style={{ backgroundColor: '#DADADA', paddingVertical: 15, borderTopColor: '#DADADA' }}>
+          <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }}>This post falls under:</Text>
         </View>
 
         {/* Renders the different Flag Selection Choices (selectors/checkboxes) */}
         {checkboxState.map((selector, i) => (
-          <View style={{backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1}} key={i}>
+          <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} key={i}>
             <CheckBox
               onPress={() => selectorHandler(true, i)}
               title={selector.label}
-              checkedIcon='dot-circle-o'
-              uncheckedIcon='circle-o'
+              checkedIcon="dot-circle-o"
+              uncheckedIcon="circle-o"
               checked={selector.checked}
               checkedColor={'#FFCC15'}
-              containerStyle={{backgroundColor: 'white', paddingVertical: 14, borderWidth: 0, borderColor: 'white'}}
-              textStyle={{color: 'black', fontSize: 14, fontWeight: 'normal'}}
+              containerStyle={{ backgroundColor: 'white', paddingVertical: 14, borderWidth: 0, borderColor: 'white' }}
+              textStyle={{ color: 'black', fontSize: 14, fontWeight: 'normal' }}
             />
           </View>
         ))}
 
         {/* Bottom line divider (styling purposes) */}
-        <View style={{backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1}}/>
+        <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
       </StyledViewPostContainer>
     </Modal>
   );
