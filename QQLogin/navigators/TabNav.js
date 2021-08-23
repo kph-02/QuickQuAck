@@ -15,7 +15,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import FeedViews from '../screens/FeedViews';
 import Messages from '../screens/Messages';
 import FeedTest from '../screens/FeedTest';
-import SettingsTest from '../screens/SettingsTest';
 import UserActivity from '../screens/UserActivity';
 
 // const FeedStack = createStackNavigator();
@@ -84,7 +83,7 @@ export default function TabNav() {
                   ),
               }}
         />
-        <Tab.Screen name="Settings" component={SettingsTest} 
+        <Tab.Screen name="Settings" component={Settings} 
             options={{
                   tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons name="cog" color={color} size={26} />
