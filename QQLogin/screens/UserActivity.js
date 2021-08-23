@@ -250,6 +250,7 @@ const UserActivity = ({ navigation }) => {
        * milliseconds
        * ]
        * */
+      
       setPostData(parseRes.data.post);
     } catch (error) {
       console.error(error.message);

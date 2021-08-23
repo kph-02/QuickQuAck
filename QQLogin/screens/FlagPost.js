@@ -1,4 +1,4 @@
-import React, { useState, Component } from 'react';
+import React, { useState, Component, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CheckBox } from 'react-native-elements';
@@ -7,7 +7,7 @@ import { CheckBox } from 'react-native-elements';
 import { serverIp } from './Login.js';
 
 //formik
-import { Formik } from 'formik';
+import { Formik, setIn } from 'formik';
 
 //icons
 
@@ -71,18 +71,14 @@ const FlagPost = ({ route, navigation }) => {
 
   //Getting user input
   const [inputs, setInputs] = useState({
-    //Values needed to create post (../server/routes/feed.js)
-    //postTitle: '',
-    postText: '',
-    //author_id: '',
-    postTag: 'Revelle' /*Initialize as first value in tags drop-down*/,
+    checkboxState: '',
   });
 
   var JWTtoken = '';
 
   //Stores values to update input fields from user
   //const { postTitle, postText, author_id, postTag } = inputs;
-  const { postText, postTag } = inputs;
+  // const { postText, postTag } = inputs;
 
   //Update inputs when user enters new ones, name is identifier, value as a string
   const onChange = (name, value) => {
@@ -152,7 +148,48 @@ const FlagPost = ({ route, navigation }) => {
       return selector;
     });
     setCheckboxState(newValue);
+    // console.log(newValue);
+    // console.log(checkboxState);
+    // console.log(newValue);
+    // // console.log(newValue.filter(o => o.checked === true));
+    // const test = newValue.filter(o => o.checked === true);
+    // if (test.length) {
+    // const test2 = test[0];
+    // const test3 = test2.label;
+    // // console.log(test3);
+    // setInputs({ checkboxState: test3 });
+    // console.log(inputs.checkboxState);
+    // };
+    // setInputs(test);
+    // console.log(inputs);
+    // const test = newValue.filter(newValue => newValue.checked === true)
+    //  console.log(test);
   };
+
+  // useEffect(() => {
+  //   console.log('test');
+  //   console.log(checkboxState);
+  //   const test = checkboxState.filter((o) => o.checked === true);
+  //   if (test.length) {
+  //     var test2 = test[0];
+  //     var test3 = test2.label;
+  //     console.log(test3)
+  //     // console.log(inputs.checkboxState);
+  //   }
+  // }, [checkboxState]);
+
+  useEffect(() => {
+    console.log('test');
+    // console.log(checkboxState);
+    const test = checkboxState.filter((o) => o.checked === true);
+    if (test.length) {
+      const test2 = test[0];
+      const test3 = test2.label;
+      setInputs({checkboxState: test3})
+      // console.log(inputs)
+      console.log(inputs);
+    }
+  }, [checkboxState]);
 
   return (
     <Modal

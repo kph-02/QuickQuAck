@@ -11,6 +11,7 @@ import { serverIp } from '../screens/Login';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 //icons
 import MultiSelect from 'react-native-multiple-select';
+import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures';
 
 import {
   StyledViewPostContainer,
@@ -202,7 +203,7 @@ const TagModal = ({ navigation }) => {
   const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
   const [update, setUpdate] = useState(false); //Changing will feed to update
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(true);
   const handleModal = () => {
     setModalOpen(!modalOpen);
   };
@@ -337,54 +338,61 @@ const TagModal = ({ navigation }) => {
   };
 
   return (
-    <StyledViewPostContainer>
-      {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
-      <StatusBar style="black" />
-      {/* Header Content */}
-      <View style={styles.headerContainer}>
-        <MultiSelect
-          single
-          hideTags={true}
-          items={items}
-          uniqueKey="name"
-          // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
-          // onSelectedItemsChange={console.log(postTag)}
-          selectedItems={selectedItems}
-          onSelectedItemsChange={onSelectedItemsChange}
-          //   onAddItem={onSelectedItemsChange}
-          selectedItemIconColor={yellow}
-          selectedItemTextColor={black}
-          tagBorderColor={yellow}
-          tagTextColor={black}
-          textInputProps={{ editable: false }}
-          searchInputPlaceholderText=""
-          searchIcon={false}
-          fixedHeight={false}
-          selectText=""
-          //   onSubmit={onSelectedItemsChange}
-        ></MultiSelect>
-      </View>
+    <GestureRecognizer
+      style={{ flex: 1 }}
+      // onSwipeUp={() => this.setModalVisible(true)}
+      onSwipeDown={() => navigation.pop()}
+    >
+      <StyledViewPostContainer>
+        {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
+        <StatusBar style="black" />
+        {/* Header Content */}
+        <View style={styles.headerContainer}>
+          <MultiSelect
+            styleTextDropdownSelected={{textAlign: 'right'}}
+            single
+            hideTags={true}
+            items={items}
+            uniqueKey="name"
+            // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
+            // onSelectedItemsChange={console.log(postTag)}
+            selectedItems={selectedItems}
+            onSelectedItemsChange={onSelectedItemsChange}
+            //   onAddItem={onSelectedItemsChange}
+            selectedItemIconColor={yellow}
+            selectedItemTextColor={black}
+            tagBorderColor={yellow}
+            tagTextColor={black}
+            textInputProps={{ editable: false }}
+            searchInputPlaceholderText=""
+            searchIcon={false}
+            fixedHeight={false}
+            selectText=""
+            //   onSubmit={onSelectedItemsChange}
+          ></MultiSelect>
+        </View>
 
-      {/* <TouchableOpacity
+        {/* <TouchableOpacity
           style={{ marginLeft: 25, paddingHorizontal: 5, marginTop: 80, position: 'absolute' }}
           onPress={() => navigation.pop()}
         >
           <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text>
         </TouchableOpacity> */}
-      {/* FlatList of User's Posts */}
-      <View style={{ backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
-        <FlatList
-          numColumns={1}
-          horizontal={false}
-          data={postData} /*postData to display*/
-          keyExtractor={(item) => item.post_id}
-          extraData={selectedId}
-          renderItem={renderItem}
-          refreshing={refresh} //true: shows spinning animation to show loading
-          onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
-        />
-      </View>
-    </StyledViewPostContainer>
+        {/* FlatList of User's Posts */}
+        <View style={{ backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
+          <FlatList
+            numColumns={1}
+            horizontal={false}
+            data={postData} /*postData to display*/
+            keyExtractor={(item) => item.post_id}
+            extraData={selectedId}
+            renderItem={renderItem}
+            refreshing={refresh} //true: shows spinning animation to show loading
+            onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
+          />
+        </View>
+      </StyledViewPostContainer>
+    </GestureRecognizer>
   );
 };
 

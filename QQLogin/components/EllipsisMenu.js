@@ -130,7 +130,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
         })()}
         {/* Flag as Inappropriate */}
         <MenuOption
-          onSelect={() => navigation.navigate('Flag Post', { post: postText, user: postUser })}
+          onSelect={() => navigation.navigate('Flag Post', { post: post_text, user: post.user_id })}
           style={{ paddingVertical: 10 }}
         >
           <Text style={styles.text}>Flag as inappropriate</Text>
@@ -148,7 +148,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
                       text: 'Yes',
                       onPress: () => {
                         blockUser();
-                        navigation.pop();
+                        // navigation.pop();
                         console.log('User Pressed Yes');
                       },
                     },

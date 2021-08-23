@@ -149,6 +149,14 @@ CREATE TABLE poll_votes (
     CONSTRAINT FK_choice_id FOREIGN KEY(choice_id) REFERENCES poll_choices(choice_id) ON DELETE CASCADE
 );
 
+CREATE TABLE post_flags (
+    poster_id uuid NOT NULL,
+    reporter_id uuid NOT NULL,
+    post_text VARCHAR(250) NOT NULL,
+    report_reason VARCHAR(255) NOT NULL,
+
+);
+
 INSERT INTO tags (tag_id) VALUES ('Revelle');
 INSERT INTO tags (tag_id) VALUES ('Muir');
 INSERT INTO tags (tag_id) VALUES ('Warren');
