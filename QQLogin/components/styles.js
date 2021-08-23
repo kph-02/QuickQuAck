@@ -205,6 +205,18 @@ export const StyledButton2 = styled.TouchableOpacity`
   top: 25px;
 `;
 
+export const StyledButton3 = styled.TouchableOpacity`
+  display: flex;
+  flex-direction: column;
+  padding: 16px 32px;
+  background-color: ${yellow};
+  justify-content: center;
+  align-items: center;
+  margin-vertical: 10px;
+  height: 25px;
+  border-radius: 100px;
+`;
+
 export const ButtonText = styled.Text`
   color: ${black};
   font-style: normal;

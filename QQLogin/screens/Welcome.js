@@ -21,7 +21,7 @@ import {
   LeftIcon,
   StyledInputLabel,
   StyledTextInput,
-  StyledButton,
+  StyledButton3,
   RightIcon,
   Colors,
   ButtonText,
@@ -184,9 +184,9 @@ const Welcome = ({ navigation }) => {
           }}
           inputContainerStyle={{ borderRadius: 100, height: '100%', width: '100%', backgroundColor: '#F9F9F9' }}
         /> */}
-        <StyledButton onPress={() => navigation.navigate('TagModal')}>
+        <StyledButton3 onPress={() => navigation.navigate('TagModal')}>
           <Text>Filter</Text>
-        </StyledButton>
+        </StyledButton3>
       </InnerContainer>
 
       <FeedViews navigation={navigation} />

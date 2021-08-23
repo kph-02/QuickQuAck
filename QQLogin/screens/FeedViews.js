@@ -116,11 +116,11 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         borderTopWidth: 1,
       }}
     >
-      <View style={[styles.postTouchables, { marginLeft: 30, marginTop: 0, backgroundColor: 'white' }]}>
+      <View style={[styles.postTouchables, { marginLeft: 20, marginTop: 0, backgroundColor: 'white' }]}>
         <View style={[styles.infoRow, { marginRight: 5 }]}>
-          {/*number of people who've viewed the post*/}
+          {/* number of people who've viewed the post
           <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
-          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>0</Text>
+          <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>0</Text> */}
         </View>
         <View style={{ marginRight: 15, flexDirection: 'row', alignItems: 'center' }}>
           {/*number of upvotes*/}
