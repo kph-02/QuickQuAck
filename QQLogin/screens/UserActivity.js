@@ -4,6 +4,7 @@ import { Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert,
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyledFeedContainer, InnerContainer, Colors } from './../components/styles';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
 //Used for local storage to store JWTtoken
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 //Used to communicate with server
 import { serverIp } from './Login.js';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import PostMenu from '../components/PostMenu';
 
 //Store JWT for authentication
 var JWTtoken = '';
@@ -275,13 +277,13 @@ const UserActivity = ({ navigation }) => {
   return (
     // Note: marginBottom for StyledFeedContainer is to offset createMaterialBottomTabNavigator,
     // need to obtain height of this.
-    <StyledFeedContainer style={{marginBottom: 36}}>
+    <StyledFeedContainer>
       <StatusBar style="black" />
       {/* Header Content */}
       <View style={styles.headerContainer}>
           <Text style={styles.headline}>My Activity</Text>
       </View>
-      <View style={{backgroundColor: '#EFEFEF',  paddingTop: 2.5, paddingBottom: 36}}>
+      <View style={{flex: 4, backgroundColor: '#EFEFEF',  paddingTop: 2.5}}>
           <FlatList
             numColumns={1}
             horizontal={false}
@@ -294,6 +296,7 @@ const UserActivity = ({ navigation }) => {
           />
       </View>
     </StyledFeedContainer>
+    
   );
 };
 
@@ -356,18 +359,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 40,
     fontWeight: 'bold',
-    // color: '#000000',
-    color: '#FFCC15',
-    textShadowColor: '#DEE2E6',
-    // textShadowColor: '#FFCC15',
-    textShadowOffset: {width: 1, height: 1},
-    textShadowRadius: 0.5,
+    color: '#000000',
     bottom: 8,
   },
   headerContainer:{
     justifyContent: 'center', 
     paddingBottom: 20, 
-  }
+  },
+  touchableStyle: {
+    position: 'absolute',
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 30,
+    bottom: 30,
+  },
 });
 
 export default UserActivity;

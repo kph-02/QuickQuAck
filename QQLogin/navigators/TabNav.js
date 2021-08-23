@@ -11,10 +11,8 @@ import Notifications from '../screens/Notifications';
 import Settings from '../screens/Settings';
 import Signup from '../screens/Signup';
 import Login from '../screens/Login';
-import { createStackNavigator } from '@react-navigation/stack';
 import FeedViews from '../screens/FeedViews';
 import Messages from '../screens/Messages';
-import FeedTest from '../screens/FeedTest';
 import UserActivity from '../screens/UserActivity';
 
 // const FeedStack = createStackNavigator();
@@ -61,7 +59,7 @@ export default function TabNav() {
     inactiveColor="#BDBDBD"
     barStyle={{backgroundColor: '#FFFFFF',  borderTopColor: '#DEE2E6', borderTopWidth: 0.5}} 
     labeled={true}>
-        <Tab.Screen name="Feed" component={FeedTest} 
+        <Tab.Screen name="Feed" component={Welcome} 
              options={{
               tabBarIcon: ({ color, size }) => (
                   <MaterialCommunityIcons name="home" color={color} size={26} />
@@ -69,12 +67,11 @@ export default function TabNav() {
           }}
         />
         <Tab.Screen name="My Activity" component={UserActivity} 
-            options={({route}) => ({
+            options={{
                   tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons name="account-circle" color={color} size={26} />
                   ),
-                  tabBarVisible: true,
-              })}
+              }}
         />
         <Tab.Screen name="Messages" component={Messages} 
             options={{

@@ -448,15 +448,6 @@ export default function FeedViews({ navigation, scrollEventThrottle, onScroll, o
   scrET = scrollEventThrottle;
   animatedOffset = offset;
 
-  // console.log(offset);
-  // console.log(animatedOffset);
-
-  // console.log(onScroll);
-  // console.log(scrollEventThrottle);
-  
-  // console.log(onScr);
-  // console.log(scrET);
-
   return (
     <TabView
       navigationState={{ index, routes }}

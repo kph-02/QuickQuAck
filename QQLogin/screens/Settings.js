@@ -46,7 +46,7 @@ const Settings = ({ navigation }) => {
   const getFromDB = async () => {
     const query = 'user_id=' + userId;
     try {
-      const response = await fetch('http://' + serverIp + ':5000/feed/user-information?' + query, {
+      const response = await fetch('http://' + serverIp + '/feed/user-information?' + query, {
         method: 'GET',
         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
       });

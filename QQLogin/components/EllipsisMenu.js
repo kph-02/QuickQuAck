@@ -86,7 +86,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
 
       console.log(post.user_id);
 
-      const response = await fetch('http://' + serverIp + ':5000/feed/block-user', {
+      const response = await fetch('http://' + serverIp + '/feed/block-user', {
         method: 'PUT',
         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
