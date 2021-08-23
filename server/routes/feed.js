@@ -334,7 +334,7 @@ router.get("/post-comments", authorization, async (req, res) => {
   try {
     const { post_id } = req.query;
     const user_id = req.user;
-    //This checks to see if there are any blocked users.
+    // This checks to see if there are any blocked users.
     const blockedList = await pool.query(
       "SELECT array_length(blocked_users, 1) FROM users WHERE user_id = $1;",
       [user_id]
@@ -661,6 +661,7 @@ router.put("/edit-user-info", authorization, async (req, res) => {
       currentPassword,
     } = req.body;
     const user_id = req.user;
+
     if (firstName && lastName) {
       const updateUserName = await pool.query(
         "UPDATE users SET first_name = $1, last_name = $2 WHERE user_id = $3",
@@ -830,7 +831,7 @@ router.delete("/delete-poll", authorization, async (req, res) => {
   try {
     const { poll_id } = req.body;
     const deletedPoll = await pool.query(
-      "DELETE FROM poll WHERE (poll_id = $1",
+      "DELETE FROM poll WHERE (poll_id = $1)",
       [poll_id]
     );
     res.status(201).send("Success");
@@ -875,15 +876,35 @@ router.put("/block-user", authorization, async (req, res) => {
   console.log("Please");
   console.log(userID);
   console.log("Blocking user: " + userID + " from user: " + userID2);
-  try {
-    const addToBlockList = await pool.query(
-      "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
-      [userID, userID2]
-    );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json("Server Error");
+  if (userID == userID2) {
+    return;
+  } else {
+    try {
+      const addToBlockList = await pool.query(
+        "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
+        [userID, userID2]
+      );
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json("Server Error");
+    }
   }
 });
+
+// router.post("/flag-post", authorization, async (req, res) => {
+//   let { userID, postText, checkboxState } = req.body;
+//   const userID2 = req.user;
+
+//   try {
+//     const flagPost = await pool.query(
+//       "INSERT INTO post_flags(poster_id, reporter_id, post_text, report_reason) "
+//       + "VALUES($1, $2, $3, $4);",
+//       [userID, userID2]
+//     );
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).json("Server Error");
+//   }
+// });
 
 module.exports = router;

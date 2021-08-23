@@ -137,6 +137,7 @@ const TagSelection = ({ navigation }) => {
   getUserId();
 
   return (
+    
     <StyledContainer>
       <StatusBar style="black" />
       <PageTitle>Personalize QuickQuAck</PageTitle>

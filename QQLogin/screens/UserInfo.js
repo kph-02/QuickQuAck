@@ -10,7 +10,7 @@ import { Formik, setIn } from 'formik';
 
 import { Colors, StyledPostInput, StyledButton, ButtonText } from './../components/styles';
 
-import { Button, View, StyleSheet, Text, TouchableOpacity, TextInput } from 'react-native';
+import { Button, View, StyleSheet, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import Modal from 'react-native-modal';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
@@ -109,9 +109,11 @@ const UserInfo = ({ navigation }) => {
         body: JSON.stringify(body),
       });
 
-      // const parseRes = await response.json();
-
-      // console.log(parseRes);
+      const parseRes = await response.json();
+      if (parseRes) {
+        alert('The original password entered is incorrect. Please try again.');
+      }
+      console.log(parseRes);
     } catch (error) {
       console.error(error.message);
     }
@@ -138,7 +140,7 @@ const UserInfo = ({ navigation }) => {
   //Executes when Submit is pressed, sends  information to the database
   const onPressButtonEmail = async (e) => {
     e.preventDefault(); //prevent refresh
-    //Check if the post has content, if not, prevent submission and notify
+
     if (inputs.email) {
       sendToDB(inputs);
       handleModal2();
@@ -149,7 +151,7 @@ const UserInfo = ({ navigation }) => {
 
   const onPressButtonPassword = async (e) => {
     e.preventDefault(); //prevent refresh
-    //Check if the post has content, if not, prevent submission and notify
+
     if (inputs.password && inputs.currentPassword) {
       sendToDB(inputs);
       handleModal3();
@@ -160,7 +162,7 @@ const UserInfo = ({ navigation }) => {
 
   const onPressButtonSchool = async (e) => {
     e.preventDefault(); //prevent refresh
-    //Check if the post has content, if not, prevent submission and notify
+
     if (inputs.gy && inputs.college) {
       sendToDB(inputs);
       handleModal4();

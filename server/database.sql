@@ -83,13 +83,8 @@ CREATE TABLE tags (
 CREATE TABLE post_tags (
     tag_id VARCHAR(10) NOT NULL,
     post_id INTEGER NOT NULL,
-<<<<<<< HEAD
-    CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
-    FOREIGN KEY(post_id) REFERENCES post(post_id),
-=======
     CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE,
->>>>>>> origin
     PRIMARY KEY (post_id, tag_id)
 );
 
@@ -152,6 +147,14 @@ CREATE TABLE poll_votes (
     CONSTRAINT FK_user_id FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT FK_poll_id FOREIGN KEY(poll_id) REFERENCES poll(poll_id) ON DELETE CASCADE,
     CONSTRAINT FK_choice_id FOREIGN KEY(choice_id) REFERENCES poll_choices(choice_id) ON DELETE CASCADE
+);
+
+CREATE TABLE post_flags (
+    poster_id uuid NOT NULL,
+    reporter_id uuid NOT NULL,
+    post_text VARCHAR(250) NOT NULL,
+    report_reason VARCHAR(255) NOT NULL,
+
 );
 
 INSERT INTO tags (tag_id) VALUES ('Revelle');
