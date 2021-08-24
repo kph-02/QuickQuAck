@@ -5,49 +5,23 @@ import { useNavigation } from '@react-navigation/native';
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
 import Poll from '../components/Poll.js';
-//formik
-import { Formik } from 'formik';
-import { Switch } from 'react-native-switch';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 //icons
 
-import { Octicons, Ionicons } from '@expo/vector-icons';
+import { Octicons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import {
-  StyledContainer,
-  PageLogo,
-  PageTitle,
-  SubTitle,
   StyledViewPostContainer,
-  StyledInputLabel,
-  StyledTextInput,
-  StyledButton,
   RightIcon,
   Colors,
-  ButtonText,
-  Line,
-  ExtraView,
-  ExtraText,
   TextLink,
-  TextLinkContent,
-  ExtraViewRight,
-  StyledPostArea,
   StyledPostInput,
-  PageTitlePost,
-  InnerPostContainer,
-  ExtraPostView,
   TextPostContent,
-  ExtraBackView,
-  TagDropdown,
-  StyledPostArea1,
-  StyledPostArea2,
   PageTitleFlag,
+  StyledViewPostScrollView,
 } from './../components/styles';
-import { Button, View, Modal, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import KeyboardAvoidingWrapper from '../components/KBWrapper';
+import { Button, View, Modal, StyleSheet, TouchableOpacity, Text, TextInput, Dimensions, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
-import { TextInput } from 'react-native-gesture-handler';
 import Map from '../screens/Map';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
@@ -229,144 +203,101 @@ const CreatePost = ({ route, navigation }) => {
       animationType="slide"
       onRequestClose={() => navigation.pop()}
     >
-      <StyledViewPostContainer>
-        <StatusBar style="black" />
+      <TouchableWithoutFeedback
+        onPress={Keyboard.dismiss}
+        accessible={false}
+      >
+        <StyledViewPostContainer>
+          <StatusBar style="black" />
 
-        {/* Back Button */}
-        <TextLink
-          onPress={() => navigation.pop()}
-          style={{ marginLeft: 10, width: 55, paddingHorizontal: 5, bottom: 20 }}
-        >
-          <TextPostContent>Back</TextPostContent>
-        </TextLink>
+          {/* Back Button */}
+          <TextLink
+            onPress={() => navigation.pop()}
+            style={{marginLeft: 10, width: 55, paddingHorizontal: 5, bottom: 20 }}
+          >
+            <TextPostContent>Back</TextPostContent>
+          </TextLink>
 
-        {/* Page Title with the Post/Update button across from it */}
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 35,
-            width: '100%',
-            justifyContent: 'space-between',
-            paddingBottom: 20,
-          }}
-        >
-          <PageTitleFlag style={{ marginLeft: 15, fontSize: 22 }}>
-            {postType.post_type === 'Update' ? 'Update Post' : 'New Post'}
-          </PageTitleFlag>
-          <TouchableOpacity onPress={onPressButton} style={{ marginRight: 15 }}>
-            <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
-          </TouchableOpacity>
-        </View>
-
-        {/* Section/Container for Anonymous Username */}
-        <View
-          style={{
-            backgroundColor: 'white',
-            paddingVertical: 10,
-            borderTopColor: '#DADADA',
-            borderTopWidth: 1,
-            paddingHorizontal: 15,
-          }}
-        >
-          <MultiSelect
-            hideSubmitButton
-            items={items}
-            uniqueKey="name"
-            // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
-            // onSelectedItemsChange={console.log(postTag)}
-
-            selectedItems={selectedItems}
-            onSelectedItemsChange={onSelectedItemsChange}
-            // onToggleList = {console.log(moo)}
-            selectedItemIconColor={yellow}
-            selectedItemTextColor={black}
-            tagBorderColor={yellow}
-            tagTextColor={black}
-            textInputProps={{ editable: false }}
-            searchInputPlaceholderText=""
-            searchIcon={false}
-          />
-        </View>
-
-        {/* Section/Container for Text input for the Post */}
-        <View
-          style={{
-            alignItems: 'stretch',
-            backgroundColor: 'white',
-            paddingVertical: 10,
-            borderTopColor: '#DADADA',
-            borderTopWidth: 1,
-          }}
-        >
-          <MyTextInput
-            placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll title'}
-            name="postText"
-            style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }}
-            placeholderTextColor={darkgray}
-            onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
-            value={postText}
-            selectionColor="#FFCC15" //implement a max length
-            maxLength={250}
-            multiline
-          />
-          <Poll Type={postType.post_type} />
-          {/* <Button
-            title="test" 
-            onPress= {() => console.log(Map.getLocationAsync())} /> */}
-        </View>
-
-        {/* <InnerPostContainer> */}
-        {/* <ExtraBackView>
-            <TextLink onPress={() => navigation.pop()}>
-              <TextPostContent>Back</TextPostContent>
-            </TextLink>
-          </ExtraBackView> */}
-        {/* <ExtraPostView style={{backgroundColor: 'yellow'}}>
-            <TextLink onPress={onPressButton} hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }} style={{backgroundColor: 'pink'}}>
+          {/* Page Title with the Post/Update button across from it */}
+          <View
+            style={{
+              flexDirection: 'row',
+              marginTop: 35,
+              width: '100%',
+              justifyContent: 'space-between',
+              paddingBottom: 20,
+            }}
+          >
+            <PageTitleFlag style={{ marginLeft: 15, fontSize: 22 }}>
+              {postType.post_type === 'Update' ? 'Update Post' : 'New Post'}
+            </PageTitleFlag>
+            <TouchableOpacity onPress={onPressButton} style={{ marginRight: 15 }}>
               <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
-            </TextLink>
-          </ExtraPostView>
-          <PageTitlePost>{postType.post_type === 'Update' ? 'Update Post' : 'New Post'}</PageTitlePost>
-          <StyledPostArea1>
-            <Line />
-
-            <MyTextInput
-              placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll title'}
+            </TouchableOpacity>
+          </View>
+         
+          {/* Section/Container for Anonymous Username */}
+          <View
+            style={{
+              backgroundColor: 'white',
+              paddingVertical: 10,
+              // paddingTop: 10,
+              borderTopColor: '#DADADA',
+              borderTopWidth: 1,
+              paddingHorizontal: 15,
+            }}
+          >
+            <MultiSelect
+              hideSubmitButton
+              items={items}
+              uniqueKey="name"
+              // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
+              selectedItems={selectedItems}
+              onSelectedItemsChange={onSelectedItemsChange}
+              // onToggleList = {console.log(moo)}
+              selectedItemIconColor={yellow}
+              selectedItemTextColor={black}
+              tagBorderColor={yellow}
+              tagTextColor={black}
+              textInputProps={{ editable: false }}
+              searchInputPlaceholderText=""
+              searchIcon={false}
+              styleListContainer={{height: height * 0.22}}
+            />
+          </View>
+          <ScrollView
+          keyboardShouldPersistTaps="handled">
+          {/* Section/Container for Text input for the Post */}
+          <View
+            style={{
+              // alignItems: 'stretch',
+              backgroundColor: 'white',
+              paddingBottom: height * 0.15,
+              borderTopColor: '#DADADA',
+              // borderTopWidth: 1,
+            }}
+          >
+            <TextInput
+              placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll Title'}
               name="postText"
-              style={{}}
+              style={styles.input}
               placeholderTextColor={darkgray}
               onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
               value={postText}
               selectionColor="#FFCC15" //implement a max length
               maxLength={250}
-              multiline={true}
+              multiline
             />
-
             <Poll Type={postType.post_type} />
-          </StyledPostArea1>
-        </InnerPostContainer>
-
-        <TagDropdown>
-          <MultiSelect
-            hideSubmitButton
-            items={items}
-            uniqueKey="name"
-            // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
-            // onSelectedItemsChange={console.log(postTag)}
-
-            selectedItems={selectedItems}
-            onSelectedItemsChange={onSelectedItemsChange}
-            // onToggleList = {console.log(moo)}
-            selectedItemIconColor={yellow}
-            selectedItemTextColor={black}
-            tagBorderColor={yellow}
-            tagTextColor={black}
-            textInputProps={{ editable: false }}
-            searchInputPlaceholderText=""
-            searchIcon={false}
-          />
-        </TagDropdown> */}
-      </StyledViewPostContainer>
+            {/* <Button
+              title="test" 
+            title="test" 
+              title="test" 
+              onPress= {() => console.log(Map.getLocationAsync())} /> */}
+          </View>
+          </ScrollView>
+        </StyledViewPostContainer>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -393,3 +324,35 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
 };
 
 export default CreatePost;
+
+const { width, height } = Dimensions.get('screen');
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    height: 45,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  divider: {
+    width: '120%',
+    borderColor:'#DEE2E6',
+    borderTopWidth: 1,
+    marginVertical: 1
+  },
+  other: { 
+    paddingVertical: 20, 
+    borderWidth: 0, 
+    borderColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  input: {
+    // margin: 12,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#DADADA',
+  },
+});
