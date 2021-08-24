@@ -35,6 +35,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import { Picker } from '@react-native-picker/picker';
@@ -252,7 +253,7 @@ const FlagPost = ({ route, navigation }) => {
           <View style={{ backgroundColor: '#DADADA', paddingVertical: 15, borderTopColor: '#DADADA' }}>
             <Text style={{ marginLeft: 15, color: 'black', fontSize: 15 }}>This post falls under:</Text>
           </View>
-
+          <ScrollView>
           {/* Renders the different Flag Selection Choices (selectors/checkboxes) */}
           {checkboxState.map((selector, i) => (
             <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} key={i}>
@@ -263,7 +264,7 @@ const FlagPost = ({ route, navigation }) => {
                 uncheckedIcon="circle-o"
                 checked={selector.checked}
                 checkedColor={'#FFCC15'}
-                containerStyle={{ backgroundColor: 'white', paddingVertical: 14, borderWidth: 0, borderColor: 'white' }}
+                containerStyle={{backgroundColor: 'white', paddingVertical: 14, borderWidth: 0, borderColor: 'white' }}
                 textStyle={{ color: 'black', fontSize: 15, fontWeight: 'normal' }}
               />
             </View>
@@ -282,6 +283,7 @@ const FlagPost = ({ route, navigation }) => {
             />
           </TouchableOpacity>
           <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
+          </ScrollView>
         </StyledViewPostContainer>
       </Modal>
 
@@ -407,5 +409,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  input: {
+    margin: 12,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#DADADA',
+    borderRadius: 5,
+    backgroundColor: 'white',
   },
 });
