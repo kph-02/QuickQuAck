@@ -868,22 +868,41 @@ router.post("/post-poll-vote", authorization, async (req, res) => {
 
 router.put("/block-user", authorization, async (req, res) => {
   let { userID } = req.body;
+  let { commentOwnerID } = req.body;
   const userID2 = req.user;
 
   userID = "{" + userID + "}";
+  commentOwnerID = "{" + commentOwnerID + "}";
 
-  console.log(req.body);
-  console.log("Please");
-  console.log(userID);
-  console.log("Blocking user: " + userID + " from user: " + userID2);
+  // console.log(req.body);
+  // console.log("Please");
+  // console.log(userID);
+
   if (userID == userID2) {
     return;
   } else {
     try {
-      const addToBlockList = await pool.query(
-        "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
-        [userID, userID2]
-      );
+      if (typeof commentOwnerID !== "undefined") {
+        // console.log("time to cry");
+        // console.log(commentOwnerID)
+        console.log(
+          "Blocking user: " + commentOwnerID + " from user: " + userID2
+        );
+
+        const addToBlockList = await pool.query(
+          "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
+          [commentOwnerID, userID2]
+        );
+      } else {
+        // console.log("time to die");
+        // console.log(userID)
+        console.log("Blocking user: " + userID + " from user: " + userID2);
+
+        const addToBlockList = await pool.query(
+          "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
+          [userID, userID2]
+        );
+      }
     } catch (err) {
       console.error(err.message);
       res.status(500).json("Server Error");
@@ -892,24 +911,57 @@ router.put("/block-user", authorization, async (req, res) => {
 });
 
 router.post("/flag-post", authorization, async (req, res) => {
-  const { poster_id, post_text, post_id, checkboxState, reportText } = req.body;
+  const {
+    poster_id,
+    post_text,
+    post_id,
+    checkboxState,
+    reportText,
+    comment_owner,
+  } = req.body;
   const reporter = req.user;
-  // console.log("hi")
-  console.log(req.body);
+
   try {
-    if (checkboxState) {
-      const flagPost = await pool.query(
-        "INSERT INTO post_flags(poster_id, reporter_id, post_text, post_id, report_reason) " +
-          "VALUES($1, $2, $3, $4, $5);",
-        [poster_id, reporter, post_text, post_id, checkboxState]
-      );
-    } else if (reportText) {
-      const flagPost = await pool.query(
-        "INSERT INTO post_flags(poster_id, reporter_id, post_text, post_id, report_reason) " +
-          "VALUES($1, $2, $3, $4, $5);",
-        [poster_id, reporter, post_text, post_id, reportText]
-      );
-    } else { return ;}
+    if (typeof comment_owner !== "undefined") {
+      if (checkboxState) {
+        const flagPost = await pool.query(
+          "INSERT INTO post_flags(poster_id, reporter_id, post_text, post_id, report_reason, comment_owner) " +
+            "VALUES($1, $2, $3, $4, $5, $6);",
+          [
+            poster_id,
+            reporter,
+            post_text,
+            post_id,
+            checkboxState,
+            comment_owner,
+          ]
+        );
+      } else if (reportText) {
+        const flagPost = await pool.query(
+          "INSERT INTO post_flags(poster_id, reporter_id, post_text, post_id, report_reason, comment_owner) " +
+            "VALUES($1, $2, $3, $4, $5, $6);",
+          [poster_id, reporter, post_text, post_id, reportText, comment_owner]
+        );
+      } else {
+        return;
+      }
+    } else {
+      if (checkboxState) {
+        const flagPost = await pool.query(
+          "INSERT INTO post_flags(poster_id, reporter_id, post_text, post_id, report_reason ) " +
+            "VALUES($1, $2, $3, $4, $5);",
+          [poster_id, reporter, post_text, post_id, checkboxState]
+        );
+      } else if (reportText) {
+        const flagPost = await pool.query(
+          "INSERT INTO post_flags(poster_id, reporter_id, post_text, post_id, report_reason ) " +
+            "VALUES($1, $2, $3, $4, $5);",
+          [poster_id, reporter, post_text, post_id, reportText]
+        );
+      } else {
+        return;
+      }
+    }
   } catch (err) {
     console.error(err.message);
     res.status(500).json("Server Error");

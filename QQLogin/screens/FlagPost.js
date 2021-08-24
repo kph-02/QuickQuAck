@@ -123,8 +123,9 @@ const FlagPost = ({ route, navigation }) => {
     body.poster_id = user;
     body.post_text = post;
     body.post_id = postid;
+    body.comment_owner = comment_owner;
     // const body = { posterID: user, post_text: post, post_id: postid };
-    console.log(body);
+    // console.log(body);
     // console.log('Inputs: ' + JSON.stringify(inputs));
 
     try {

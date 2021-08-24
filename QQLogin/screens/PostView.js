@@ -183,6 +183,8 @@ const PostView = ({ route, navigation }) => {
               commentOwner={userId === item.user_id ? true : false}
               commentOwnerID={item.user_id}
               comment_id={item.comment_id}
+              // comment_text={item.comment_text}
+
               JWTtoken={JWTtoken}
             />
           </View>
