@@ -26,6 +26,7 @@ import TagSettings from '../screens/TagSettings';
 import Map from '../screens/Map';
 import UserInfo from '../screens/UserInfo';
 import TagModal from '../components/TagModal';
+import ReportModal from '../components/ReportModal';
 
 const Stack = createStackNavigator();
 
@@ -58,6 +59,7 @@ const RootStack = () => {
       <Stack.Screen name="Chat Ellipsis" component={ChatRoomEllipsis} />
       <Stack.Screen name="UserInfo" component={UserInfo} />
       <Stack.Screen name="TagModal" component={TagModal} />
+      <Stack.Screen name="ReportModal" component={ReportModal} />
     </Stack.Navigator>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, Component, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CheckBox } from 'react-native-elements';
+import { AntDesign } from '@expo/vector-icons';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
@@ -15,34 +16,15 @@ import { Ionicons } from '@expo/vector-icons';
 
 import {
   StyledViewPostContainer,
-  PageLogo,
   PageTitleFlag,
-  SubTitle,
-  StyledFormArea,
   StyledInputLabel,
-  StyledTextInput,
-  StyledButton,
   RightIcon,
   Colors,
-  ButtonText,
-  Line,
-  ExtraView,
-  ExtraText,
   TextLink,
-  TextLinkContent,
-  ExtraViewRight,
-  StyledPostArea,
   StyledPostInput,
-  PageTitlePost,
-  InnerPostContainer,
-  ExtraPostView,
   TextPostContent,
-  ExtraBackView,
-  TagDropdown,
-  StyledPostArea1,
-  StyledPostArea2,
 } from './../components/styles';
-import { Button, View, Modal, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { Button, View, Modal, StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import { Picker } from '@react-native-picker/picker';
 
@@ -66,7 +48,7 @@ const FlagPost = ({ route, navigation }) => {
     { label: 'Invasion of Privacy', value: 'privacy', checked: false },
     { label: 'Trolling', value: 'trolling', checked: false },
     { label: 'Spam', value: 'spam', checked: false },
-    { label: 'Other', value: 'other', checked: false },
+    // { label: 'Other', value: 'other', checked: false },
   ]);
 
   //Getting user input
@@ -213,12 +195,12 @@ const FlagPost = ({ route, navigation }) => {
             flexDirection: 'row',
             marginTop: 45,
             width: '100%',
-            alignContent: 'space-between',
+            justifyContent: 'space-between',
             paddingBottom: 20,
           }}
         >
           <PageTitleFlag style={{ marginLeft: 15, fontSize: 22 }}>Flag as inappropriate?</PageTitleFlag>
-          <TouchableOpacity onPress={onPressButton} style={{ marginLeft: 115 }}>
+          <TouchableOpacity onPress={onPressButton} style={{ marginRight: 15 }}>
             <TextPostContent>Flag</TextPostContent>
           </TouchableOpacity>
         </View>
@@ -237,7 +219,7 @@ const FlagPost = ({ route, navigation }) => {
 
         {/* Section to separate Post/Comment data from Selectors */}
         <View style={{ backgroundColor: '#DADADA', paddingVertical: 15, borderTopColor: '#DADADA' }}>
-          <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }}>This post falls under:</Text>
+          <Text style={{ marginLeft: 15, color: 'black', fontSize: 15 }}>This post falls under:</Text>
         </View>
 
         {/* Renders the different Flag Selection Choices (selectors/checkboxes) */}
@@ -251,14 +233,24 @@ const FlagPost = ({ route, navigation }) => {
               checked={selector.checked}
               checkedColor={'#FFCC15'}
               containerStyle={{ backgroundColor: 'white', paddingVertical: 14, borderWidth: 0, borderColor: 'white' }}
-              textStyle={{ color: 'black', fontSize: 14, fontWeight: 'normal' }}
+              textStyle={{ color: 'black', fontSize: 15, fontWeight: 'normal'}}
             />
           </View>
         ))}
 
         {/* Bottom line divider (styling purposes) */}
         <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
+        {/* "Other" option to report post */}
+        <TouchableOpacity 
+          style={[styles.other]}
+          onPress={() => navigation.navigate("ReportModal", { post: post, user: user })}
+        >
+          <Text style={{fontSize: 15, marginLeft: width * 0.05}}>Other:</Text>
+          <AntDesign name="right" size={20} color="#BDBDBD" style={{paddingHorizontal: 10, marginRight: width * 0.05}}/>
+        </TouchableOpacity>
+        <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
       </StyledViewPostContainer>
+     
     </Modal>
   );
 };
@@ -282,3 +274,31 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
 };
 
 export default FlagPost;
+
+
+const { width, height } = Dimensions.get('screen');
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    height: 45,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  divider: {
+    width: '120%',
+    borderColor:'#DEE2E6',
+    borderTopWidth: 1,
+    marginVertical: 1
+  },
+  other: { 
+    paddingVertical: 20, 
+    borderWidth: 0, 
+    borderColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+});
+
