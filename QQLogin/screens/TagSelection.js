@@ -21,7 +21,7 @@ import {
   ButtonText,
   StyledButton2,
 } from './../components/styles';
-import { Button, View, Modal, StyleSheet, Text } from 'react-native';
+import { Button, View, Modal, StyleSheet, Text, Dimensions } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 import MultiSelect from 'react-native-multiple-select';
@@ -162,6 +162,7 @@ const TagSelection = ({ navigation }) => {
           searchIcon={false}
           fixedHeight={false}
           selectText=""
+          styleListContainer={{height: height * 0.22}}
         ></MultiSelect>
       </View>
       <StyledButton2 onPress={onPressButton}>
@@ -170,6 +171,8 @@ const TagSelection = ({ navigation }) => {
     </StyledContainer>
   );
 };
+
+const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   welcome: {

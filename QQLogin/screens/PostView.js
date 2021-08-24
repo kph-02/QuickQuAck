@@ -12,6 +12,7 @@ import {
   Alert,
   Touchable,
   KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import { MaterialCommunityIcons, EvilIcons } from '@expo/vector-icons';
 
@@ -815,7 +816,7 @@ const PostView = ({ route, navigation }) => {
       </View>
 
       {/* Comment Section (Scrollable) */}
-      <View style={{ flex: 2.5, backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
+      <View style={{ flex: 4, backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
         <FlatList
           numColumns={1}
           horizontal={false}
@@ -864,9 +865,11 @@ const PostView = ({ route, navigation }) => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.commentInputContainer}
           >
+            {/* <ScrollView */}
+            {/* keyboardShouldPersistTaps="handled"> */}
             <TextInput
-              label=""
-              icon=""
+              // label=""
+              // icon=""
               placeholder="Add a comment"
               placeholderTextColor={darkgray}
               onChangeText={handleChange('commentText')}
@@ -874,18 +877,22 @@ const PostView = ({ route, navigation }) => {
               //onSubmitEditing={}
               value={values.commentText}
               selectionColor="#FFCC15"
+              maxLength={250}
               multiline
+              // numberOfLines={}
               style={styles.commentInputField}
               //keyboardType='default'
             />
+             {/* </ScrollView> */}
             <EvilIcons
               name="arrow-up"
-              size={35}
+              size={40}
               color={yellow}
               justifyContent="center"
               onPress={handleSubmit}
               style={styles.commentInputSubmit}
             />
+           
           </KeyboardAvoidingView>
         )}
       </Formik>
@@ -982,21 +989,32 @@ const styles = StyleSheet.create({
     height: width * 0.18,
   },
   commentInputContainer: {
-    flex: 0.3,
-    display: 'flex',
+    // flex: 0.3,
+    // display: 'flex',
+    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#DADADA',
   },
   commentInputField: {
-    flex: 0.98,
+    // flex: 0.98,
+    // flex: 4,
+    padding: 15,
+    height: '100%',
+    width: '90%',
     color: 'black',
-    backgroundColor: 'white',
-    borderTopWidth: 10,
-    borderColor: 'white',
+    // borderTopWidth: 1,
+    // borderTopWidth: 10,
+    // borderColor: '#DADADA',
   },
   commentInputSubmit: {
-    borderTopWidth: 10,
-    borderColor: 'white',
+    // borderTopWidth: 1,
+    // borderColor: 'white',
+    // flex: 1,
+    width: '10%',
   },
   editPost: {
     width: width * 0.07,
