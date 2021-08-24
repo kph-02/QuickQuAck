@@ -42,6 +42,7 @@
     "react-native-pager-view": "5.0.12",
     "react-native-paper": "^4.9.2",
     "react-native-permissions": "^3.0.5",
+    "react-native-poll": "^0.1.2",
     "react-native-popup-menu": "^0.15.11",
     "react-native-reanimated": "^2.2.0",
     "react-native-safe-area-context": "^3.2.0",
@@ -54,6 +55,7 @@
     "react-native-vector-icons": "^8.1.0",
     "react-native-web": "^0.17.1",
     "react-native-webview": "11.6.2",
+    "react-polls": "^1.2.0",
     "react-usestateref": "^1.0.5",
     "styled-components": "^5.3.0"
   },
