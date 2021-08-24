@@ -891,20 +891,29 @@ router.put("/block-user", authorization, async (req, res) => {
   }
 });
 
-// router.post("/flag-post", authorization, async (req, res) => {
-//   let { userID, postText, checkboxState } = req.body;
-//   const userID2 = req.user;
-
-//   try {
-//     const flagPost = await pool.query(
-//       "INSERT INTO post_flags(poster_id, reporter_id, post_text, report_reason) "
-//       + "VALUES($1, $2, $3, $4);",
-//       [userID, userID2]
-//     );
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).json("Server Error");
-//   }
-// });
+router.post("/flag-post", authorization, async (req, res) => {
+  const { poster_id, post_text, post_id, checkboxState, reportText } = req.body;
+  const reporter = req.user;
+  // console.log("hi")
+  console.log(req.body);
+  try {
+    if (checkboxState) {
+      const flagPost = await pool.query(
+        "INSERT INTO post_flags(poster_id, reporter_id, post_text, post_id, report_reason) " +
+          "VALUES($1, $2, $3, $4, $5);",
+        [poster_id, reporter, post_text, post_id, checkboxState]
+      );
+    } else if (reportText) {
+      const flagPost = await pool.query(
+        "INSERT INTO post_flags(poster_id, reporter_id, post_text, post_id, report_reason) " +
+          "VALUES($1, $2, $3, $4, $5);",
+        [poster_id, reporter, post_text, post_id, reportText]
+      );
+    } else { return ;}
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
 
 module.exports = router;

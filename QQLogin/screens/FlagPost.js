@@ -43,6 +43,8 @@ import { Picker } from '@react-native-picker/picker';
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 const FlagPost = ({ route, navigation }) => {
+  // const { post_id, post_text } = post;
+
   // Use State hooks
   const [composePost, setComposePost] = useState(false);
   const [agree, setAgree] = useState(false);
@@ -50,7 +52,7 @@ const FlagPost = ({ route, navigation }) => {
   const [modalOpen, setModalOpen] = useState(true);
   const [modalOpen2, setModalOpen2] = useState(false);
 
-  const { post, user } = route.params;
+  const { post, user, postid } = route.params;
 
   //Hooks and initial states for the Selectors
   const [checkboxState, setCheckboxState] = useState([
@@ -73,6 +75,25 @@ const FlagPost = ({ route, navigation }) => {
 
   var JWTtoken = '';
 
+  const goBackModal = async () => {
+    setModalOpen2(false);
+    setModalOpen(true);
+    clearState();
+  };
+
+  const handleModal2 = async () => {
+    setModalOpen2(true);
+    clearState();
+  };
+  const initialState = {
+    checkboxState: '',
+    reportText: '',
+  };
+
+  const clearState = () => {
+    setInputs({ ...initialState });
+  };
+
   //Stores values to update input fields from user
   //const { postTitle, postText, author_id, postTag } = inputs;
   // const { postText, postTag } = inputs;
@@ -80,15 +101,6 @@ const FlagPost = ({ route, navigation }) => {
   //Update inputs when user enters new ones, name is identifier, value as a string
   const onChange = (name, value) => {
     setInputs({ ...inputs, [name]: value });
-  };
-
-  //Executes when Post is pressed, sends post information to the database
-  const onPressButton = async (e) => {
-    e.preventDefault();
-    sendToDB(inputs);
-    navigation.pop();
-    //not sure if modal will handle this navigation below, try later
-    //navigation.navigate('TabNav', { Screen: 'Feed' });
   };
 
   //Getting JWT from local storage, must exist otherwise user can't be on this page
@@ -107,24 +119,56 @@ const FlagPost = ({ route, navigation }) => {
   const sendToDB = async (body) => {
     await getJWT();
     //body.author_id = JWTtoken; //Temp set to JWTtoken, change later maybe?
-
+    body.poster_id = user;
+    body.post_text = post;
+    body.post_id = postid;
+    // const body = { posterID: user, post_text: post, post_id: postid };
+    console.log(body);
     // console.log('Inputs: ' + JSON.stringify(inputs));
 
     try {
       // console.log('Sent Token:      ' + JWTtoken);
       // Update server with user's registration information
-      const response = await fetch('http://' + serverIp + '/feed/create-post', {
+      const response = await fetch('http://' + serverIp + '/feed/flag-post', {
         method: 'POST',
         headers: { token: JWTtoken, 'content-type': 'application/json' },
         body: JSON.stringify(body),
       });
 
-      const parseRes = await response.json();
+      // const parseRes = await response.json();
 
-      console.log(parseRes);
+      // console.log(parseRes);
     } catch (error) {
       console.error(error.message);
     }
+  };
+
+  useEffect(() => {
+    // console.log('This is logging the value of test3');
+    // console.log(checkboxState);
+    const checkboxObjectArray = checkboxState.filter((o) => o.checked === true);
+    // console.log(checkboxObject);
+    if (checkboxObjectArray.length) {
+      const checkboxObject = checkboxObjectArray[0];
+      var test3 = checkboxObject.label;
+      console.log(test3);
+      setInputs({ checkboxState: test3 });
+      // console.log('This is logging the value of inputs');
+      // console.log(inputs.checkboxState);
+    }
+  }, [checkboxState]);
+
+  // useEffect(() => {
+  //   // console.log(inputs.checkboxState)
+  //   sendToDB(inputs);
+  // }, [inputs]);
+
+  //Executes when Post is pressed, sends post information to the database
+  const onPressButton = async (e) => {
+    e.preventDefault();
+    // console.log(inputs);
+    sendToDB(inputs);
+    navigation.pop()
   };
 
   // Function to handle the checked state of Selectors
@@ -145,62 +189,6 @@ const FlagPost = ({ route, navigation }) => {
       return selector;
     });
     setCheckboxState(newValue);
-    // console.log(newValue);
-    // console.log(checkboxState);
-    // console.log(newValue);
-    // // console.log(newValue.filter(o => o.checked === true));
-    // const test = newValue.filter(o => o.checked === true);
-    // if (test.length) {
-    // const test2 = test[0];
-    // const test3 = test2.label;
-    // // console.log(test3);
-    // setInputs({ checkboxState: test3 });
-    // console.log(inputs.checkboxState);
-    // };
-    // setInputs(test);
-    // console.log(inputs);
-    // const test = newValue.filter(newValue => newValue.checked === true)
-    //  console.log(test);
-  };
-
-  // useEffect(() => {
-  //   console.log('test');
-  //   console.log(checkboxState);
-  //   const test = checkboxState.filter((o) => o.checked === true);
-  //   if (test.length) {
-  //     var test2 = test[0];
-  //     var test3 = test2.label;
-  //     console.log(test3)
-  //     // console.log(inputs.checkboxState);
-  //   }
-  // }, [checkboxState]);
-
-  useEffect(() => {
-    console.log('test');
-    // console.log(checkboxState);
-    const test = checkboxState.filter((o) => o.checked === true);
-    if (test.length) {
-      const test2 = test[0];
-      const test3 = test2.label;
-      setInputs({ checkboxState: test3 });
-      // console.log(inputs)
-      console.log(inputs);
-    }
-  }, [checkboxState]);
-
-  const goBackModal = async () => {
-    setModalOpen2(false);
-    setModalOpen(true);
-    clearState();
-  };
-
-  const initialState = {
-    checkboxState: '',
-    reportText: '',
-  };
-
-  const clearState = () => {
-    setInputs({ ...initialState });
   };
 
   return (
@@ -272,7 +260,7 @@ const FlagPost = ({ route, navigation }) => {
           {/* Bottom line divider (styling purposes) */}
           <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
           {/* "Other" option to report post */}
-          <TouchableOpacity style={[styles.other]} onPress={() => setModalOpen2()}>
+          <TouchableOpacity style={[styles.other]} onPress={() => handleModal2()}>
             <Text style={{ fontSize: 15, marginLeft: width * 0.05 }}>Other:</Text>
             <AntDesign
               name="right"
@@ -407,5 +395,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  divider: {
+    width: '120%',
+    borderColor: '#DEE2E6',
+    borderTopWidth: 1,
+    marginVertical: 1,
+  },
+  other: {
+    paddingVertical: 20,
+    borderWidth: 0,
+    borderColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  input: {
+    // height: 40,
+    margin: 12,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#DADADA',
+    borderRadius: 5,
+    backgroundColor: 'white',
+  },
+  thingy: {
+    backgroundColor: 'white',
+    borderTopColor: '#DADADA',
+    borderTopWidth: 1,
   },
 });
