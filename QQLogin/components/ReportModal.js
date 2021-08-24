@@ -35,17 +35,6 @@ const ReportModal = ({ route, navigation }) => {
 
   const { post, user } = route.params;
 
-//   //Hooks and initial states for the Selectors
-//   const [checkboxState, setCheckboxState] = useState([
-//     { label: 'Bullying / Harassment', value: 'harassment', checked: false },
-//     { label: 'Inappropriate Content', value: 'inappropriate', checked: false },
-//     { label: 'Discrimination / Hate Speech', value: 'hate', checked: false },
-//     { label: 'Invasion of Privacy', value: 'privacy', checked: false },
-//     { label: 'Trolling', value: 'trolling', checked: false },
-//     { label: 'Spam', value: 'spam', checked: false },
-//     // { label: 'Other', value: 'other', checked: false },
-//   ]);
-
   //Getting user input
   const [inputs, setInputs] = useState({
     reportText: '',
@@ -230,7 +219,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input: {
-    // height: 40,
     margin: 12,
     padding: 10,
     borderWidth: 1,
@@ -238,10 +226,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: 'white',
   },
-  thingy: { 
-      backgroundColor: 'white', 
-      borderTopColor: '#DADADA', 
-      borderTopWidth: 1 
-  }
 });
 

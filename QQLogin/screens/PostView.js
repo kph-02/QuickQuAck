@@ -271,6 +271,7 @@ const PostView = ({ route, navigation }) => {
         //console.log('Retrieved Token: ' + token);
         userId = user_id;
       });
+      console.log(userId);
     } catch (error) {
       console.error(error.message);
     }

@@ -47,6 +47,12 @@ export const StyledViewPostContainer = styled.View`
   background-color: ${primary};
 `;
 
+export const StyledViewPostScrollView = styled.ScrollView`
+  flex: 1;
+  padding-top: ${StatusBarHeight + 20}px;
+  background-color: ${primary};
+`;
+
 export const InnerContainer = styled.View`
   flex: 1;
   width: 100%;

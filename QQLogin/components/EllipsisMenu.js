@@ -9,7 +9,9 @@ import { serverIp } from '../screens/Login.js';
 const { SlideInMenu } = renderers;
 
 const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, JWTtoken }) => {
-  const { post_id, post_text } = post;
+  const { anon_name, post_id, post_text} = post;
+  console.log("This is post:");
+  console.log(post);
 
   //When user clicks on icon to update post
   const updatePost = () => {
@@ -130,7 +132,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, J
         })()}
         {/* Flag as Inappropriate */}
         <MenuOption
-          onSelect={() => navigation.navigate('Flag Post', { post: post_text, user: post.user_id })}
+          onSelect={() => navigation.navigate('Flag Post', { post: post_text, user: anon_name })}
           style={{ paddingVertical: 10 }}
         >
           <Text style={styles.text}>Flag as inappropriate</Text>
