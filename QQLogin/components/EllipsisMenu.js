@@ -150,7 +150,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
                       text: 'Yes',
                       onPress: () => {
                         blockUser();
-                        // navigation.pop();
+                        navigation.pop();
                         console.log('User Pressed Yes');
                       },
                     },
