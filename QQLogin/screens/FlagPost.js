@@ -24,7 +24,18 @@ import {
   StyledPostInput,
   TextPostContent,
 } from './../components/styles';
-import { Button, View, Modal, StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-native';
+import {
+  Button,
+  View,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard,
+  TextInput,
+} from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 import { Picker } from '@react-native-picker/picker';
 
@@ -37,6 +48,7 @@ const FlagPost = ({ route, navigation }) => {
   const [agree, setAgree] = useState(false);
   const [selectedValue, setSelectedValue] = useState(true);
   const [modalOpen, setModalOpen] = useState(true);
+  const [modalOpen2, setModalOpen2] = useState(false);
 
   const { post, user } = route.params;
 
@@ -54,7 +66,10 @@ const FlagPost = ({ route, navigation }) => {
   //Getting user input
   const [inputs, setInputs] = useState({
     checkboxState: '',
+    reportText: '',
   });
+
+  const { reportText } = inputs;
 
   var JWTtoken = '';
 
@@ -167,91 +182,185 @@ const FlagPost = ({ route, navigation }) => {
     if (test.length) {
       const test2 = test[0];
       const test3 = test2.label;
-      setInputs({checkboxState: test3})
+      setInputs({ checkboxState: test3 });
       // console.log(inputs)
       console.log(inputs);
     }
   }, [checkboxState]);
 
+  const goBackModal = async () => {
+    setModalOpen2(false);
+    setModalOpen(true);
+    clearState();
+  };
+
+  const initialState = {
+    checkboxState: '',
+    reportText: '',
+  };
+
+  const clearState = () => {
+    setInputs({ ...initialState });
+  };
+
   return (
-    <Modal
-      transparent={true}
-      statusBarTranslucent={false}
-      visible={modalOpen}
-      animationType="slide"
-      onRequestClose={() => navigation.pop()}
-    >
-      <StyledViewPostContainer>
-        <StatusBar style="black" />
+    <View>
+      <Modal
+        transparent={true}
+        statusBarTranslucent={false}
+        visible={modalOpen}
+        animationType="slide"
+        onRequestClose={() => navigation.pop()}
+      >
+        <StyledViewPostContainer>
+          <StatusBar style="black" />
 
-        {/* Back Button */}
-        <TextLink onPress={() => navigation.pop()} style={{ marginLeft: 10, width: 55, paddingHorizontal: 5 }}>
-          <TextPostContent>Back</TextPostContent>
-        </TextLink>
+          {/* Back Button */}
+          <TextLink onPress={() => navigation.pop()} style={{ marginLeft: 10, width: 55, paddingHorizontal: 5 }}>
+            <TextPostContent>Back</TextPostContent>
+          </TextLink>
 
-        {/* Flag as Inappropriate Title, with the Flag button across from it */}
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 45,
-            width: '100%',
-            justifyContent: 'space-between',
-            paddingBottom: 20,
-          }}
-        >
-          <PageTitleFlag style={{ marginLeft: 15, fontSize: 22 }}>Flag as inappropriate?</PageTitleFlag>
-          <TouchableOpacity onPress={onPressButton} style={{ marginRight: 15 }}>
-            <TextPostContent>Flag</TextPostContent>
-          </TouchableOpacity>
-        </View>
-
-        {/* Section/Container for Anonymous Username */}
-        <View style={{ backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1 }}>
-          <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }}>{user}</Text>
-        </View>
-
-        {/* Section/Container for Text in the Post/Comment to be reported */}
-        <View style={{ backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1 }}>
-          <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }} numberOfLines={1}>
-            {post}
-          </Text>
-        </View>
-
-        {/* Section to separate Post/Comment data from Selectors */}
-        <View style={{ backgroundColor: '#DADADA', paddingVertical: 15, borderTopColor: '#DADADA' }}>
-          <Text style={{ marginLeft: 15, color: 'black', fontSize: 15 }}>This post falls under:</Text>
-        </View>
-
-        {/* Renders the different Flag Selection Choices (selectors/checkboxes) */}
-        {checkboxState.map((selector, i) => (
-          <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} key={i}>
-            <CheckBox
-              onPress={() => selectorHandler(true, i)}
-              title={selector.label}
-              checkedIcon="dot-circle-o"
-              uncheckedIcon="circle-o"
-              checked={selector.checked}
-              checkedColor={'#FFCC15'}
-              containerStyle={{ backgroundColor: 'white', paddingVertical: 14, borderWidth: 0, borderColor: 'white' }}
-              textStyle={{ color: 'black', fontSize: 15, fontWeight: 'normal'}}
-            />
+          {/* Flag as Inappropriate Title, with the Flag button across from it */}
+          <View
+            style={{
+              flexDirection: 'row',
+              marginTop: 45,
+              width: '100%',
+              justifyContent: 'space-between',
+              paddingBottom: 20,
+            }}
+          >
+            <PageTitleFlag style={{ marginLeft: 15, fontSize: 22 }}>Flag as inappropriate?</PageTitleFlag>
+            <TouchableOpacity onPress={onPressButton} style={{ marginRight: 15 }}>
+              <TextPostContent>Flag</TextPostContent>
+            </TouchableOpacity>
           </View>
-        ))}
 
-        {/* Bottom line divider (styling purposes) */}
-        <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
-        {/* "Other" option to report post */}
-        <TouchableOpacity 
-          style={[styles.other]}
-          onPress={() => navigation.navigate("ReportModal", { post: post, user: user })}
-        >
-          <Text style={{fontSize: 15, marginLeft: width * 0.05}}>Other:</Text>
-          <AntDesign name="right" size={20} color="#BDBDBD" style={{paddingHorizontal: 10, marginRight: width * 0.05}}/>
-        </TouchableOpacity>
-        <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
-      </StyledViewPostContainer>
-     
-    </Modal>
+          {/* Section/Container for Anonymous Username */}
+          <View style={{ backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1 }}>
+            <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }}>{user}</Text>
+          </View>
+
+          {/* Section/Container for Text in the Post/Comment to be reported */}
+          <View style={{ backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1 }}>
+            <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }} numberOfLines={1}>
+              {post}
+            </Text>
+          </View>
+
+          {/* Section to separate Post/Comment data from Selectors */}
+          <View style={{ backgroundColor: '#DADADA', paddingVertical: 15, borderTopColor: '#DADADA' }}>
+            <Text style={{ marginLeft: 15, color: 'black', fontSize: 15 }}>This post falls under:</Text>
+          </View>
+
+          {/* Renders the different Flag Selection Choices (selectors/checkboxes) */}
+          {checkboxState.map((selector, i) => (
+            <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} key={i}>
+              <CheckBox
+                onPress={() => selectorHandler(true, i)}
+                title={selector.label}
+                checkedIcon="dot-circle-o"
+                uncheckedIcon="circle-o"
+                checked={selector.checked}
+                checkedColor={'#FFCC15'}
+                containerStyle={{ backgroundColor: 'white', paddingVertical: 14, borderWidth: 0, borderColor: 'white' }}
+                textStyle={{ color: 'black', fontSize: 15, fontWeight: 'normal' }}
+              />
+            </View>
+          ))}
+
+          {/* Bottom line divider (styling purposes) */}
+          <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
+          {/* "Other" option to report post */}
+          <TouchableOpacity style={[styles.other]} onPress={() => setModalOpen2()}>
+            <Text style={{ fontSize: 15, marginLeft: width * 0.05 }}>Other:</Text>
+            <AntDesign
+              name="right"
+              size={20}
+              color="#BDBDBD"
+              style={{ paddingHorizontal: 10, marginRight: width * 0.05 }}
+            />
+          </TouchableOpacity>
+          <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
+        </StyledViewPostContainer>
+      </Modal>
+
+      <Modal
+        transparent={true}
+        statusBarTranslucent={false}
+        visible={modalOpen2}
+        animationType="slide"
+        onRequestClose={() => goBackModal()}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <StyledViewPostContainer>
+            <StatusBar style="black" />
+
+            {/* Back Button */}
+            {/* Using navigation.pop(2) for now, because popping back to the FlagPost modal causes issues */}
+            <TextLink onPress={() => goBackModal()} style={{ marginLeft: 10, width: 55, paddingHorizontal: 5 }}>
+              <TextPostContent>Back</TextPostContent>
+            </TextLink>
+
+            {/* Flag as Inappropriate Title, with the Flag button across from it */}
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 45,
+                width: '100%',
+                justifyContent: 'space-between',
+                paddingBottom: 20,
+              }}
+            >
+              <PageTitleFlag style={{ marginLeft: 15, fontSize: 22 }}>Flag as inappropriate?</PageTitleFlag>
+              <TouchableOpacity onPress={onPressButton} style={{ marginRight: 15 }}>
+                {/* Change to: "Submit Report" */}
+                <TextPostContent>Flag</TextPostContent>
+              </TouchableOpacity>
+            </View>
+
+            {/* Section/Container for Anonymous Username */}
+            <View
+              style={{ backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1 }}
+            >
+              <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }}>{user}</Text>
+            </View>
+
+            {/* Section/Container for Text in the Post/Comment to be reported */}
+            <View
+              style={{ backgroundColor: 'white', paddingVertical: 15, borderTopColor: '#DADADA', borderTopWidth: 1 }}
+            >
+              <Text style={{ marginLeft: 15, color: 'black', fontSize: 14 }} numberOfLines={1}>
+                {post}
+              </Text>
+            </View>
+
+            {/* Section to separate Post/Comment data from Selectors */}
+            <View style={{ backgroundColor: '#DADADA', paddingVertical: 15, borderTopColor: '#DADADA' }}>
+              <Text style={{ marginLeft: 15, color: 'black', fontSize: 15 }}>"Other" Reasoning:</Text>
+            </View>
+
+            {/* Bottom line divider (styling purposes) */}
+            <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
+            {/* Text Input for "Other" reasoning */}
+
+            <TextInput
+              placeholder="Reasoning Here..."
+              name="reportText"
+              style={styles.input}
+              placeholderTextColor={darkgray}
+              onChangeText={(e) => onChange('reportText', e)} //update inputs to match user input
+              value={reportText}
+              selectionColor="#FFCC15" //implement a max length
+              maxLength={250}
+              multiline
+            />
+
+            <View style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }} />
+          </StyledViewPostContainer>
+        </TouchableWithoutFeedback>
+      </Modal>
+    </View>
   );
 };
 
@@ -275,7 +384,6 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
 
 export default FlagPost;
 
-
 const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
@@ -288,17 +396,16 @@ const styles = StyleSheet.create({
   },
   divider: {
     width: '120%',
-    borderColor:'#DEE2E6',
+    borderColor: '#DEE2E6',
     borderTopWidth: 1,
-    marginVertical: 1
+    marginVertical: 1,
   },
-  other: { 
-    paddingVertical: 20, 
-    borderWidth: 0, 
+  other: {
+    paddingVertical: 20,
+    borderWidth: 0,
     borderColor: 'white',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
 });
-
