@@ -53,7 +53,7 @@ const FlagPost = ({ route, navigation }) => {
   const [modalOpen, setModalOpen] = useState(true);
   const [modalOpen2, setModalOpen2] = useState(false);
 
-  const { post, user, postid } = route.params;
+  const { post, user, postid, comment_owner } = route.params;
 
   //Hooks and initial states for the Selectors
   const [checkboxState, setCheckboxState] = useState([

@@ -181,6 +181,7 @@ const PostView = ({ route, navigation }) => {
               navigation={navigation}
               post={post}
               commentOwner={userId === item.user_id ? true : false}
+              commentOwnerID={item.user_id}
               comment_id={item.comment_id}
               JWTtoken={JWTtoken}
             />
@@ -439,6 +440,8 @@ const PostView = ({ route, navigation }) => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
+      console.log("Does this even do anything ;-;");
+      console.log(parseRes.data);
 
       //Copy useState parameters b/c shouldn't call useState in if statements
       let map = mapComments;
@@ -448,6 +451,8 @@ const PostView = ({ route, navigation }) => {
       //Updates postData to have post information using useState
       if (parseRes.data) {
         comments = parseRes.data.comment;
+        console.log("This is comments");
+        console.log(comments);
         //iterate through the comments to update upvotes array
         for (const comment of comments) {
           //comment hasn't been mapped yet, so map it.
