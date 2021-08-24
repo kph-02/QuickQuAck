@@ -168,3 +168,22 @@ INSERT INTO tags (tag_id) VALUES ('Food');
 INSERT INTO tags (tag_id) VALUES ('Social');
 INSERT INTO tags (tag_id) VALUES ('Poll');
 INSERT INTO tags (tag_id) VALUES ('Question');
+
+CREATE TABLE messages (
+  ID SERIAL PRIMARY KEY,
+  text varchar(255) NOT NULL,
+  username varchar(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT now()
+);
+
+INSERT INTO messages (text, username)
+  VALUES ('1+1=2', 'matthew'), 
+  ('2+2=4', 'blake'), 
+  ('3+3=6', 'julie'), 
+  ('4+4=8', 'courtney'), 
+  ('5+5=10', 'brian'), 
+  ('6+6=12', 'michael'), 
+  ('7+7=14', 'edward'), 
+  ('1+1=2', 'matthew'), 
+  ('2+2=4', 'blake'), 
+  ('3+3=6', 'julie');
