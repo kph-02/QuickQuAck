@@ -15,6 +15,7 @@ import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
 <<<<<<< HEAD
+<<<<<<< HEAD
 // const serverIp = '192.168.1.119:5000';
 //const serverIp = '192.168.0.153:5000';
  const serverIp = '192.168.50.115:5000';
@@ -24,9 +25,15 @@ const serverIp = '192.168.1.119:5000';
 // const serverIp = '192.168.50.115:5000';
 >>>>>>> main
 // const serverIp = '192.168.1.51:5000';
+=======
+// const serverIp = '192.168.1.119:5000';
+// const serverIp = '192.168.0.153:5000';
+// const serverIp = '192.168.50.115:5000';
+const serverIp = '192.168.1.51:5000';
+>>>>>>> main
 // const serverIp = '100.83.38.217:5000';
 // const serverIp = '10.128.124.246:5000';
-// const serverIp = '132.249.242.71';
+// const serverIp = '132.249.242.71'; //Ip for the server :)
 
 import {
   StyledContainer,
