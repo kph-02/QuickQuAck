@@ -19,7 +19,19 @@ import {
   PageTitleFlag,
   StyledViewPostScrollView,
 } from './../components/styles';
-import { Button, View, Modal, StyleSheet, TouchableOpacity, Text, TextInput, Dimensions, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import {
+  Button,
+  View,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  TextInput,
+  Dimensions,
+  Keyboard,
+  TouchableWithoutFeedback,
+  ScrollView,
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
 import Map from '../screens/Map';
@@ -53,6 +65,14 @@ const CreatePost = ({ route, navigation }) => {
 
     // console.log(inputs);
   };
+
+  //Runs only when objects are rendered
+  useEffect(() => {
+    //If updating post, select tags already associated with the post
+    if (postType.post_type === 'Update') {
+      setSelectedItems(postType.tagarray);
+    }
+  }, []);
 
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
@@ -203,17 +223,14 @@ const CreatePost = ({ route, navigation }) => {
       animationType="slide"
       onRequestClose={() => navigation.pop()}
     >
-      <TouchableWithoutFeedback
-        onPress={Keyboard.dismiss}
-        accessible={false}
-      >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <StyledViewPostContainer>
           <StatusBar style="black" />
 
           {/* Back Button */}
           <TextLink
             onPress={() => navigation.pop()}
-            style={{marginLeft: 10, width: 55, paddingHorizontal: 5, bottom: 20 }}
+            style={{ marginLeft: 10, width: 55, paddingHorizontal: 5, bottom: 20 }}
           >
             <TextPostContent>Back</TextPostContent>
           </TextLink>
@@ -235,7 +252,7 @@ const CreatePost = ({ route, navigation }) => {
               <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
             </TouchableOpacity>
           </View>
-         
+
           {/* Section/Container for Anonymous Username */}
           <View
             style={{
@@ -262,39 +279,38 @@ const CreatePost = ({ route, navigation }) => {
               textInputProps={{ editable: false }}
               searchInputPlaceholderText=""
               searchIcon={false}
-              styleListContainer={{height: height * 0.22}}
+              styleListContainer={{ height: height * 0.22 }}
             />
           </View>
-          <ScrollView
-          keyboardShouldPersistTaps="handled">
-          {/* Section/Container for Text input for the Post */}
-          <View
-            style={{
-              // alignItems: 'stretch',
-              backgroundColor: 'white',
-              paddingBottom: height * 0.15,
-              borderTopColor: '#DADADA',
-              // borderTopWidth: 1,
-            }}
-          >
-            <TextInput
-              placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll Title'}
-              name="postText"
-              style={styles.input}
-              placeholderTextColor={darkgray}
-              onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
-              value={postText}
-              selectionColor="#FFCC15" //implement a max length
-              maxLength={250}
-              multiline
-            />
-            <Poll Type={postType.post_type} />
-            {/* <Button
+          <ScrollView keyboardShouldPersistTaps="handled">
+            {/* Section/Container for Text input for the Post */}
+            <View
+              style={{
+                // alignItems: 'stretch',
+                backgroundColor: 'white',
+                paddingBottom: height * 0.15,
+                borderTopColor: '#DADADA',
+                // borderTopWidth: 1,
+              }}
+            >
+              <TextInput
+                placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll Title'}
+                name="postText"
+                style={styles.input}
+                placeholderTextColor={darkgray}
+                onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
+                value={postText}
+                selectionColor="#FFCC15" //implement a max length
+                maxLength={250}
+                multiline
+              />
+              <Poll Type={postType.post_type} />
+              {/* <Button
               title="test" 
             title="test" 
               title="test" 
               onPress= {() => console.log(Map.getLocationAsync())} /> */}
-          </View>
+            </View>
           </ScrollView>
         </StyledViewPostContainer>
       </TouchableWithoutFeedback>
@@ -337,13 +353,13 @@ const styles = StyleSheet.create({
   },
   divider: {
     width: '120%',
-    borderColor:'#DEE2E6',
+    borderColor: '#DEE2E6',
     borderTopWidth: 1,
-    marginVertical: 1
+    marginVertical: 1,
   },
-  other: { 
-    paddingVertical: 20, 
-    borderWidth: 0, 
+  other: {
+    paddingVertical: 20,
+    borderWidth: 0,
     borderColor: 'white',
     flexDirection: 'row',
     justifyContent: 'space-between',
