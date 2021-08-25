@@ -1,7 +1,6 @@
 const express = require("express"); //import Express
 const app = express(); //create an Express application on the app variable
 const cors = require("cors"); //import cors
-<<<<<<< HEAD
 const bodyParser = require('body-parser');
 const db = require('./routes/chatQueries');
 const socketPort = 8000;
@@ -14,10 +13,8 @@ const io = require("socket.io")(server, {
       methods: ["GET", "POST"],
    },
 });
-=======
 const cron = require("node-cron"); //import cron for schedule-based code
 const pool = require("./db");
->>>>>>> main
 
 // middleware //
 app.use(express.json()); //req.body
@@ -62,7 +59,6 @@ cron.schedule("0 * * * *", async () => {
   }
 });
 
-<<<<<<< HEAD
 
 /* Socket.io Methods */
 
@@ -93,7 +89,3 @@ const emitMostRecentMessges = () => {
  server.listen(socketPort, () => {
     console.log(`listening on *:${socketPort}`);
  });
-=======
-//Increasing a posts age by 24 hrs to test
-//UPDATE post SET time_posted = time_posted - interval '24 hours' WHERE post_id = 52;
->>>>>>> main
