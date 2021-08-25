@@ -153,7 +153,8 @@ CREATE TABLE post_flags (
     poster_id uuid NOT NULL,
     reporter_id uuid NOT NULL,
     post_text VARCHAR(250) NOT NULL,
-    report_reason VARCHAR(255) NOT NULL,
+    post_id BIGSERIAL NOT NULL,
+    report_reason VARCHAR(255) NOT NULL
 
 );
 
