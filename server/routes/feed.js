@@ -4,8 +4,6 @@ const authorization = require("../middleware/authorization");
 const pool = require("../db");
 const bcrypt = require("bcrypt");
 
-//
-
 /*
 Post functionality CRUD Operations
 Create Post(POST)
