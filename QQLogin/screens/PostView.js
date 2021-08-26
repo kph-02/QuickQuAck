@@ -443,7 +443,7 @@ const PostView = ({ route, navigation }) => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
-      console.log("Does this even do anything ;-;");
+      console.log('Does this even do anything ;-;'); //Yes, yes it does
       console.log(parseRes.data);
 
       //Copy useState parameters b/c shouldn't call useState in if statements
@@ -454,7 +454,7 @@ const PostView = ({ route, navigation }) => {
       //Updates postData to have post information using useState
       if (parseRes.data) {
         comments = parseRes.data.comment;
-        console.log("This is comments");
+        console.log('This is comments');
         console.log(comments);
         //iterate through the comments to update upvotes array
         for (const comment of comments) {
@@ -743,10 +743,10 @@ const PostView = ({ route, navigation }) => {
     /* Style for the entire screen, controls how children are aligned */
     <StyledViewPostContainer>
       <StatusBar style="black" />
-      <View style={{paddingTop: 5, marginHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View style={{ paddingTop: 5, marginHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between' }}>
         {/* Back Button */}
         <TouchableOpacity
-          style={{width: 55, paddingHorizontal: 5}}
+          style={{ width: 55, paddingHorizontal: 5 }}
           onPress={() => {
             navigation.pop();
             updatePostAttributes();
@@ -756,7 +756,7 @@ const PostView = ({ route, navigation }) => {
           {/* <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFCC15' }}>Back</Text> */}
         </TouchableOpacity>
         {/* The ... button above the original post's text */}
-        <View style={{ alignSelf: 'flex-end', marginRight: 5}}>
+        <View style={{ alignSelf: 'flex-end', marginRight: 5 }}>
           <EllipsisMenu
             navigation={navigation}
             post={post}
@@ -768,7 +768,7 @@ const PostView = ({ route, navigation }) => {
       <StatusBar style="black" />
 
       {/* The Original Post's Text */}
-      <View style={[styles.postBox, {marginTop: 10}]}>
+      <View style={[styles.postBox, { marginTop: 10 }]}>
         <AdjustLabel fontSize={30} text={post.post_text} style={styles.ogPostText} numberOfLines={8} />
       </View>
 
@@ -776,14 +776,14 @@ const PostView = ({ route, navigation }) => {
       <View
         style={[
           styles.postTouchables,
-          { justifyContent: 'flex-start', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5},
+          { justifyContent: 'flex-start', borderTopWidth: 0, borderTopColor: 'white', marginBottom: 10, marginTop: 5 },
         ]}
       >
         <RenderStyledTags tags={post.tagarray} />
       </View>
 
       {/* Container/View for the number of views, upvotes, comments, who posted it, and how long ago it was posted */}
-      <View style={[styles.postTouchables, {justifyContent: 'space-between'}]}>
+      <View style={[styles.postTouchables, { justifyContent: 'space-between' }]}>
         {/* <View style={[styles.infoRow, { marginRight: 5 }]}>
           <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
           <Text style={[styles.dataRow, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
@@ -800,20 +800,20 @@ const PostView = ({ route, navigation }) => {
             size={35}
             style={{ width: 29 }}
           />
-          <Text style={[styles.dataRow, { }]}>{upvotes}</Text>
+          <Text style={[styles.dataRow, {}]}>{upvotes}</Text>
         </TouchableOpacity>
         {/* Number of comments */}
         <View style={styles.infoRow}>
           <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-          <Text style={[styles.dataRow, { }]}>{comments.length}</Text>
+          <Text style={[styles.dataRow, {}]}>{comments.length}</Text>
         </View>
         {/* Name of poster */}
-        <View style={[styles.infoRow, ]}>
-          <Text style={[styles.dataRow, { }]}>{post.anon_name}</Text>
+        <View style={[styles.infoRow]}>
+          <Text style={[styles.dataRow, {}]}>{post.anon_name}</Text>
         </View>
         {/* time posted */}
         <View style={{}}>
-          <Text style={[styles.dataRow, { }]}>{formatTime(post.post_age)}</Text>
+          <Text style={[styles.dataRow, {}]}>{formatTime(post.post_age)}</Text>
         </View>
       </View>
 
@@ -885,7 +885,7 @@ const PostView = ({ route, navigation }) => {
               style={styles.commentInputField}
               //keyboardType='default'
             />
-             {/* </ScrollView> */}
+            {/* </ScrollView> */}
             <EvilIcons
               name="arrow-up"
               size={40}
@@ -894,7 +894,6 @@ const PostView = ({ route, navigation }) => {
               onPress={handleSubmit}
               style={styles.commentInputSubmit}
             />
-           
           </KeyboardAvoidingView>
         )}
       </Formik>

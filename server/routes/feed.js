@@ -4,8 +4,6 @@ const authorization = require("../middleware/authorization");
 const pool = require("../db");
 const bcrypt = require("bcrypt");
 
-//
-
 /*
 Post functionality CRUD Operations
 Create Post(POST)
@@ -975,10 +973,11 @@ router.post("/post-poll-vote", authorization, async (req, res) => {
 });
 
 router.put("/block-user", authorization, async (req, res) => {
+  console.log(req.body);
+
   let { userID } = req.body;
   let { commentOwnerID } = req.body;
   const userID2 = req.user;
-
   userID = "{" + userID + "}";
   commentOwnerID = "{" + commentOwnerID + "}";
 
@@ -986,35 +985,31 @@ router.put("/block-user", authorization, async (req, res) => {
   // console.log("Please");
   // console.log(userID);
 
-  if (userID == userID2) {
-    return;
-  } else {
-    try {
-      if (typeof commentOwnerID !== "undefined") {
-        // console.log("time to cry");
-        // console.log(commentOwnerID)
-        console.log(
-          "Blocking user: " + commentOwnerID + " from user: " + userID2
-        );
+  try {
+    if ( commentOwnerID !== "{undefined}") {
+      console.log("time to cry");
+      console.log(commentOwnerID)
+      console.log(
+        "Blocking user: " + commentOwnerID + " from user: " + userID2
+      );
 
-        const addToBlockList = await pool.query(
-          "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
-          [commentOwnerID, userID2]
-        );
-      } else {
-        // console.log("time to die");
-        // console.log(userID)
-        console.log("Blocking user: " + userID + " from user: " + userID2);
+      const addToBlockList = await pool.query(
+        "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
+        [commentOwnerID, userID2]
+      );
+    } else {
+      console.log("time to die");
+      // console.log(userID)
+      console.log("Blocking user: " + userID + " from user: " + userID2);
 
-        const addToBlockList = await pool.query(
-          "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
-          [userID, userID2]
-        );
-      }
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).json("Server Error");
+      const addToBlockList = await pool.query(
+        "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
+        [userID, userID2]
+      );
     }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
   }
 });
 

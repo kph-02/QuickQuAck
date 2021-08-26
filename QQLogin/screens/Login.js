@@ -20,7 +20,7 @@ const serverIp = '192.168.0.153:5000';
 // const serverIp = '192.168.1.51:5000';
 // const serverIp = '100.83.38.217:5000';
 // const serverIp = '10.128.124.246:5000';
-// const serverIp = '132.249.242.71';
+// const serverIp = '132.249.242.71'; //Ip for the server :)
 
 import {
   StyledContainer,

@@ -9,7 +9,7 @@ import { serverIp } from '../screens/Login.js';
 const { SlideInMenu } = renderers;
 
 const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, commentOwnerID, JWTtoken }) => {
-  const { anon_name, post_id, post_text} = post;
+  const { anon_name, post_id, post_text, tagarray } = post;
   // console.log("This is comment:");
   // console.log(commentOwnerID);
 
@@ -19,6 +19,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
       post_type: 'Update',
       post_text: post_text,
       post_id: post_id,
+      tagarray: tagarray,
     };
     navigation.navigate('Create Post', { postType });
   };
@@ -80,7 +81,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
 
   const blockUser = async () => {
     const body = { userID: post.user_id, commentOwnerID: commentOwnerID };
-
+    console.log(body);
     try {
       // const query = 'user_id=' + post.user_id; //sets up query information
       console.log('this is userId ');
@@ -132,7 +133,14 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
         })()}
         {/* Flag as Inappropriate */}
         <MenuOption
-          onSelect={() => navigation.navigate('Flag Post', { post: post_text, user: post.user_id, postid: post_id, comment_owner: commentOwnerID })}
+          onSelect={() =>
+            navigation.navigate('Flag Post', {
+              post: post_text,
+              user: post.user_id,
+              postid: post_id,
+              comment_owner: commentOwnerID,
+            })
+          }
           style={{ paddingVertical: 10 }}
         >
           <Text style={styles.text}>Flag as inappropriate</Text>
