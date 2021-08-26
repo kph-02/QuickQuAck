@@ -71,7 +71,7 @@ const TagSettings = ({ navigation }) => {
     //Check if the post has content, if not, prevent submission and notify
     if (inputs.postTag.length != 0) {
       sendToDB(inputs);
-      navigation.navigate('Profile');
+      navigation.pop();
     } else {
       alert('Please select at least one tag.');
     }
