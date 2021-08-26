@@ -4,6 +4,8 @@ const authorization = require("../middleware/authorization");
 const pool = require("../db");
 const bcrypt = require("bcrypt");
 
+//
+
 /*
 Post functionality CRUD Operations
 Create Post(POST)
@@ -406,7 +408,7 @@ router.get("/all-posts", authorization, async (req, res) => {
       );
     } else {
       var allFeed = await pool.query(
-        "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id  INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age;"
+        "(SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id  INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age);"
       );
     }
     /* For future reference, this is how to order by upvotes. */
@@ -804,12 +806,12 @@ router.post("/create-poll", authorization, async (req, res) => {
 router.post("/create-poll", authorization, async (req, res) => {
   try {
     // const { pollOptions, pollTag, num_comments } = req.body;
-    const { pollQuestion, pollOptions, pollTag, num_comments } = req.body;
+    const { pollQuestion, pollOptions, pollTag, num_comments, num_upvotes} = req.body;
     const author_id = req.user;
-
+    console.log(req.body);
     const newPoll = await pool.query(
-      "INSERT INTO poll (user_id, num_comments, poll_question) VALUES ($1, $2, $3) RETURNING *;",
-      [author_id, num_comments, pollQuestion]
+      "INSERT INTO poll (user_id, num_comments, poll_question, num_upvotes) VALUES ($1, $2, $3, $4) RETURNING *;",
+      [author_id, num_comments, pollQuestion, num_upvotes]
     );
 
     const pollID = newPoll.rows[0].poll_id;
@@ -898,6 +900,8 @@ router.get("/all-polls", authorization, async(req, res) => {
       + "INNER JOIN (SELECT poll_id, ARRAY_AGG(choice_id) "
       + "FROM poll_choices GROUP BY poll_id) AS bar ON bar.poll_id = poll.poll_id) AS PB ORDER BY PB.poll_id; "
     );
+
+
     res.status(201).json({
       data: {
         polls: allPolls.rows,
@@ -973,11 +977,10 @@ router.post("/post-poll-vote", authorization, async (req, res) => {
 });
 
 router.put("/block-user", authorization, async (req, res) => {
-  console.log(req.body);
-
   let { userID } = req.body;
   let { commentOwnerID } = req.body;
   const userID2 = req.user;
+
   userID = "{" + userID + "}";
   commentOwnerID = "{" + commentOwnerID + "}";
 
@@ -985,31 +988,35 @@ router.put("/block-user", authorization, async (req, res) => {
   // console.log("Please");
   // console.log(userID);
 
-  try {
-    if ( commentOwnerID !== "{undefined}") {
-      console.log("time to cry");
-      console.log(commentOwnerID)
-      console.log(
-        "Blocking user: " + commentOwnerID + " from user: " + userID2
-      );
+  if (userID == userID2) {
+    return;
+  } else {
+    try {
+      if (typeof commentOwnerID !== "undefined") {
+        // console.log("time to cry");
+        // console.log(commentOwnerID)
+        console.log(
+          "Blocking user: " + commentOwnerID + " from user: " + userID2
+        );
 
-      const addToBlockList = await pool.query(
-        "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
-        [commentOwnerID, userID2]
-      );
-    } else {
-      console.log("time to die");
-      // console.log(userID)
-      console.log("Blocking user: " + userID + " from user: " + userID2);
+        const addToBlockList = await pool.query(
+          "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
+          [commentOwnerID, userID2]
+        );
+      } else {
+        // console.log("time to die");
+        // console.log(userID)
+        console.log("Blocking user: " + userID + " from user: " + userID2);
 
-      const addToBlockList = await pool.query(
-        "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
-        [userID, userID2]
-      );
+        const addToBlockList = await pool.query(
+          "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
+          [userID, userID2]
+        );
+      }
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json("Server Error");
     }
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json("Server Error");
   }
 });
 

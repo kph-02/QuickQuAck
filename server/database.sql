@@ -31,15 +31,35 @@ CREATE TABLE users (
 
 CREATE TABLE post (
     post_id BIGSERIAL,
+    poll_id BIGSERIAL,
+
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
     num_comments INTEGER NOT NULL,
     num_upvotes INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    poll_question VARCHAR(250),
+
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT post_unique UNIQUE (post_id)
 );
+
+CREATE TABLE poll (
+    post_id BIGSERIAL,
+    poll_id BIGSERIAL,
+
+    user_id uuid NOT NULL,
+    post_text VARCHAR(250),
+    num_comments INTEGER NOT NULL,
+    num_upvotes INTEGER NOT NULL,
+    time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    poll_question VARCHAR(250),
+    PRIMARY KEY (poll_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT poll_unique UNIQUE (poll_id)
+);
+
 
 CREATE TABLE comment (
     comment_id BIGSERIAL,
@@ -111,19 +131,6 @@ CREATE TABLE post_names (
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE poll (
-    poll_id BIGSERIAL,
-    user_id uuid NOT NULL,
-    num_comments INTEGER NOT NULL,
-    time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    poll_question VARCHAR(250),
-    startsAt DATETIME,
-    endsAt DATETIME,
-    -- poll_location geography(point),
-    PRIMARY KEY (poll_id),
-    CONSTRAINT FK_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    CONSTRAINT poll_unique UNIQUE (poll_id)
-);
 
 CREATE TABLE poll_tag (
     tag_id VARCHAR(10) NOT NULL,

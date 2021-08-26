@@ -41,7 +41,8 @@ const CreatePoll = ({ route, navigation }) => {
     pollQuestion: '',
     pollOptions: [],
     pollTag: [],
-    num_comments: 0
+    num_comments: 0,
+    num_upvotes: 0,
   });
  
 
