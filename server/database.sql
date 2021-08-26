@@ -158,6 +158,17 @@ CREATE TABLE post_flags (
 
 );
 
+CREATE TABLE chatrooms (
+    chatroom_id BIGSERIAL,
+    initiator_id uuid NOT NULL,
+    recipient_id uuid NOT NULL,
+    accepted_invite VARCHAR(1) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (chatroom_id),
+    CONSTRAINT FK_initiator_id FOREIGN KEY (initiator_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT FK_recipient_id FOREIGN KEY (recipient_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
 CREATE TABLE messages (
     message_id BIGSERIAL,
     text VARCHAR(100) NOT NULL,
@@ -167,18 +178,6 @@ CREATE TABLE messages (
     PRIMARY KEY (message_id),
     CONSTRAINT FK_author_id FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT FK_chatroom_id FOREIGN KEY (chatroom_id) REFERENCES chatrooms(chatroom_id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE chatrooms (
-    chatroom_id BIGSERIAL,
-    initiator_id uuid NOT NULL,
-    recipient_id uuid NOT NULL,
-    accepted_invite VARCHAR(1) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (chatroom_id),
-    CONSTRAINT FOREIGN KEY (initiator_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (recipient_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 INSERT INTO tags (tag_id) VALUES ('Revelle');
