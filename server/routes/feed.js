@@ -724,6 +724,7 @@ router.get("/current-password", authorization, async (req, res) => {
 });
 
 // create a poll (cannot edit once created)
+/*
 router.post("/create-poll", authorization, async (req, res) => {
   try {
     const { pollOptions, pollTag, num_comments } = req.body;
@@ -799,6 +800,113 @@ router.post("/create-poll", authorization, async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json("Server Error");
+  }
+});
+*/
+router.post("/create-poll", authorization, async (req, res) => {
+  try {
+    // const { pollOptions, pollTag, num_comments } = req.body;
+    const { pollQuestion, pollOptions, pollTag, num_comments } = req.body;
+    const author_id = req.user;
+
+    const newPoll = await pool.query(
+      "INSERT INTO poll (user_id, num_comments, poll_question) VALUES ($1, $2, $3) RETURNING *;",
+      [author_id, num_comments, pollQuestion]
+    );
+
+    const pollID = newPoll.rows[0].poll_id;
+    // console.log("pollID:");
+    // console.log(pollID);
+
+    for (const i of pollOptions) {
+      // console.log("Console says " + i);
+      const pollChoices = await pool.query(
+        "INSERT INTO poll_choices (choice_id, poll_id) VALUES ($1, $2) RETURNING *;",
+        [i, pollID]
+      );
+    }
+
+    for (const i of pollTag) {
+      // console.log("Console says " + i);
+      const pollTags = await pool.query(
+        "INSERT INTO poll_tag (tag_id, poll_id) VALUES ($1, $2) RETURNING *;",
+        [i, pollID]
+      );
+    }
+
+    // need to implement votes here
+    
+    res.status(201).json({
+      status: "Post Success",
+      data: {
+        poll: newPoll.rows[0],
+        tags: pollTag,
+        pollChoices: pollOptions
+        // anonName: postName.rows[0],
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Server Error");
+  }
+});
+
+
+// router.get("/get-poll", authorization, async(req, res) => {
+// const blockedList = await pool.query(
+    //   "SELECT array_length(blocked_users, 1) FROM users WHERE user_id = $1;",
+    //   [user_id]
+    // );
+
+    // const blockedListUsers = await pool.query(
+    //   "SELECT blocked_users FROM users WHERE user_id = $1;",
+    //   [user_id]
+    // );
+
+    // // console.log(blockedList.rows[0].array_length);
+    // if (blockedList.rows[0].array_length != null) {
+    //   var homeFeed = await pool.query(
+    //     "SELECT * FROM (SELECT DISTINCT ON (P.poll_id) P.poll_id, UT.tag_id, P.post_text, P.time_posted, P.user_id, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, tar.ARRAY_AGG AS tagArray, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id WHERE UT.User_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW() AND P.user_id != all ($2)) AS SB ORDER BY SB.time_posted DESC;",
+    //     [user_id, blockedListUsers.rows[0].blocked_users]
+    //   );
+    // } else {
+    // }
+    // const homeFeed = await pool.query(
+    //   "SELECT * FROM (SELECT DISTINCT ON (P.post_id) P.post_id, UT.tag_id, P.post_text, P.time_posted, p.num_comments, p.num_upvotes, AGE(NOW(), p.time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM User_Tags AS UT Inner Join Post_Tags AS PT ON (UT.tag_id = PT.tag_id) Inner Join Post AS P ON (PT.post_id = P.Post_id) INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id WHERE UT.User_id = $1 AND time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.time_posted DESC;",
+    //   [user_id]
+    // );
+// });
+router.get("/all-polls", authorization, async(req, res) => {
+  try{
+    
+    // var allPolls = await pool.query(
+    //     "SELECT * FROM (SELECT DISTINCT ON (poll.poll_id) poll.poll_id AS poll_id, tar.ARRAY_AGG AS tagArray, " 
+    //     + "PT.tag_id, poll.user_id AS user_id, poll_question, num_comments "
+    //     + "FROM poll "
+    //     + "INNER JOIN poll_tag AS PT ON (poll.poll_id = PT.poll_id) " 
+    //     + "INNER JOIN poll_choices AS PC ON (poll.poll_id = PC.poll_id) "
+    //     + "INNER JOIN (SELECT poll_id, ARRAY_AGG(tag_id) " 
+    //     + "FROM poll_tag GROUP BY poll_id) as tar ON tar.poll_id = poll.poll_id) AS PB ORDER BY PB.poll_id;" 
+    // );
+
+    var allPolls = await pool.query(
+      "SELECT * FROM (SELECT DISTINCT ON (poll.poll_id) poll.poll_id AS poll_id, tar.ARRAY_AGG AS tagArray, bar.ARRAY_AGG AS pollChoices, " 
+      + "PT.tag_id, poll.user_id AS user_id, poll_question, num_comments "
+      + "FROM poll "
+      + "INNER JOIN poll_tag AS PT ON (poll.poll_id = PT.poll_id) "
+      + "INNER JOIN poll_choices AS PC ON (poll.poll_id = PC.poll_id) "
+      + "INNER JOIN (SELECT poll_id, ARRAY_AGG(tag_id) "
+      + "FROM poll_tag GROUP BY poll_id) as tar ON tar.poll_id = poll.poll_id "
+      + "INNER JOIN (SELECT poll_id, ARRAY_AGG(choice_id) "
+      + "FROM poll_choices GROUP BY poll_id) AS bar ON bar.poll_id = poll.poll_id) AS PB ORDER BY PB.poll_id; "
+    );
+    res.status(201).json({
+      data: {
+        polls: allPolls.rows,
+      },
+    });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
   }
 });
 

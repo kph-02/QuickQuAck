@@ -8,7 +8,7 @@ import Poll from '../components/Poll.js';
 //icons
 
 import { Octicons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-
+import { Menu, MenuOptions, MenuOption, MenuTrigger, renderers } from 'react-native-popup-menu';
 import {
   StyledViewPostContainer,
   RightIcon,
@@ -18,15 +18,16 @@ import {
   TextPostContent,
   PageTitleFlag,
   StyledViewPostScrollView,
+  Line,
 } from './../components/styles';
-import { Button, Image, View, Modal, StyleSheet, TouchableOpacity, Text, TextInput, Dimensions, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import { Button, View, Image, Modal, StyleSheet, TouchableOpacity, Text, TextInput, Dimensions, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
 import Map from '../screens/Map';
 //colors
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
-const CreatePost = ({ route, navigation }) => {
+const CreatePoll = ({ route, navigation }) => {
   // Use State hooks
   const [composePost, setComposePost] = useState(false);
   const [agree, setAgree] = useState(false);
@@ -34,31 +35,55 @@ const CreatePost = ({ route, navigation }) => {
   const [modalOpen, setModalOpen] = useState(true);
   const { postType } = route.params;
   //Getting user input
+  const [option, setOption] = useState('');
   const [inputs, setInputs] = useState({
-    //Values needed to create post (../server/routes/feed.js)
-    postText: '',
-    postTag: [] /*Initialize as first value in tags drop-down*/,
-    num_comments: 0 /*0 comments to begin with, updated when new comments added */,
-    num_upvotes: 0,
+    //Values needed to create poll (../server/routes/feed.js)
+    pollQuestion: '',
+    pollOptions: [],
+    pollTag: [],
+    num_comments: 0
   });
+ 
 
   var JWTtoken = '';
 
   //Stores values to update input fields from user
-  const { postText, postTag } = inputs;
+  const { pollQuestion, pollOptions, pollTag } = inputs;
 
   //Update inputs when user enters new ones, name is identifier, value as a string (name='postText',value='')
-  const onChange = (name, value) => {
+  const onChangeInputs = (name, value) => {
     setInputs({ ...inputs, [name]: value });
 
     // console.log(inputs);
+  };
+
+  //Update option when user enters new option, value is text input
+  const onChange = (value) => {
+    setOption(value);
+    // console.log(option);
+  };
+
+  //handles the '+' button press, adds option to poll
+  const handleAddButtonPress = async (e) => {
+    if(option){
+      var options = inputs.pollOptions;
+    //   console.log("This is options:");
+    //   console.log(options);
+      options.push(option);
+    //   console.log("This is options after push:");
+    //   console.log(options);
+      setInputs({...inputs, pollOptions: options})
+    //   console.log("This is inputs:");
+    //   console.log(inputs);
+      setOption('');
+    }
   };
 
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
     e.preventDefault(); //prevent refresh
     //Check if the post has content, if not, prevent submission and notify
-    if (inputs.postText && inputs.postTag.length != 0) {
+    if (inputs.pollQuestion && inputs.pollOptions.length != 0 && inputs.pollTag.length != 0) {
       sendToDB(postType.post_type, inputs);
 
       if (postType.post_type === 'Update') {
@@ -66,10 +91,10 @@ const CreatePost = ({ route, navigation }) => {
         alert('Post Updated!');
       } else {
         navigation.pop();
-        if (postType.post_type === 'Text') {
-          alert('Post Created');
+        if (postType.post_type === 'Poll') {
+          alert('Poll Created');
         } else {
-          alert('Post not created, poll not setup yet');
+          alert('Poll not created, poll not setup yet');
         }
       }
     } else {
@@ -93,11 +118,11 @@ const CreatePost = ({ route, navigation }) => {
   const sendToDB = async (type, body) => {
     await getJWT(); //get Token
 
-    if (type === 'Text') {
+    if (type === 'Poll') {
       try {
         // console.log('Sent Token:      ' + JWTtoken);
         // Send post info to DB
-        const response = await fetch('http://' + serverIp + '/feed/create-post', {
+        const response = await fetch('http://' + serverIp + '/feed/create-poll', {
           method: 'POST',
           headers: { token: JWTtoken, 'content-type': 'application/json' },
           body: JSON.stringify(body),
@@ -105,35 +130,35 @@ const CreatePost = ({ route, navigation }) => {
 
         const parseRes = await response.json();
         // console.log(postTag);
-        // console.log(parseRes);
+        console.log(parseRes);
       } catch (error) {
         console.error(error.message);
       }
     }
 
-    if (type === 'Update') {
-      const updateBody = {
-        postText: body.postText,
-        post_id: postType.post_id,
-        postTag: body.postTag,
-      };
+    // if (type === 'Update') {
+    //   const updateBody = {
+    //     pollQuestion: body.pollQuestion,
+    //     post_id: postType.post_id,
+    //     pollTag: body.pollTag,
+    //   };
 
-      try {
-        // console.log('Sent Token:      ' + JWTtoken);
-        // Send post info to DB
-        const response = await fetch('http://' + serverIp + '/feed/update-post', {
-          method: 'PUT',
-          headers: { token: JWTtoken, 'content-type': 'application/json' },
-          body: JSON.stringify(updateBody),
-        });
+    //   try {
+    //     // console.log('Sent Token:      ' + JWTtoken);
+    //     // Send post info to DB
+    //     const response = await fetch('http://' + serverIp + '/feed/update-post', {
+    //       method: 'PUT',
+    //       headers: { token: JWTtoken, 'content-type': 'application/json' },
+    //       body: JSON.stringify(updateBody),
+    //     });
 
-        const parseRes = await response.json();
+    //     const parseRes = await response.json();
 
-        //console.log('UPDATE: ' + JSON.stringify(parseRes));
-      } catch (error) {
-        console.error(error.message);
-      }
-    }
+    //     //console.log('UPDATE: ' + JSON.stringify(parseRes));
+    //   } catch (error) {
+    //     console.error(error.message);
+    //   }
+    // }
   };
 
   const items = [
@@ -159,41 +184,15 @@ const CreatePost = ({ route, navigation }) => {
       return;
     }
     setSelectedItems(selectedItems);
-    setInputs({ ...inputs, postTag: selectedItems });
+    setInputs({ ...inputs, pollTag: selectedItems });
   };
 
   useEffect(() => {
     if (postType.post_type === 'Update') {
-      onChange('postText', postType.post_text);
+      onChangeInputs('pollQuestion', postType.post_text);
     }
   }, []);
 
-  // const [location, setLocation] = useState({
-  //   errorMessage: '',
-  //   location: {
-  //     latitude: 32.880213553722704,
-  //     longitude: -117.23399204377725,
-  //   },
-  // });
-
-  // getLocationAsync = async () => {
-  //   let { status } = await Location.requestForegroundPermissionsAsync();
-  //   if (status !== 'granted') {
-  //     setLocation({
-  //       errorMessage: 'Permission to access location was denied',
-  //     });
-  //     return;
-  //   }
-
-  //   let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
-  //   const { latitude, longitude } = location.coords;
-  //   this.getGeocodeAsync({ latitude, longitude });
-  //   setLocation({ location: { latitude, longitude } });
-  // };
-
-  const HideKeyboard = ({ children }) => (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>{children}</TouchableWithoutFeedback>
-  );
 
   return (
     <Modal
@@ -229,7 +228,7 @@ const CreatePost = ({ route, navigation }) => {
             }}
           >
             <PageTitleFlag style={{ marginLeft: 15, fontSize: 22 }}>
-              {postType.post_type === 'Update' ? 'Update Post' : 'New Post'}
+              {postType.post_type === 'Update' ? 'Update Post' : 'New Poll'}
             </PageTitleFlag>
             <TouchableOpacity onPress={onPressButton} style={{ marginRight: 15 }}>
               <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
@@ -251,7 +250,6 @@ const CreatePost = ({ route, navigation }) => {
               hideSubmitButton
               items={items}
               uniqueKey="name"
-              // onSelectedItemsChange={(selectedItems) => onChange('postTag', selectedItems)} //update inputs to match user input
               selectedItems={selectedItems}
               onSelectedItemsChange={onSelectedItemsChange}
               // onToggleList = {console.log(moo)}
@@ -265,36 +263,56 @@ const CreatePost = ({ route, navigation }) => {
               styleListContainer={{height: height * 0.22}}
             />
           </View>
-          <ScrollView
-          keyboardShouldPersistTaps="handled">
+          
           {/* Section/Container for Text input for the Post */}
           <View
             style={{
               // alignItems: 'stretch',
               backgroundColor: 'white',
-              paddingBottom: height * 0.15,
+            //   paddingBottom: height * 0.15,
               borderTopColor: '#DADADA',
               // borderTopWidth: 1,
             }}
           >
             <TextInput
               placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll Title'}
-              name="postText"
+              name="pollQuestion"
               style={styles.input}
               placeholderTextColor={darkgray}
-              onChangeText={(e) => onChange('postText', e)} //update inputs to match user input
-              value={postText}
+              onChangeText={(e) => onChangeInputs('pollQuestion', e)} //update inputs to match user input
+              value={pollQuestion}
               selectionColor="#FFCC15" //implement a max length
-              maxLength={250}
+              maxLength={100}
               multiline
             />
-            {/* <Poll Type={postType.post_type} /> */}
-            {/* <Button
-              title="test" 
-            title="test" 
-              title="test" 
-              onPress= {() => console.log(Map.getLocationAsync())} /> */}
-          </View>
+            <Line style={{backgroundColor: '#DADADA',}}/>
+            <View style={styles.optionContainer}>
+                <TextInput 
+                  name="option"
+                  style={[styles.input, {width: '85%', borderRightColor: 'white'}]} 
+                  placeholder="Enter Poll Option" 
+                  placeholderTextColor={darkgray} 
+                  value={option}
+                  onChangeText={(e) => onChange(e)}
+                />
+                <TouchableOpacity onPress={handleAddButtonPress} style={styles.addOption}>
+                    <MaterialCommunityIcons name="plus-circle" color="#BDBDBD" size={30} />
+                </TouchableOpacity>
+            </View>
+        </View>
+        <Line style={{backgroundColor: '#DADADA',}}/>
+            <ScrollView
+          keyboardShouldPersistTaps="handled"
+          style={{backgroundColor: '#EFEFEF'}}
+          >
+              {/* <View style={{backgroundColor:'pink'}}> */}
+              {/* {paddingVertical: 10, borderWidth: 1, borderColor: 'black'} */}
+            {inputs.pollOptions.map((options, index) => (
+                <View style={[styles.input, {backgroundColor: 'white', marginTop: 5}]} key={index}>
+                    <Text>{options}</Text>
+                </View>
+            ))}
+          {/* </View> */}
           </ScrollView>
         </StyledViewPostContainer>
       </TouchableWithoutFeedback>
@@ -323,7 +341,7 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
   );
 };
 
-export default CreatePost;
+export default CreatePoll;
 
 const { width, height } = Dimensions.get('screen');
 
@@ -354,5 +372,15 @@ const styles = StyleSheet.create({
     padding: 15,
     borderWidth: 1,
     borderColor: '#DADADA',
+  },
+  optionContainer: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      alignItems: 'center'
+  },
+  addOption: {
+      alignItems: 'center',
+      width: '15%',
   },
 });

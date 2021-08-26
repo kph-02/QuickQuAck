@@ -119,15 +119,11 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       <RenderStyledTags tags={item.tagarray} />
     </View>
     <View style={{ borderColor: '#F4F4F4', borderWidth: 1 }} />
+    
     {/* The Data of each Post */}
     <View style={[styles.postTouchables]}>
-      <View style={[styles.infoRow]}>
-        {/*number of people who've viewed the post*/}
-        <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
-      </View>
+      {/*Number of Upvotes*/}
       <View style={[styles.infoRow, { justifyContent: 'flex-start', marginRight: 5 }]}>
-        {/*number of upvotes*/}
         <MaterialCommunityIcons
           name="chevron-up"
           color="#BDBDBD"
@@ -136,15 +132,16 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_upvotes}</Text>
       </View>
+      {/*Number of Comments*/}
       <View style={[styles.infoRow]}>
-        {/*number of comments*/}
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
       </View>
+      {/*Anonymous name of user*/}
       <View style={[styles.infoRow]}>
-        {/*Anonymous name of user*/}
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.anon_name}</Text>
       </View>
+      {/* Age of Post */}
       <View style={[styles.infoRow]}>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
       </View>

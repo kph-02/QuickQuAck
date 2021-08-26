@@ -9,7 +9,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //Used to communicate with server
 import { serverIp } from './Login.js';
-import PollFeed from './PollFeed.js';
 
 var JWTtoken = ''; //Store JWT for authentication
 
@@ -18,21 +17,6 @@ var onScr = null;
 var scrET = null;
 
 var animatedOffset = null;
-
-const allposts = [
-  {
-    post_id: '38bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user_id: 'Pink Seahorse',
-    likes: '16',
-    post_text: 'What games do you all play?',
-  },
-  {
-    post_id: '20bd68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user_id: 'Yellow Squirrel',
-    likes: '25',
-    post_text: 'Test post lol',
-  },
-];
 
 //Limits the number of lines and characters that can be shown on each of the post previews on the feed.
 const AdjustTextPreview = ({ style, text }) => {
@@ -96,7 +80,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     {/* View for the text preview of each post as shown on the feed */}
     <View style={{ justifyContent: 'center', marginLeft: 25, marginRight: 25 }}>
-      <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.post_text} />
+      <AdjustTextPreview style={[styles.bodyText, textColor]} text={item.poll_question} />
     </View>
     {/* Tags Info Row */}
     <View
@@ -118,11 +102,11 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
     {/* The Data of each Post */}
     <View style={[styles.postTouchables, {justifyContent:'space-between', marginLeft: 20, marginRight: 25, marginTop: 0,}]}>
       
-      {/*Number of Upvotes*/}
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      {/*Number of Votes*/}
+      {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29, }} />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_upvotes}</Text>
-      </View>
+      </View> */}
 
        {/*Number of Comments*/}
       <View style={[styles.infoRow]}>
@@ -131,14 +115,14 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       </View>
 
       {/*Anonymous name of user*/}
-      <View style={[styles.infoRow]}>
+      {/* <View style={[styles.infoRow]}>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.anon_name}</Text>
-      </View>
+      </View> */}
 
       {/* Age of Post */}
-      <View>
+      {/* <View>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
-      </View>
+      </View> */}
     </View>
   </TouchableOpacity>
 );
@@ -163,10 +147,10 @@ const formatTime = (post_age) => {
   return postAgeDisplay;
 };
 
-// HOME feed (home posts)
-const FirstRoute = ({scrollEventThrottle, onScroll}) => {
+// Poll feed (Poll posts)
+const PollFeed = ({scrollEventThrottle, onScroll}) => {
   //useStates can only be defined within functions
-  const [postData, setPostData] = useState([]); //Store post data from the Database
+  const [pollData, setPollData] = useState([]); //Store post data from the Database
   const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
   const [update, setUpdate] = useState(false); //Changing will feed to update
@@ -175,8 +159,8 @@ const FirstRoute = ({scrollEventThrottle, onScroll}) => {
 
   //renderItem function for each item passed through
   const renderItem = ({ item }) => {
-    const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const color = item.post_id === selectedId ? 'white' : 'black';
+    const backgroundColor = item.poll_id === selectedId ? '#FFCC15' : '#FFFFFF';
+    const color = item.poll_id === selectedId ? 'white' : 'black';
 
     return (
       <Item
@@ -184,10 +168,10 @@ const FirstRoute = ({scrollEventThrottle, onScroll}) => {
         item={item}
         //Functionality for when a post is pressed
         onPress={() => {
-          setSelectedId(item.post_id);
+          setSelectedId(item.poll_id);
 
           //navigate to post view page, sends through post information as parameter
-          navigation.navigate('Post View', { post: item });
+          navigation.navigate('Poll View', { poll: item });
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
@@ -214,15 +198,15 @@ const FirstRoute = ({scrollEventThrottle, onScroll}) => {
     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
 
     try {
-      // Gets all of the post information from the database for the feed
-      const response = await fetch('http://' + serverIp + '/feed/home-feed', {
+      // Gets all of the poll information from the database for the feed
+      const response = await fetch('http://' + serverIp + '/feed/all-polls', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', token: JWTtoken },
       });
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
-      // console.log(parseRes);
+      console.log(parseRes);
       // console.log(parseRes.data.post[0].tagarray);
       /*
        *"post":[
@@ -242,7 +226,7 @@ const FirstRoute = ({scrollEventThrottle, onScroll}) => {
        * milliseconds
        * ]
        * */
-      setPostData(parseRes.data.post);
+      setPollData(parseRes.data.polls);
     } catch (error) {
       console.error(error.message);
     }
@@ -267,15 +251,12 @@ const FirstRoute = ({scrollEventThrottle, onScroll}) => {
   };
 
   return (
-    // <StyledFeedContainer>
-    //     <StatusBar style="black" />
-    //     <InnerContainer/>
     <View style={{ backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
       <FlatList
         numColumns={1}
         horizontal={false}
-        data={postData} /*postData to display*/
-        keyExtractor={(item) => item.post_id}
+        data={pollData} /*postData to display*/
+        keyExtractor={(item) => item.poll_id}
         extraData={selectedId}
         renderItem={renderItem}
         refreshing={refresh} //true: shows spinning animation to show loading
@@ -284,185 +265,10 @@ const FirstRoute = ({scrollEventThrottle, onScroll}) => {
         scrollEventThrottle={scrollEventThrottle}
       />
     </View>
-    // </StyledFeedContainer>
   );
 };
 
-// ALL feed (all posts)
-const SecondRoute = ({scrollEventThrottle, onScroll}) => {
-  const [allData, setAllData] = useState([]); //Store post data from the Database
-  const [selectedId, setSelectedId] = useState(null); //Currently selected post (will highlight yellow)
-  const [refresh, setRefresh] = useState(false); //Handle refreshing logic
-  const [update, setUpdate] = useState(false); //Changing will feed to update
-  const navigation = useNavigation();
-
-  //renderItem function for each item passed through
-  const renderItem = ({ item }) => {
-    const backgroundColor = item.post_id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const color = item.post_id === selectedId ? 'white' : 'black';
-    return (
-      <Item
-        //destructure the item
-        item={item}
-        //Functionality for when a post is pressed
-        onPress={() => {
-          setSelectedId(item.post_id);
-
-          //navigate to post view page, sends through post information as parameter
-          navigation.navigate('Post View', { post: item });
-        }}
-        backgroundColor={{ backgroundColor }}
-        textColor={{ color }}
-      />
-    );
-  };
-
-  //Extracting the posts from the Database
-
-  //Getting JWT from local storage, must exist otherwise user can't be on this page
-  const getJWT = async () => {
-    try {
-      await AsyncStorage.getItem('token').then((token) => {
-        // console.log('Retrieved Token: ' + token);
-        JWTtoken = token;
-      });
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
-
-  //Communicating with the database to get all the posts
-  const getFromDB = async () => {
-    let post;
-    await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
-
-    try {
-      // Gets all of the post information from the database for the feed
-      const response = await fetch('http://' + serverIp + '/feed/all-posts', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json', token: JWTtoken },
-      });
-
-      //The response includes post information, need in json format
-      const parseRes = await response.json();
-
-      /*
-       *"post":[
-       * {"post_id":,
-       * "user_id":,
-       * "post_text":,
-       * "num_comments":,
-       * "num_upvotes":,
-       * "time_posted":
-       *
-       * "anon_name:""
-       *
-       * "post_age":[
-       * hours:
-       * minutes:
-       * seconds:
-       * milliseconds
-       * ]
-       * */
-      post = parseRes.data.post;
-    } catch (error) {
-      console.error(error.message);
-    }
-    setAllData(post);
-  };
-
-  //useFocusEffect triggers works like useEffect, but only when this screen is focused
-  // this lets us use navigation as the variable to track changes with, so feed updates
-  // whenever the page is loaded
-  useFocusEffect(
-    React.useCallback(() => {
-      console.log('Home Feed Refreshed');
-      getFromDB();
-      setRefresh(false); //End refresh animation
-      setSelectedId(null); //reset Selected Id
-    }, [navigation, update]),
-  );
-
-  //Handle the logic for what to do when flatlist is refreshed
-  const handleRefresh = () => {
-    setRefresh(true); //update animation
-    setUpdate(!update); //Change variable to trigger useEffect to pull posts from database
-  };
-
-  return (
-    // <StyledFeedContainer style={{backgroundColor: 'pink'}}>
-    //     <StatusBar style="black" />
-    //     <InnerContainer/>
-    <View style={{ backgroundColor: '#EFEFEF', paddingTop: 2.5 }}>
-      <FlatList
-        numColumns={1}
-        horizontal={false}
-        data={allData}
-        keyExtractor={(item) => item.post_id}
-        extraData={selectedId}
-        renderItem={renderItem}
-        refreshing={refresh} //true: shows spinning animation to show loading
-        onRefresh={handleRefresh} //When user refreshes by pulling down, what to do
-        onScroll={onScroll}
-        scrollEventThrottle={scrollEventThrottle}
-      />
-    </View>
-    // </StyledFeedContainer>
-  );
-};
-
-const initialLayout = { width: Dimensions.get('window').width };
-
-// const renderScene = SceneMap({
-//   home: FirstRoute,
-//   all: SecondRoute,
-// });
-
-const renderScene = ({ route }) => {
-  switch(route.key) {
-    case 'home':
-      return <FirstRoute scrollEventThrottle={scrET} onScroll={onScr}/>;
-    case 'all':
-      return <SecondRoute scrollEventThrottle={scrET} onScroll={onScr}/>;
-    case 'poll':
-      return <PollFeed scrollEventThrottle={scrET} onScroll={onScr}/>;  
-    default:
-      return null;
-  }
-}
-
-const renderTabBar = (props) => (
-  <TabBar
-    {...props}
-    indicatorStyle={{ backgroundColor: '#FFCC15' }}
-    activeColor={'#FFCC15'}
-    inactiveColor={'#BDBDBD'}
-    style={{ backgroundColor: 'white' }}
-  />
-);
-
-export default function FeedViews({ navigation, scrollEventThrottle, onScroll, offset }) {
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    { key: 'home', title: 'Home' },
-    { key: 'all', title: 'All' },
-    { key: 'poll', title: 'Polls'}
-  ]);
-  onScr = onScroll;
-  scrET = scrollEventThrottle;
-  animatedOffset = offset;
-
-  return (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      renderTabBar={renderTabBar}
-      onIndexChange={setIndex}
-      initialLayout={initialLayout}
-      style={styles.container}
-    />
-  );
-}
+export default PollFeed;
 
 const { width, height } = Dimensions.get('screen');
 
