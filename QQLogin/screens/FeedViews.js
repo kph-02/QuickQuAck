@@ -424,8 +424,8 @@ const renderScene = ({ route }) => {
       return <FirstRoute scrollEventThrottle={scrET} onScroll={onScr}/>;
     case 'all':
       return <SecondRoute scrollEventThrottle={scrET} onScroll={onScr}/>;
-    case 'poll':
-      return <PollFeed scrollEventThrottle={scrET} onScroll={onScr}/>;  
+    // case 'poll':
+    //   return <PollFeed scrollEventThrottle={scrET} onScroll={onScr}/>;  
     default:
       return null;
   }
@@ -446,7 +446,7 @@ export default function FeedViews({ navigation, scrollEventThrottle, onScroll, o
   const [routes] = React.useState([
     { key: 'home', title: 'Home' },
     { key: 'all', title: 'All' },
-    { key: 'poll', title: 'Polls'}
+    // { key: 'poll', title: 'Polls'}
   ]);
   onScr = onScroll;
   scrET = scrollEventThrottle;
