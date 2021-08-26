@@ -9,7 +9,7 @@ CREATE DATABASE Chats;*/
 -- create extension if not exists "postgis"; 
 
 
-CREATE DATABASE Main;
+CREATE DATABASE main;
 
 create extension if not exists "uuid-ossp"; 
 
@@ -117,8 +117,8 @@ CREATE TABLE poll (
     num_comments INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     poll_question VARCHAR(250),
-    startsAt DATETIME,
-    endsAt DATETIME,
+    -- startsAt DATETIME,
+    -- endsAt DATETIME,
     -- poll_location geography(point),
     PRIMARY KEY (poll_id),
     CONSTRAINT FK_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,

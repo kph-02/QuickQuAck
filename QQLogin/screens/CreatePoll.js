@@ -72,12 +72,23 @@ const CreatePoll = ({ route, navigation }) => {
       options.push(option);
     //   console.log("This is options after push:");
     //   console.log(options);
-      setInputs({...inputs, pollOptions: options})
+      setInputs({...inputs, pollOptions: options});
     //   console.log("This is inputs:");
     //   console.log(inputs);
       setOption('');
     }
   };
+
+  const handleMinusButtonPress = async (index) => {
+    var options = inputs.pollOptions;
+    if (index > -1 && options.length > 0) {
+      options.splice(index, 1);
+      setInputs({...inputs, pollOptions: options});
+    }
+    else{
+      alert('Nothing to delete!!!');
+    }
+  }
 
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
@@ -296,23 +307,25 @@ const CreatePoll = ({ route, navigation }) => {
                   onChangeText={(e) => onChange(e)}
                 />
                 <TouchableOpacity onPress={handleAddButtonPress} style={styles.addOption}>
-                    <MaterialCommunityIcons name="plus-circle" color="#BDBDBD" size={30} />
+                    <MaterialCommunityIcons name="plus-circle" color={yellow} size={30} />
                 </TouchableOpacity>
             </View>
-        </View>
-        <Line style={{backgroundColor: '#DADADA',}}/>
-            <ScrollView
-          keyboardShouldPersistTaps="handled"
-          style={{backgroundColor: '#EFEFEF'}}
+          </View>
+          <Line style={{backgroundColor: '#DADADA',}}/>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            style={{backgroundColor: '#EFEFEF'}}
           >
-              {/* <View style={{backgroundColor:'pink'}}> */}
-              {/* {paddingVertical: 10, borderWidth: 1, borderColor: 'black'} */}
             {inputs.pollOptions.map((options, index) => (
-                <View style={[styles.input, {backgroundColor: 'white', marginTop: 5}]} key={index}>
-                    <Text>{options}</Text>
+                <View style={[styles.pollChoiceContainer]} key={index}>
+                  <View style={styles.pollChoice} key={index}>
+                    <Text style={{marginLeft: 15}}>{options}</Text>
+                  </View>
+                  <TouchableOpacity onPress={() => handleMinusButtonPress(index)} style={[styles.addOption]}>
+                    <MaterialCommunityIcons name="minus-circle" color="red" size={30} />
+                  </TouchableOpacity>
                 </View>
             ))}
-          {/* </View> */}
           </ScrollView>
         </StyledViewPostContainer>
       </TouchableWithoutFeedback>
@@ -341,6 +354,7 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
   );
 };
 
+//#BDBDBD
 export default CreatePoll;
 
 const { width, height } = Dimensions.get('screen');
@@ -383,4 +397,22 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       width: '15%',
   },
+  pollChoiceContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 5,
+    borderWidth: 1,
+    borderColor: '#DADADA',
+    backgroundColor: 'white'
+  },
+  pollChoice: {
+    width: '85%', 
+    //backgroundColor: 'yellow', 
+    justifyContent: 'center', 
+    paddingVertical: 15,
+    borderRightWidth: 1,
+    borderRightColor: '#DADADA',
+  }
 });

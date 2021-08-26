@@ -38,6 +38,7 @@ const RootStack = () => {
       initialRouteName="Splash"
       screenOptions={({ route, navigation }) => ({
         gestureEnabled: true,
+         gestureEnabled: false,
         headerShown: false,
         headerTransparent: true,
       })}
