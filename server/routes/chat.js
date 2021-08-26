@@ -47,8 +47,10 @@ router.post("/create-chatroom", authorization, async (req, res) => {
 router.put("/accept-chat", authorization, async (req, res) => {
     try {
       //Reading information contained in request
-      const { recipient_id } = req.body;
-      const initiator_id = req.user;
+      const { initiator_id } = req.body;
+      const recipient_id = req.user;
+      console.log(initiator_id);
+      console.log(recipient_id);
     
       const acceptChatroom = await pool.query(
         "UPDATE chatrooms SET accepted_invite = '1' WHERE initiator_id = $1 " 
@@ -65,28 +67,8 @@ router.put("/accept-chat", authorization, async (req, res) => {
     }
 });
 
-router.put("/accept-chat", authorization, async (req, res) => {
-    try {
-      //Reading information contained in request
-      const { recipient_id } = req.body;
-      const initiator_id = req.user;
-    
-      const acceptChatroom = await pool.query(
-        "UPDATE chatrooms SET accepted_invite = '2' WHERE initiator_id = $1 " 
-        + "AND recipient_id = $2;",
-        [initiator_id, recipient_id]
-      );
-  
-      res.status(201).json({
-        status: "Chat Rejected",
-      });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).json("Server Error");
-    }
-});
 
-router.put("/accept-chat", authorization, async (req, res) => {
+router.put("/reject-chat", authorization, async (req, res) => {
     try {
       //Reading information contained in request
       const { recipient_id } = req.body;
@@ -115,7 +97,7 @@ router.get("/requests-and-chatrooms", authorization, async (req, res) => {
       const allChatrooms = await pool.query(
         "SELECT * FROM chatrooms WHERE (initiator_id = $1 OR recipient_id = $1)" 
         + " AND (accepted_invite = '1' OR accepted_invite = '0') AND created_at" 
-        + " < NOW() - INTERVAL'24 HOURS';",
+        + " > NOW() - INTERVAL'24 HOURS';",
         [user_id]
       );
       
@@ -129,3 +111,5 @@ router.get("/requests-and-chatrooms", authorization, async (req, res) => {
       res.status(500).json("Server Error");
     }
 });
+
+module.exports = router;
