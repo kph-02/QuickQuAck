@@ -31,35 +31,19 @@ CREATE TABLE users (
 
 CREATE TABLE post (
     post_id BIGSERIAL,
-    poll_id BIGSERIAL,
-
+    is_poll BOOLEAN,
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
     num_comments INTEGER NOT NULL,
     num_upvotes INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    poll_question VARCHAR(250),
 
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT post_unique UNIQUE (post_id)
 );
 
-CREATE TABLE poll (
-    post_id BIGSERIAL,
-    poll_id BIGSERIAL,
-
-    user_id uuid NOT NULL,
-    post_text VARCHAR(250),
-    num_comments INTEGER NOT NULL,
-    num_upvotes INTEGER NOT NULL,
-    time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    poll_question VARCHAR(250),
-    PRIMARY KEY (poll_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    CONSTRAINT poll_unique UNIQUE (poll_id)
-);
-
+ 
 
 CREATE TABLE comment (
     comment_id BIGSERIAL,
@@ -131,28 +115,20 @@ CREATE TABLE post_names (
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-
-CREATE TABLE poll_tag (
-    tag_id VARCHAR(10) NOT NULL,
-    poll_id INTEGER NOT NULL,
-    CONSTRAINT FK_tag_id FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON UPDATE CASCADE,
-    FOREIGN KEY(poll_id) REFERENCES poll(poll_id),
-    PRIMARY KEY (poll_id, tag_id)
-);
-
 CREATE TABLE poll_choices (
     choice_id TEXT NOT NULL,
-    poll_id BIGSERIAL,
-    CONSTRAINT FK_poll_id FOREIGN KEY(poll_id) REFERENCES poll(poll_id) ON DELETE CASCADE,
-    PRIMARY KEY (choice_id, poll_id)
+    post_id BIGSERIAL,
+    CONSTRAINT FK_poll_id FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE,
+    PRIMARY KEY (choice_id, post_id),
+    UNIQUE(choice_id)
 );
 
 CREATE TABLE poll_votes (
     user_id uuid NOT NULL,
     choice_id TEXT NOT NULL,
-    poll_id BIGSERIAL,
+    post_id BIGSERIAL,
     CONSTRAINT FK_user_id FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    CONSTRAINT FK_poll_id FOREIGN KEY(poll_id) REFERENCES poll(poll_id) ON DELETE CASCADE,
+    CONSTRAINT FK_poll_id FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE,
     CONSTRAINT FK_choice_id FOREIGN KEY(choice_id) REFERENCES poll_choices(choice_id) ON DELETE CASCADE
 );
 
