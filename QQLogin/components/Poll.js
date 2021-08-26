@@ -123,3 +123,20 @@ const styles = StyleSheet.create(
     }
   });
 
+// import RNPoll, { IChoice } from "react-native-poll";
+
+// <RNPoll
+//   totalVotes={30}
+//   choices={choices}
+//   onChoicePress={(selectedChoice: IChoice) =>
+//     console.log("SelectedChoice: ", selectedChoice)
+//   }
+// />
+
+// const choices: Array<IChoice> = [
+//   { id: 1, choice: "Nike", votes: 12 },
+//   { id: 2, choice: "Adidas", votes: 1 },
+//   { id: 3, choice: "Puma", votes: 3 },
+//   { id: 4, choice: "Reebok", votes: 5 },
+//   { id: 5, choice: "Under Armour", votes: 9 },
+// ];
