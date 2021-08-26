@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
 import Poll from '../components/Poll.js';
+import * as Location from 'expo-location';
+
 //icons
 
 import { Octicons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,6 +20,8 @@ import {
   TextPostContent,
   PageTitleFlag,
   StyledViewPostScrollView,
+  StyledButton,
+  ButtonText,
 } from './../components/styles';
 import {
   Button,
@@ -31,6 +35,9 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView,
+  Switch,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
@@ -44,6 +51,7 @@ const CreatePost = ({ route, navigation }) => {
   const [agree, setAgree] = useState(false);
   const [selectedValue, setSelectedValue] = useState(true);
   const [modalOpen, setModalOpen] = useState(true);
+  const [alertModal, setAlertModal] = useState(false);
   const { postType } = route.params;
   //Getting user input
   const [inputs, setInputs] = useState({
@@ -52,9 +60,17 @@ const CreatePost = ({ route, navigation }) => {
     postTag: [] /*Initialize as first value in tags drop-down*/,
     num_comments: 0 /*0 comments to begin with, updated when new comments added */,
     num_upvotes: 0,
+    latitude: null,
+    longitude: null,
   });
 
   var JWTtoken = '';
+
+  //Used w/ Switch for Location
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  //Used for activity indicator
+  const [animated, setAnimation] = useState(false);
 
   //Stores values to update input fields from user
   const { postText, postTag } = inputs;
@@ -73,6 +89,10 @@ const CreatePost = ({ route, navigation }) => {
       setSelectedItems(postType.tagarray);
     }
   }, []);
+
+  // useEffect(() => {
+  //   getLocationAsync();
+  // } , []);
 
   //Executes when Post is pressed, sends post information to the database
   const onPressButton = async (e) => {
@@ -188,32 +208,75 @@ const CreatePost = ({ route, navigation }) => {
     }
   }, []);
 
-  // const [location, setLocation] = useState({
-  //   errorMessage: '',
+  //Below functions/consts are from Settings.js, above are from Profile.js
+  // const initialLocationState = {
   //   location: {
-  //     latitude: 32.880213553722704,
-  //     longitude: -117.23399204377725,
+  //     latitude: 0,
+  //     longitude: 0,
   //   },
-  // });
-
-  // getLocationAsync = async () => {
-  //   let { status } = await Location.requestForegroundPermissionsAsync();
-  //   if (status !== 'granted') {
-  //     setLocation({
-  //       errorMessage: 'Permission to access location was denied',
-  //     });
-  //     return;
-  //   }
-
-  //   let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
-  //   const { latitude, longitude } = location.coords;
-  //   this.getGeocodeAsync({ latitude, longitude });
-  //   setLocation({ location: { latitude, longitude } });
   // };
 
-  const HideKeyboard = ({ children }) => (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>{children}</TouchableWithoutFeedback>
-  );
+  // const initialErrorMessage = {
+  //   errorMessage: '',
+  // };
+  // const [locationPermission, setLocationPermission] = useState(initialLocationState);
+  const [location, setLocation] = useState(null);
+  const [errorMessage, setErrorMsg] = useState(null);
+
+  const getLocationAsync = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      setErrorMsg('Permission to access location was denied');
+      return;
+    }
+    let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
+    setInputs({ ...inputs, latitude: location.coords.latitude, longitude: location.coords.longitude });
+  };
+
+  useEffect(() => {
+    console.log(inputs);
+  }, [inputs]);
+
+  const toggleSwitch = () => {
+    // setAnimation(true);
+    if (isEnabled == false) {
+      Alert.alert('Post to Map', "This will place a marker at your device's current location.", [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => boop() },
+      ]);
+    } else {
+      setIsEnabled((previousState) => !previousState);
+      setInputs({ ...inputs, latitude: null, longitude: null });
+      console.log(inputs);
+    }
+    const boop = () => {
+      setIsEnabled((previousState) => !previousState);
+      if (isEnabled == false) {
+        getLocationAsync();
+        handleModal();
+        // setTimeout(() => {Alert.alert('Please Hold', "This will take a few seconds.", []), 3000);
+        console.log(inputs);
+      }
+    };
+  };
+
+  const handleModal = () => {
+    setTimeout(() => {
+      setAlertModal(true);
+    }, 100);
+    setTimeout(() => {
+      setAlertModal(false);
+    }, 6000);
+  };
+  // useEffect(() => {
+  //   if (inputs.latitude) {
+  //     setAnimation(true);
+  //   }
+  // }, [inputs.latitude]);
 
   return (
     <Modal
@@ -281,6 +344,27 @@ const CreatePost = ({ route, navigation }) => {
               searchIcon={false}
               styleListContainer={{ height: height * 0.22 }}
             />
+            <View style={[styles.buttonContainer]}>
+              <Text style={{ fontSize: 15 }}>Post to Map</Text>
+              <Switch
+                trackColor={{ false: '#767577', true: '#FFCC15' }}
+                thumbColor={isEnabled ? '#ffdd62' : '#f4f3f4'}
+                style={{ transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }] }}
+                onValueChange={toggleSwitch}
+                value={isEnabled}
+              />
+            </View>
+            {/* <View style={styles.loading} pointerEvents="none">
+            <ActivityIndicator
+              color="#FFCC15"
+              size="large"
+              animating={animated}
+              
+            />
+            </View> */}
+            {/* <StyledButton onPress={() => console.log(inputs)}>
+              <ButtonText>Location</ButtonText>
+            </StyledButton> */}
           </View>
           <ScrollView keyboardShouldPersistTaps="handled">
             {/* Section/Container for Text input for the Post */}
@@ -305,15 +389,38 @@ const CreatePost = ({ route, navigation }) => {
                 multiline
               />
               <Poll Type={postType.post_type} />
-              {/* <Button
-              title="test" 
-            title="test" 
-              title="test" 
-              onPress= {() => console.log(Map.getLocationAsync())} /> */}
             </View>
           </ScrollView>
         </StyledViewPostContainer>
       </TouchableWithoutFeedback>
+      <Modal animationType={'fade'} transparent={true} visible={alertModal}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#00000080',
+
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 10,
+              overflow: 'hidden',
+              width: 300,
+              height: 100,
+              backgroundColor: '#fff',
+              padding: 20,
+            }}
+          >
+            <View style={styles.loading}>
+              <Text style={styles.waitText}>Please wait...</Text>
+              <ActivityIndicator size="large" color="#FFCC15" />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Modal>
   );
 };
@@ -371,4 +478,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#DADADA',
   },
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  containerStyle: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+
+  },
+  modalContainer: {
+    width: '75%',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#cdd2c9',
+    backgroundColor: '#cdd2c9',
+
+
+  },
+  waitText: {
+    textAlign: 'center', // <-- the magic
+    fontSize: 18,
+    
+  }
 });

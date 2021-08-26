@@ -12,9 +12,9 @@ router.post("/register", validInfo, async (req, res) => {
     //destructure req.body
     const { firstName, lastName, email, password, dob, college, gy } = req.body;
     //check if user already exists (throw error)
-    console.log(firstName + " " + lastName + " " + email + " " + password);
+    console.log(firstName + " " + lastName + " " + email.toLowerCase() + " " + password);
     const user = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
+      email.toLowerCase(),
     ]);
 
     if (user.rows.length !== 0) {
@@ -33,9 +33,10 @@ router.post("/register", validInfo, async (req, res) => {
       "INSERT INTO users (first_name, last_name, email, user_password," +
         "date_of_birth, college, grad_year)" +
         "VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-      [firstName, lastName, email, bcryptPassword, dob, college, gy]
+      [firstName, lastName, email.toLowerCase(), bcryptPassword, dob, college, gy]
     );
 
+    
     //Used to return stored data for testing
     //res.json(newUser.rows[0]);
 
@@ -61,7 +62,7 @@ router.post("/login", validInfo, async (req, res) => {
     //Check if user does not exist
 
     const user = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
+      email.toLowerCase(),
     ]);
 
     if (user.rows.length === 0) {

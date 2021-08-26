@@ -54,18 +54,35 @@ const randomNameGenerator = () => {
 router.post("/create-post", authorization, async (req, res) => {
   try {
     //Reading information contained in post
-    const { postText, postTag, num_comments, num_upvotes } = req.body;
+    console.log(req.body);
+    const {
+      postText,
+      postTag,
+      num_comments,
+      num_upvotes,
+      latitude,
+      longitude,
+    } = req.body;
     const author_id = req.user;
+    console.log(latitude);
     //Name of the dropdown of the post tag tagdropdown
     //var postTag = req.body.tagdropdown;
 
     console.log("Upvotes: " + num_upvotes);
 
-    const newPost = await pool.query(
-      "INSERT INTO post (post_text, user_id, num_comments, num_upvotes) VALUES ($1, $2, $3, $4) RETURNING *;",
-      [postText, author_id, num_comments, num_upvotes]
-    );
-
+    if (latitude !== null) {
+      console.log("not undefined");
+      var newPost = await pool.query(
+        "INSERT INTO post (post_text, user_id, num_comments, num_upvotes, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
+        [postText, author_id, num_comments, num_upvotes, parseFloat(latitude), parseFloat(longitude)]
+      );
+    } else {
+      console.log("wowee");
+      var newPost = await pool.query(
+        "INSERT INTO post (post_text, user_id, num_comments, num_upvotes) VALUES ($1, $2, $3, $4) RETURNING *;",
+        [postText, author_id, num_comments, num_upvotes]
+      );
+    }
     const postID = newPost.rows[0].post_id;
 
     for (const i of postTag) {
@@ -878,9 +895,9 @@ router.put("/block-user", authorization, async (req, res) => {
   // console.log(userID);
 
   try {
-    if ( commentOwnerID !== "{undefined}") {
+    if (commentOwnerID !== "{undefined}") {
       console.log("time to cry");
-      console.log(commentOwnerID)
+      console.log(commentOwnerID);
       console.log(
         "Blocking user: " + commentOwnerID + " from user: " + userID2
       );
@@ -960,6 +977,24 @@ router.post("/flag-post", authorization, async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json("Server Error");
+  }
+});
+
+//Getting Information to store on Markers
+router.get("/marker-info", async (req, res) => {
+
+  try {
+    const markerInfo = await pool.query(
+      "SELECT post_id, post_text, latitude, longitude FROM post WHERE (latitude IS NOT NULL AND longitude IS NOT NULL);",
+    );
+
+    res.status(201).json({
+      data: {
+        markers: markerInfo.rows,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

@@ -1,13 +1,28 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, Image, Button, StatusBar, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Platform, Text, Image, Button, StatusBar, Dimensions, TouchableOpacity, ImageBackground } from 'react-native';
 import MapView, { Heatmap, PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps';
 import { MapContainer, TopMapContainer } from './../components/styles';
 import * as Location from 'expo-location';
 import { AntDesign } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import { serverIp } from './Login.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomMarker from '../assets/CustomMarker';
+var JWTtoken = '';
 
 class Maps extends Component {
+  getJWT = async () => {
+    try {
+      await AsyncStorage.getItem('token').then((token) => {
+        //console.log('Retrieved Token: ' + token);
+        JWTtoken = token;
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   //State
   state = {
     location: {
@@ -16,6 +31,7 @@ class Maps extends Component {
     },
     geocode: null,
     errorMessage: '',
+    markerData: [],
   };
 
   //Custom style for the map. Derived from google maps style.
@@ -39,19 +55,37 @@ class Maps extends Component {
     },
   ];
 
-  //Requesting permissions to access location.Then if the permission status is granted it will continue to get the location data, else it will state the Permission to access location was denied error message.
+  //Get Marker Information From Database
+  getFromDB = async () => {
+    try {
+      let markers;
+      const response = await fetch('http://' + serverIp + '/feed/marker-info', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
 
-  // Next, the function will use expo-location getCurrentPositionAsync function to get the location data.
+      const parseRes = await response.json();
+      // console.log(parseRes);
+      // markers = parseRes.data.markers;
+      // console.log(markers);
 
-  // postMarkers = () => {
-  //   return this.state.reports.map((post) => <Marker
-  //     key={post.id}
-  //     coordinate={{ latitude: post.lat, longitude: post.lon }}
-  //     title={post.location}
-  //     description={post.post_id}
-  //   >
-  //   </Marker >)
-  // }
+      // const { markerData } = this.state;
+      this.setState({ ...this.state, markerData: parseRes.data.markers });
+      console.log('markerData');
+
+      console.log(this.state.markerData);
+
+      // console.log(parseRes.data.markers);
+    } catch (err) {
+      console.log(err.message);
+    }
+    // const { markerData } = this.state;
+
+    // this.setState({ ...this.state, markerData: this.state.parseRes });
+    // console.log('markerData');
+
+    // console.log(markerData);
+  };
 
   getLocationAsync = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -77,7 +111,11 @@ class Maps extends Component {
   //Requesting permissions to access location as soon as map is opened
   componentDidMount() {
     this.getLocationAsync();
-    console.log(this.state.location);
+    // this.getJWT();
+    this.getFromDB();
+
+    // console.log(this.state.location);
+    // console.log(this.parseRes);
     // console.log(this.state.geocode);
   }
 
@@ -103,22 +141,49 @@ class Maps extends Component {
             longitudeDelta: 0.01,
           }}
         >
-          <Marker pinColor="#FFCC15" coordinate={{ latitude: 32.88232190507297, longitude: -117.23403495912069 }}>
+          {this.state.markerData.map((marker) => (
+            <Marker
+              pinColor="#FFCC15"
+              key={marker.post_id}
+              coordinate={{
+                latitude: parseFloat(marker.latitude),
+                longitude: parseFloat(marker.longitude),
+              }}
+            >
+              {/* <Image source={require('./../assets/Marker.png')} /> */}
+              <CustomMarker text={marker.post_text.length <= 20 ? `${marker.post_text}` : `${marker.post_text.substring(0, 20)}...`} />
+
+              {/* <Callout
+              tooltip>
+                <Text>
+                  {marker.post_text.length <= 20 ? `${marker.post_text}` : `${marker.post_text.substring(0, 20)}...`}
+                </Text>
+              </Callout> */}
+            </Marker>
+          ))}
+          {/* <Marker pinColor="#FFCC15" coordinate={{ latitude: 32.88232190507297, longitude: -117.23403495912069 }}>
             <Callout>
               <Text>Why can't I step on the seal?</Text>
             </Callout>
           </Marker>
-          <Marker pinColor="#FFCC15" draggable coordinate={{ latitude: 32.88122376973488, longitude: -117.23757610041588 }}>
+          <Marker
+            pinColor="#FFCC15"
+            draggable
+            coordinate={{ latitude: 32.88122376973488, longitude: -117.23757610041588 }}
+          >
             <Callout>
               <Text>what if we... studied together... on geisel 8th floor.. aha ha.. just kidding.. unless..?</Text>
             </Callout>
           </Marker>
-          <Marker pinColor="#FFCC15" draggable coordinate={{ latitude: 32.87971535134385, longitude: -117.23555259895977 }}>
+          <Marker
+            pinColor="#FFCC15"
+            draggable
+            coordinate={{ latitude: 32.87971535134385, longitude: -117.23555259895977 }}
+          >
             <Callout>
               <Text>Not gonna lie, Tapex has the best food on campus.</Text>
             </Callout>
-          </Marker>
- 
+          </Marker> */}
         </MapView>
         <TouchableOpacity activeOpacity={0.5} onPress={() => navigation.pop()} style={styles.touchableStyle}>
           <Image source={require('./../assets/backbo.png')} style={styles.floatingButtonStyle} />
