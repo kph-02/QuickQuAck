@@ -81,7 +81,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
 
   const blockUser = async () => {
     const body = { userID: post.user_id, commentOwnerID: commentOwnerID };
-
+    console.log(body);
     try {
       // const query = 'user_id=' + post.user_id; //sets up query information
       console.log('this is userId ');

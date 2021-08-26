@@ -364,10 +364,10 @@ const TagModal = ({ navigation }) => {
             tagBorderColor={yellow}
             tagTextColor={black}
             textInputProps={{ editable: false }}
-            searchInputPlaceholderText=""
+            searchInputPlaceholderText="Select a Tag"
             searchIcon={false}
             fixedHeight={false}
-            selectText=""
+            selectText="Select a Tag"
             //   onSubmit={onSelectedItemsChange}
           ></MultiSelect>
         </View>
