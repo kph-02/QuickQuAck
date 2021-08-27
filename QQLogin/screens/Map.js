@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, Image, Button, StatusBar, Dimensions, TouchableOpacity, ImageBackground } from 'react-native';
+import { StyleSheet, View, Platform, Text, Image, Button, StatusBar, Dimensions, TouchableOpacity, ImageBackground, Alert } from 'react-native';
 import MapView, { Heatmap, PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps';
 import { MapContainer, TopMapContainer } from './../components/styles';
 import * as Location from 'expo-location';
@@ -32,6 +32,7 @@ class Maps extends Component {
     geocode: null,
     errorMessage: '',
     markerData: [],
+    post: '',
   };
 
   //Custom style for the map. Derived from google maps style.
@@ -65,16 +66,18 @@ class Maps extends Component {
       });
 
       const parseRes = await response.json();
-      // console.log(parseRes);
+      console.log('markerData');
+
+      console.log(parseRes);
       // markers = parseRes.data.markers;
       // console.log(markers);
 
       // const { markerData } = this.state;
+      this.setState({...this.state, post: parseRes})
       this.setState({ ...this.state, markerData: parseRes.data.markers });
-      console.log('markerData');
 
-      console.log(this.state.markerData);
-
+      // console.log(this.state.markerData);
+      // console.log(this.state.post);
       // console.log(parseRes.data.markers);
     } catch (err) {
       console.log(err.message);
@@ -115,17 +118,31 @@ class Maps extends Component {
     this.getFromDB();
 
     // console.log(this.state.location);
+    // console.log("meep");
     // console.log(this.parseRes);
     // console.log(this.state.geocode);
   }
 
+  
   render() {
     const { navigation } = this.props;
     const markerKhosla = require('./../assets/coleslaw.jpg');
+    const boop = (marker) => {
+      Alert.alert('', "Would you like to go to this post?", [
+        {
+          text: 'No',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => navigation.navigate('Post View', { post: marker }) },
+      ]);
+      
+    }
     return (
       <View>
         <StatusBar translucent={true} backgroundColor="transparent" barStyle="dark-content" />
         <MapView
+        
           mapType="standard"
           customMapStyle={this.mapStyle}
           loadingEnabled={true}
@@ -143,6 +160,7 @@ class Maps extends Component {
         >
           {this.state.markerData.map((marker) => (
             <Marker
+              onPress={() => boop(marker)}
               pinColor="#FFCC15"
               key={marker.post_id}
               coordinate={{
@@ -192,6 +210,7 @@ class Maps extends Component {
     );
   }
 }
+// navigation.navigate('Post View', { post: this.state.post })
 
 export default function Map(props) {
   const navigation = useNavigation();

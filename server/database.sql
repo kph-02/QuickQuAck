@@ -34,6 +34,8 @@ CREATE TABLE post (
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
     num_comments INTEGER NOT NULL,
+    latitude NUMERIC (10,7),
+    longitude NUMERIC (10,7),
     num_upvotes INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id),
@@ -117,9 +119,6 @@ CREATE TABLE poll (
     num_comments INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     poll_question VARCHAR(250),
-    startsAt DATETIME,
-    endsAt DATETIME,
-    -- poll_location geography(point),
     PRIMARY KEY (poll_id),
     CONSTRAINT FK_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT poll_unique UNIQUE (poll_id)
