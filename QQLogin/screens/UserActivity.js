@@ -105,7 +105,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       {/*Number of Comments*/}
       <View style={[styles.infoRow]}>
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_comments}</Text>
       </View>
       {/*Anonymous name of user*/}
       <View style={[styles.infoRow]}>

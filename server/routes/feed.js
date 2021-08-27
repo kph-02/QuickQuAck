@@ -56,18 +56,42 @@ const randomNameGenerator = () => {
 router.post("/create-post", authorization, async (req, res) => {
   try {
     //Reading information contained in post
-    const { postText, postTag, num_comments, num_upvotes } = req.body;
+    console.log(req.body);
+    const {
+      postText,
+      postTag,
+      num_comments,
+      num_upvotes,
+      latitude,
+      longitude,
+    } = req.body;
     const author_id = req.user;
+    console.log(latitude);
     //Name of the dropdown of the post tag tagdropdown
     //var postTag = req.body.tagdropdown;
 
     console.log("Upvotes: " + num_upvotes);
 
-    const newPost = await pool.query(
-      "INSERT INTO post (post_text, user_id, num_comments, num_upvotes) VALUES ($1, $2, $3, $4) RETURNING *;",
-      [postText, author_id, num_comments, num_upvotes]
-    );
-
+    if (latitude !== null) {
+      console.log("not undefined");
+      var newPost = await pool.query(
+        "INSERT INTO post (post_text, user_id, num_comments, num_upvotes, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
+        [
+          postText,
+          author_id,
+          num_comments,
+          num_upvotes,
+          parseFloat(latitude),
+          parseFloat(longitude),
+        ]
+      );
+    } else {
+      console.log("wowee");
+      var newPost = await pool.query(
+        "INSERT INTO post (post_text, user_id, num_comments, num_upvotes) VALUES ($1, $2, $3, $4) RETURNING *;",
+        [postText, author_id, num_comments, num_upvotes]
+      );
+    }
     const postID = newPost.rows[0].post_id;
 
     for (const i of postTag) {
@@ -921,16 +945,13 @@ router.put("/block-user", authorization, async (req, res) => {
   // console.log("Please");
   // console.log(userID);
 
-  if (userID == userID2) {
-    return;
-  } else {
-    try {
-      if (typeof commentOwnerID !== "undefined") {
-        // console.log("time to cry");
-        // console.log(commentOwnerID)
-        console.log(
-          "Blocking user: " + commentOwnerID + " from user: " + userID2
-        );
+  try {
+    if (commentOwnerID !== "{undefined}") {
+      console.log("time to cry");
+      console.log(commentOwnerID);
+      console.log(
+        "Blocking user: " + commentOwnerID + " from user: " + userID2
+      );
 
         const addToBlockList = await pool.query(
           "UPDATE users SET blocked_users = array_append(blocked_users, $1) WHERE user_id = $2;",
@@ -1008,6 +1029,23 @@ router.post("/flag-post", authorization, async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json("Server Error");
+  }
+});
+
+//Getting Information to store on Markers
+router.get("/marker-info", async (req, res) => {
+  try {
+    const markerInfo = await pool.query(
+      "SELECT DISTINCT ON (P.post_id) P.post_id, P.user_id, P.post_text, P.num_comments, post_names.anon_name_id AS anon_name, P.num_upvotes, P.time_posted AS post_age, P.latitude, P.longitude, tar.array_agg AS tagArray FROM post P INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id WHERE (latitude IS NOT NULL AND longitude IS NOT NULL) GROUP BY P.post_id, tagArray, post_names.anon_name_id;"
+    );
+
+    res.status(201).json({
+      data: {
+        markers: markerInfo.rows,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

@@ -36,6 +36,7 @@ router.post("/register", validInfo, async (req, res) => {
       [firstName, lastName, email.toLowerCase(), bcryptPassword, dob, college, gy]
     );
 
+    
     //Used to return stored data for testing
     //res.json(newUser.rows[0]);
 

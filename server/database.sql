@@ -35,9 +35,10 @@ CREATE TABLE post (
     user_id uuid NOT NULL,
     post_text VARCHAR(250),
     num_comments INTEGER NOT NULL,
+    latitude NUMERIC (10,7),
+    longitude NUMERIC (10,7),
     num_upvotes INTEGER NOT NULL,
     time_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
     PRIMARY KEY (post_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT post_unique UNIQUE (post_id)

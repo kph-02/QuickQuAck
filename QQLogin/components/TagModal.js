@@ -121,6 +121,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
     <View style={{ borderColor: '#F4F4F4', borderWidth: 1 }} />
     
     {/* The Data of each Post */}
+<<<<<<< HEAD
     <View style={[styles.postTouchables]}>
       {/*Number of Upvotes*/}
       <View style={[styles.infoRow, { justifyContent: 'flex-start', marginRight: 5 }]}>
@@ -132,17 +133,37 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_upvotes}</Text>
       </View>
+=======
+    <View style={[styles.postTouchables, { justifyContent: 'space-between', marginLeft: 20, marginRight: 25, marginTop: 0, }]}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+        {/*number of upvotes*/}
+        <MaterialCommunityIcons name="chevron-up" color="#BDBDBD" size={35} style={{ width: 29, }} />
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_upvotes}</Text>
+      </View>
+
+>>>>>>> main
       {/*Number of Comments*/}
       <View style={[styles.infoRow]}>
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_comments}</Text>
       </View>
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
       {/*Anonymous name of user*/}
       <View style={[styles.infoRow]}>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.anon_name}</Text>
       </View>
+<<<<<<< HEAD
       {/* Age of Post */}
       <View style={[styles.infoRow]}>
+=======
+
+      {/* Age of Post */}
+      <View>
+>>>>>>> main
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
       </View>
     </View>
@@ -345,8 +366,11 @@ const TagModal = ({ navigation }) => {
         <StatusBar style="black" />
         {/* Header Content */}
         <View style={styles.headerContainer}>
+          <Text style={styles.headline}>Filter Tags</Text>
+        </View>
+        <View style={styles.headerContainer}>
           <MultiSelect
-            styleTextDropdownSelected={{textAlign: 'right'}}
+            styleTextDropdownSelected={{textAlign: 'left', marginLeft: width*0.05}}
             single
             hideTags={true}
             items={items}
