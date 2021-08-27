@@ -10,10 +10,10 @@ const serverPort = 5000;
 const { emit } = require("process");
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
-   cors: {
-      origin: "http://localhost:5001",
-      methods: ["GET", "POST"],
-   },
+  cors: {
+    origin: "http://localhost:5001",
+    methods: ["GET", "POST"],
+  },
 });
 
 /** Middleware **/
@@ -32,9 +32,7 @@ app.use("/dashboard", require("./routes/dashboard"));
 app.use("/feed", require("./routes/feed"));
 
 //Chat Server Routes
-app.use("/chats", require("./routes/chat"));
-
-
+app.use("/chat", require("./routes/chat"));
 
 // Displays in terminal which port the socketPort is running on
 server.listen(serverPort, () => {
@@ -52,11 +50,11 @@ cron.schedule("0 * * * *", async () => {
 
     //Deletes chatrooms matching recipient and author that are older than 24 hours.
     const deletedChatrooms = await pool.query(
-      "DELETE FROM chatrooms WHERE initiator_id = $1 AND recipient_id = $2" 
-      + " AND created_at < NOW() - INTERVAL'24 HOURS';",
+      "DELETE FROM chatrooms WHERE initiator_id = $1 AND recipient_id = $2" +
+        " AND created_at < NOW() - INTERVAL'24 HOURS';",
       [initiator_id, recipient_id]
     );
-    
+
     console.log("Old Posts Deleted: ");
     console.log(deletedPosts.rows);
     console.log("Old Chatrooms Deleted: ");
@@ -69,14 +67,14 @@ cron.schedule("0 * * * *", async () => {
 //Increasing a posts age by 24 hrs to test
 //UPDATE post SET time_posted = time_posted - interval '24 hours' WHERE post_id = 52;
 
-
 /** WEBSOCKET API Socket.io Methods **/
 
 // sends out all messages from recent to old
 const emitMessages = () => {
-  chatSockets.getSocketMessages(chatroom_id)
-     .then((result) => io.emit("chat-messages", result))
-     .catch(console.log);
+  chatSockets
+    .getSocketMessages(chatroom_id)
+    .then((result) => io.emit("chat-messages", result))
+    .catch(console.log);
 };
 
 // connects, creates message, and emits all messages
@@ -84,15 +82,16 @@ io.on("connection", (socket) => {
   console.log("User connected");
 
   socket.on("send-message", (text, author_id, chatroom_id) => {
-     chatSockets.createSocketMessage(text, author_id, chatroom_id)
-        .then((_) => {
-           emitMessages();
-        })
-        .catch((err) => io.emit(err));
+    chatSockets
+      .createSocketMessage(text, author_id, chatroom_id)
+      .then((_) => {
+        emitMessages();
+      })
+      .catch((err) => io.emit(err));
   });
 
-// close event when user disconnects from app
+  // close event when user disconnects from app
   socket.on("disconnect", () => {
-     console.log("user disconnected");
+    console.log("user disconnected");
   });
 });

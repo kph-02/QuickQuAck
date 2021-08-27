@@ -184,6 +184,7 @@ const PostView = ({ route, navigation }) => {
               commentOwner={userId === item.user_id ? true : false}
               commentOwnerID={item.user_id}
               comment_id={item.comment_id}
+              name={item.anon_name_id}
               // comment_text={item.comment_text}
 
               JWTtoken={JWTtoken}
@@ -762,6 +763,7 @@ const PostView = ({ route, navigation }) => {
             post={post}
             postOwner={userId === post.user_id ? true : false}
             JWTtoken={JWTtoken}
+            name={post.anon_name}
           />
         </View>
       </View>
