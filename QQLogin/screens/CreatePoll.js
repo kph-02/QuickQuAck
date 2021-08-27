@@ -241,8 +241,7 @@ const CreatePoll = ({ route, navigation }) => {
       if (isEnabled == false) {
         getLocationAsync();
         handleModal();
-        // setTimeout(() => {Alert.alert('Please Hold', "This will take a few seconds.", []), 3000);
-        //console.log(inputs);
+
       }
     };
   };
