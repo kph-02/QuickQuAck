@@ -316,7 +316,17 @@ const CreatePost = ({ route, navigation }) => {
               <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
             </TouchableOpacity>
           </View>
-
+          {/* Switch to allow app to obtain poster's location for map */}
+          <View style={styles.switchContainer}>
+              <Text style={[{padding: 15, width: '85%', fontSize: 15}]}>Post to Map</Text>
+              <Switch
+                trackColor={{ false: '#767577', true: '#FFCC15' }}
+                thumbColor={isEnabled ? '#ffdd62' : '#f4f3f4'}
+                style={{ width: '13%', transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }] }}
+                onValueChange={toggleSwitch}
+                value={isEnabled}
+              />
+          </View>
           {/* Section/Container for Anonymous Username */}
           <View
             style={{
@@ -345,16 +355,6 @@ const CreatePost = ({ route, navigation }) => {
               searchIcon={false}
               styleListContainer={{ height: height * 0.22 }}
             />
-            <View style={[styles.buttonContainer]}>
-              <Text style={{ fontSize: 15 }}>Post to Map</Text>
-              <Switch
-                trackColor={{ false: '#767577', true: '#FFCC15' }}
-                thumbColor={isEnabled ? '#ffdd62' : '#f4f3f4'}
-                style={{ transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }] }}
-                onValueChange={toggleSwitch}
-                value={isEnabled}
-              />
-            </View>
             {/* <View style={styles.loading} pointerEvents="none">
             <ActivityIndicator
               color="#FFCC15"
@@ -458,12 +458,13 @@ export default CreatePost;
 const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    height: 45,
+  switchContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    width: '100%',
+    borderTopColor: '#DADADA',
+    borderTopWidth: 1,
+    width: '100%'
   },
   divider: {
     width: '120%',

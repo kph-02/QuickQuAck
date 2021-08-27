@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
 import Poll from '../components/Poll.js';
+import * as Location from 'expo-location';
 //icons
 
 import { Octicons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -20,7 +21,23 @@ import {
   StyledViewPostScrollView,
   Line,
 } from './../components/styles';
-import { Button, View, Image, Modal, StyleSheet, TouchableOpacity, Text, TextInput, Dimensions, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import { 
+  Button, 
+  View, 
+  Image, 
+  Modal, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Text, 
+  TextInput, 
+  Dimensions, 
+  Keyboard, 
+  TouchableWithoutFeedback, 
+  ScrollView,
+  Switch,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
 import Map from '../screens/Map';
@@ -28,6 +45,11 @@ import Map from '../screens/Map';
 const { primary, yellow, background, lightgray, darkgray, black } = Colors;
 
 const CreatePoll = ({ route, navigation }) => {
+
+  //Used w/ Switch for Location
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [errorMessage, setErrorMsg] = useState(null);
+  const [alertModal, setAlertModal] = useState(false);
   // Use State hooks
   const [composePost, setComposePost] = useState(false);
   const [agree, setAgree] = useState(false);
@@ -43,6 +65,8 @@ const CreatePoll = ({ route, navigation }) => {
     pollTag: [],
     num_comments: 0,
     num_upvotes: 0,
+    latitude: null,
+    longitude: null,
   });
  
 
@@ -142,35 +166,11 @@ const CreatePoll = ({ route, navigation }) => {
 
         const parseRes = await response.json();
         // console.log(postTag);
-        console.log(parseRes);
+        // console.log(parseRes);
       } catch (error) {
         console.error(error.message);
       }
     }
-
-    // if (type === 'Update') {
-    //   const updateBody = {
-    //     pollQuestion: body.pollQuestion,
-    //     post_id: postType.post_id,
-    //     pollTag: body.pollTag,
-    //   };
-
-    //   try {
-    //     // console.log('Sent Token:      ' + JWTtoken);
-    //     // Send post info to DB
-    //     const response = await fetch('http://' + serverIp + '/feed/update-post', {
-    //       method: 'PUT',
-    //       headers: { token: JWTtoken, 'content-type': 'application/json' },
-    //       body: JSON.stringify(updateBody),
-    //     });
-
-    //     const parseRes = await response.json();
-
-    //     //console.log('UPDATE: ' + JSON.stringify(parseRes));
-    //   } catch (error) {
-    //     console.error(error.message);
-    //   }
-    // }
   };
 
   const items = [
@@ -204,6 +204,57 @@ const CreatePoll = ({ route, navigation }) => {
       onChangeInputs('pollQuestion', postType.post_text);
     }
   }, []);
+
+  //Functions related to Location Switch
+  const getLocationAsync = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      setErrorMsg('Permission to access location was denied');
+      return;
+    }
+    let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
+    setInputs({ ...inputs, latitude: location.coords.latitude, longitude: location.coords.longitude });
+  };
+
+  useEffect(() => {
+    console.log(inputs);
+  }, [inputs]);
+
+  const toggleSwitch = () => {
+    // setAnimation(true);
+    if (isEnabled == false) {
+      Alert.alert('Post to Map', "This will place a marker at your device's current location.", [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => boop() },
+      ]);
+    } else {
+      setIsEnabled((previousState) => !previousState);
+      setInputs({ ...inputs, latitude: null, longitude: null });
+      console.log(inputs);
+    }
+    const boop = () => {
+      setIsEnabled((previousState) => !previousState);
+      if (isEnabled == false) {
+        getLocationAsync();
+        handleModal();
+        // setTimeout(() => {Alert.alert('Please Hold', "This will take a few seconds.", []), 3000);
+        //console.log(inputs);
+      }
+    };
+  };
+
+  const handleModal = () => {
+    setTimeout(() => {
+      setAlertModal(true);
+    }, 100);
+    setTimeout(() => {
+      setAlertModal(false);
+    }, 6000);
+  };
 
 
   return (
@@ -246,7 +297,17 @@ const CreatePoll = ({ route, navigation }) => {
               <TextPostContent>{postType.post_type === 'Update' ? 'Update' : 'Post'}</TextPostContent>
             </TouchableOpacity>
           </View>
-         
+          {/* Switch to allow app to obtain poster's location for map */}
+          <View style={styles.switchContainer}>
+              <Text style={[{padding: 15, width: '85%', fontSize: 15}]}>Post to Map</Text>
+              <Switch
+                trackColor={{ false: '#767577', true: '#FFCC15' }}
+                thumbColor={isEnabled ? '#ffdd62' : '#f4f3f4'}
+                style={{ width: '13%', transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }] }}
+                onValueChange={toggleSwitch}
+                value={isEnabled}
+              />
+          </View>
           {/* Section/Container for Anonymous Username */}
           <View
             style={{
@@ -330,6 +391,34 @@ const CreatePoll = ({ route, navigation }) => {
           </ScrollView>
         </StyledViewPostContainer>
       </TouchableWithoutFeedback>
+      <Modal animationType={'fade'} transparent={true} visible={alertModal}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#00000080',
+
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 10,
+              overflow: 'hidden',
+              width: 300,
+              height: 100,
+              backgroundColor: '#fff',
+              padding: 20,
+            }}
+          >
+            <View style={styles.loading}>
+              <Text style={styles.waitText}>Please wait...</Text>
+              <ActivityIndicator size="large" color="#FFCC15" />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Modal>
   );
 };
@@ -361,6 +450,14 @@ export default CreatePoll;
 const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    borderTopColor: '#DADADA',
+    borderTopWidth: 1,
+    width: '100%'
+  },
   buttonContainer: {
     height: 45,
     flexDirection: 'row',
@@ -415,5 +512,18 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRightWidth: 1,
     borderRightColor: '#DADADA',
+  },
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  waitText: {
+    textAlign: 'center',
+    fontSize: 18,
   }
 });
