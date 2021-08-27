@@ -971,8 +971,7 @@ router.put("/block-user", authorization, async (req, res) => {
       console.error(err.message);
       res.status(500).json("Server Error");
     }
-  }
-});
+  });
 
 router.post("/flag-post", authorization, async (req, res) => {
   const {

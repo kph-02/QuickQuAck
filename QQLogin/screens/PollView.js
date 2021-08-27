@@ -434,56 +434,6 @@ const PollView = ({ route, navigation }) => {
   };
 
   //Getting comments from the database to show for post
-
-  //Get from database whether user has upvoted this post/comments before or not
-//   const getUpvoted = async () => {
-//     //posts
-//     let initialVote = false;
-
-//     try {
-//       const query = 'post_id=' + post.post_id + '&user_id=' + userId;
-
-//       // Get whether or not the post has been updated by the user
-//       const response = await fetch('http://' + serverIp + '/feed/post-votes?' + query, {
-//         method: 'GET',
-//         headers: { 'Content-Type': 'application/json', token: JWTtoken },
-//       });
-
-//       //The response includes post information, need in json format
-//       const parseRes = await response.json();
-
-//       //Vote values will be returned in an array, but we just want the first object here
-//       if (parseRes[0]) {
-//         if (parseRes[0].vote_value == 1) {
-//           initialVote = true;
-//         }
-//       }
-
-//       // console.log(userId);
-//       // console.log(post.post_id);
-//       // console.log(parseRes);
-//       // console.log(initialVote);
-
-//       setUpvoted(initialVote);
-//     } catch (error) {
-//       console.error(error.message);
-//     }
-//   };
-
-
-  //Triggered everytime a new comment is submitted, gets comment from DB to display it
-//   useEffect(() => {
-//     async function updateComments() {
-//       await getFromDB();
-//       await getCommentsUpvoted();
-
-//       setRefreshComments(!refreshComments); //refresh flatlist
-//       console.log('Comments Refreshed');
-//     }
-//     updateComments();
-//     setRefresh(false);
-//   }, [newComments]);
-
   const [options, setOptions] = useState([]);
   const pollData = () => {
       if (poll.pollchoices.length > 0){
@@ -501,7 +451,7 @@ const PollView = ({ route, navigation }) => {
           setOptions(newOptions);
       }
       return null;
-};
+    };
   //triggers on first load
   useEffect(() => {
     async function fetchAuthorizations() {
@@ -521,99 +471,6 @@ const PollView = ({ route, navigation }) => {
     }, [navigation]),
   );
 
-  /* Controls the look of each "item", or comment in this context */
-//   const renderItem = ({ item }) => {
-//     const backgroundColor = '#FFFFFF';
-//     const color = 'black';
-//     return <Item item={item} backgroundColor={{ backgroundColor }} textColor={{ color }} />;
-//   };
-
-  //Updates database with whether this user upvoted post or not
-//   const updatePostValue = async (body) => {
-//     try {
-//       const response = await fetch('http://' + serverIp + '/feed/post-vote', {
-//         method: 'POST',
-//         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
-//         body: JSON.stringify(body),
-//       });
-
-//       const parseRes = await response.json();
-
-//       // console.log('Update Upvotes: ' + JSON.stringify(parseRes));
-//     } catch (error) {
-//       console.error(error.message);
-//     }
-//   };
-
-  //Update the attributes of the post such as the number of comments and upvotes
-//   const updatePostAttributes = () => {
-//     const body = {
-//       post_id: post.post_id,
-//       num_comments: comments.length,
-//       num_upvotes: upvotes,
-//     };
-
-//     sendToDB('update', body);
-
-//     //Update whether the use upvoted in the database
-//     const bodyUpvotes = {
-//       user_id: userId,
-//       post_id: post.post_id,
-//       vote_value: upvoted ? 1 : 0,
-//     };
-//     updatePostValue(bodyUpvotes);
-
-//     //Comments that were changed by the user, to change in the database
-//     const bodyCommentUpvotes = {
-//       user_id: userId,
-//       post_id: post.post_id,
-//       comments: commentsUpvoted,
-//     };
-
-//     updateCommentValues(bodyCommentUpvotes);
-//     console.log('Updated Post/Comment attributes');
-//   };
-
-//   //updating the database with whether the user upvoted the comment or not
-//   const updateCommentValues = async (body) => {
-//     try {
-//       const response = await fetch('http://' + serverIp + '/feed/comment-vote', {
-//         method: 'POST',
-//         headers: { token: JWTtoken, 'Content-Type': 'application/json' },
-//         body: JSON.stringify(body),
-//       });
-
-//       const parseRes = await response.json();
-//       if (debugComments === true) {
-//         console.log(
-//           'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
-//         );
-//         console.log(body);
-//         console.log(
-//           'Updated Comment Values Sent To comment-vote -----------------------------------------------------------',
-//         );
-//       }
-//     } catch (error) {
-//       console.error(error.message);
-//     }
-//   };
-
-  //handles functionality for when user upvotes a post
-//   const handleUpvote = () => {
-//     let upvote = !upvoted;
-//     let incrementUpvotes = 0;
-
-//     // If true, then upvote was added, else upvote was removed
-//     if (upvote) {
-//       incrementUpvotes = 1;
-//     } else {
-//       incrementUpvotes = -1;
-//     }
-
-//     //toggle upvote button
-//     setUpvoted(upvote);
-//     setUpvotes(upvotes + incrementUpvotes);
-//   };
 const choices: Array<IChoice> = [
   { id: 1, choice: "Nike", votes: 12 },
   { id: 2, choice: "Adidas", votes: 1 },
