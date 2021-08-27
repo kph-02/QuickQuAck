@@ -147,30 +147,6 @@ const CreatePoll = ({ route, navigation }) => {
         console.error(error.message);
       }
     }
-
-    // if (type === 'Update') {
-    //   const updateBody = {
-    //     pollQuestion: body.pollQuestion,
-    //     post_id: postType.post_id,
-    //     pollTag: body.pollTag,
-    //   };
-
-    //   try {
-    //     // console.log('Sent Token:      ' + JWTtoken);
-    //     // Send post info to DB
-    //     const response = await fetch('http://' + serverIp + '/feed/update-post', {
-    //       method: 'PUT',
-    //       headers: { token: JWTtoken, 'content-type': 'application/json' },
-    //       body: JSON.stringify(updateBody),
-    //     });
-
-    //     const parseRes = await response.json();
-
-    //     //console.log('UPDATE: ' + JSON.stringify(parseRes));
-    //   } catch (error) {
-    //     console.error(error.message);
-    //   }
-    // }
   };
 
   const items = [
