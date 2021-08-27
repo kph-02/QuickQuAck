@@ -92,7 +92,8 @@ const RenderStyledTags = ({ tags }) => {
 };
 
 // Generates each of the Post previews on the Feed views
-const Item = ({ item, onPress, backgroundColor, textColor }) => (
+const Item = ({ item, onPress, backgroundColor, textColor }) => {
+  return(
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     {/* View for the text preview of each post as shown on the feed */}
     <View style={{ justifyContent: 'center', marginLeft: 25, marginRight: 25 }}>
@@ -141,7 +142,8 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       </View>
     </View>
   </TouchableOpacity>
-);
+  );
+};
 
 //format the time of the post from the database to display it to the screen
 const formatTime = (post_age) => {
@@ -365,6 +367,7 @@ const SecondRoute = ({scrollEventThrottle, onScroll}) => {
        * ]
        * */
       post = parseRes.data.post;
+      console.log(post);
     } catch (error) {
       console.error(error.message);
     }
@@ -468,7 +471,6 @@ const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   container: {
-    // marginTop: StatusBar.currentHeight,
     flex: 4,
     justifyContent: 'flex-start',
   },

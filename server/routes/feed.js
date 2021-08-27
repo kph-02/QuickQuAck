@@ -403,12 +403,12 @@ router.get("/all-posts", authorization, async (req, res) => {
     // console.log(blockedListUsers.rows[0].blocked_users);
     if (blockedList.rows[0].array_length != null) {
       var allFeed = await pool.query(
-        "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, bar.ARRAY_AGG as pollChoices, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id LEFT JOIN (SELECT post_id, ARRAY_AGG(choice_id) FROM poll_choices GROUP BY post_id) AS bar ON post.post_id = bar.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW() AND post.user_id != all ($1)) AS SB ORDER BY SB.post_age;",
+        "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, post.is_poll, tar.ARRAY_AGG as tagArray, bar.ARRAY_AGG as pollChoices, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id LEFT JOIN (SELECT post_id, ARRAY_AGG(choice_id) FROM poll_choices GROUP BY post_id) AS bar ON post.post_id = bar.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW() AND post.user_id != all ($1)) AS SB ORDER BY SB.post_age;",
         [blockedListUsers.rows[0].blocked_users]
       );
     } else {
       var allFeed = await pool.query(
-        "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, tar.ARRAY_AGG as tagArray, bar.ARRAY_AGG as pollChoices, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id LEFT JOIN (SELECT post_id, ARRAY_AGG(choice_id) FROM poll_choices GROUP BY post_id) AS bar ON post.post_id = bar.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age;"
+        "SELECT * FROM (SELECT DISTINCT ON (post.post_id) post.post_id AS post_id, post.is_poll, tar.ARRAY_AGG as tagArray, bar.ARRAY_AGG as pollChoices, PT.tag_id, post.user_id AS user_id, post_text, num_comments, num_upvotes, AGE(NOW(), time_posted) AS post_age, post_names.anon_name_id AS anon_name FROM post INNER JOIN post_names ON post.user_id = post_names.user_id AND post.post_id = post_names.post_id INNER JOIN post_tags AS PT ON (post.post_id = PT.post_id) INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = post.post_id LEFT JOIN (SELECT post_id, ARRAY_AGG(choice_id) FROM poll_choices GROUP BY post_id) AS bar ON post.post_id = bar.post_id WHERE time_posted BETWEEN NOW() - INTERVAL'24 HOURS' AND NOW()) AS SB ORDER BY SB.post_age;"
       );
     }
 
@@ -725,85 +725,6 @@ router.get("/current-password", authorization, async (req, res) => {
 });
 
 // create a poll (cannot edit once created)
-/*
-router.post("/create-poll", authorization, async (req, res) => {
-  try {
-    const { pollOptions, pollTag, num_comments } = req.body;
-    const author_id = req.user;
-
-    const newPoll = await pool.query(
-      "INSERT INTO poll (poll_options, user_id, num_comments) VALUES ($1, $2, $3) RETURNING *;",
-      [postText, author_id, num_comments]
-    );
-
-    const pollID = newPoll.rows[0].poll_id;
-
-    for (const i of pollTag) {
-      console.log("Console says " + i);
-      const pollTags = await pool.query(
-        "INSERT INTO poll_tags (tag_id, post_id) VALUES ($2, $1) RETURNING *;",
-        [postID, i]
-      );
-    }
-
-    const nameAdjectives = [
-      "Red",
-      "Orange",
-      "Yellow",
-      "Green",
-      "Blue",
-      "Purple",
-      "Pink",
-      "Gray",
-      "Turquoise",
-      "Brown",
-    ];
-    const nameAnimals = [
-      "Dog",
-      "Cat",
-      "Raccoon",
-      "Giraffe",
-      "Elephant",
-      "Panda",
-      "Koala",
-      "Rabbit",
-      "Turtle",
-      "Fox",
-    ];
-
-    const adjIndex = parseInt(Math.random() * 10);
-    const animalIndex = parseInt(Math.random() * 10);
-
-    let anonAdj = nameAdjectives[adjIndex];
-    let anonAnimal = nameAnimals[animalIndex];
-    const anonName = anonAdj + " " + anonAnimal;
-
-    const createAnonName = await pool.query(
-      "INSERT INTO anon_names (anon_name_id) VALUES ($1) ON CONFLICT DO NOTHING;",
-      [anonName]
-    );
-
-    const postName = await pool.query(
-      "INSERT INTO post_names (user_id, anon_name_id, post_id) VALUES ($1, $2, $3) RETURNING *;",
-      [author_id, anonName, postID]
-    );
-
-    ///postTags is declared in a loop so it is not defined here
-
-    res.status(201).json({
-      status: "Post Success",
-      data: {
-        post: newPost.rows[0],
-        tags: postTags.rows[0],
-        anonName: postName.rows[0],
-      },
-    });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json("Server Error");
-  }
-});
-*/
 router.post("/create-poll", authorization, async (req, res) => {
   try {
     // const { pollOptions, pollTag, num_comments } = req.body;

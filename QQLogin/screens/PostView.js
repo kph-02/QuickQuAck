@@ -14,6 +14,9 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
+
+import RNAnimated from "react-native-animated-component";
+import RNPoll, { IChoice } from "react-native-poll";
 import { MaterialCommunityIcons, EvilIcons } from '@expo/vector-icons';
 
 //Testing purposes, change serverIP in login.js to your local IPV4 address
@@ -143,6 +146,8 @@ const PostView = ({ route, navigation }) => {
   const [mapComments, setMapComments] = useState([]);
   // const [currIndex, setCurrIndex] = useState(0); //current index to map to
   const [refresh, setRefresh] = useState(false); //Handle refreshing logic
+
+  const [options, setOptions] = useState([]); //handles getting the poll choices
 
   const handleRefresh = async () => {
     setRefresh(true); //update animation
@@ -576,6 +581,24 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
+  const getPollData = () => {
+      if (post.pollchoices.length > 0){
+          let count = 1;
+          var newOptions = [];
+          for (const i of post.pollchoices) {
+              const newOption: IChoice = {
+                  id: count,
+                  choice: i,
+                  votes: 0
+              }
+              newOptions.push(newOption);
+              ++count;
+          }
+          setOptions(newOptions);
+      }
+      return null;
+    };
+
   //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
     async function updateComments() {
@@ -598,6 +621,10 @@ const PostView = ({ route, navigation }) => {
     }
 
     fetchAuthorizations();
+    if(post.is_poll){
+      getPollData();
+    }
+    
   }, []);
 
   //update values when screens change
@@ -771,7 +798,23 @@ const PostView = ({ route, navigation }) => {
       <View style={[styles.postBox, { marginTop: 10 }]}>
         <AdjustLabel fontSize={30} text={post.post_text} style={styles.ogPostText} numberOfLines={8} />
       </View>
-
+      {/* If the post is a poll, show the poll*/}
+      {post.is_poll &&
+        <RNPoll
+          totalVotes={30}
+          choices={options}
+          onChoicePress={(selectedChoice: IChoice) =>
+            console.log("SelectedChoice: ", selectedChoice)
+          }
+          PollContainer={RNAnimated}
+          PollItemContainer={RNAnimated}
+          appearFrom="left"
+          style={[{marginHorizontal: 35}]}
+          borderColor={yellow}
+          fillBackgroundColor={yellow}
+          choiceTextStyle={{fontWeight: 'bold'}}
+        />
+      }
       {/* Container/View for the Tags associated with this post */}
       <View
         style={[

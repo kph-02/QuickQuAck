@@ -43,8 +43,6 @@ CREATE TABLE post (
     CONSTRAINT post_unique UNIQUE (post_id)
 );
 
- 
-
 CREATE TABLE comment (
     comment_id BIGSERIAL,
     post_id INTEGER NOT NULL,
