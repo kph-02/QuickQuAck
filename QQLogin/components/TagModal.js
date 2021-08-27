@@ -119,7 +119,7 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       <RenderStyledTags tags={item.tagarray} />
     </View>
     <View style={{ borderColor: '#F4F4F4', borderWidth: 1 }} />
-    
+
     {/* The Data of each Post */}
     <View style={[styles.postTouchables]}>
       {/*Number of Upvotes*/}
@@ -349,7 +349,8 @@ const TagModal = ({ navigation }) => {
         </View>
         <View style={styles.headerContainer}>
           <MultiSelect
-            styleTextDropdownSelected={{textAlign: 'left', marginLeft: width*0.05}}
+            styleTextDropdown={{ textAlign: 'left', marginLeft: width * 0.05 }}
+            styleTextDropdownSelected={{ textAlign: 'left', marginLeft: width * 0.05 }}
             single
             hideTags={true}
             items={items}
