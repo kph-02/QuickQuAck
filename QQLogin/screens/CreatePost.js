@@ -35,7 +35,10 @@ import {
   Dimensions, 
   Keyboard, 
   TouchableWithoutFeedback, 
-  ScrollView 
+  ScrollView,
+  Switch,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
