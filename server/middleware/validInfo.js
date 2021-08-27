@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
     }
 
     function validPassword(userPassword) {
-        return /^[a-zA-Z]{3,}$/.test(userPassword);
+        return /^[a-zA-Z]{8,}$/.test(userPassword);
     }
 
     if (req.path === "/register"){
