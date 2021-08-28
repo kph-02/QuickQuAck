@@ -341,6 +341,14 @@ const TagModal = ({ navigation }) => {
       onSwipeDown={() => navigation.pop()}
     >
       <StyledViewPostContainer>
+        <TouchableOpacity onPress={() => navigation.pop()} style={styles.touchableStyle}>
+          <MaterialCommunityIcons
+            name="close-thick"
+            color={'#BDBDBD'}
+            size={25}
+            style={{ alignItems: 'center', right: 3, bottom: 2 }}
+          />
+        </TouchableOpacity>
         {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
         <StatusBar style="black" />
         {/* Header Content */}
@@ -467,6 +475,21 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#EFEFEF',
+  },
+
+  touchableStyle: {
+    position: 'absolute',
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 20,
+    top: 40,
+  },
+  floatingButtonStyle: {
+    resizeMode: 'contain',
+    width: width * 0.18,
+    height: width * 0.18,
   },
 });
 
