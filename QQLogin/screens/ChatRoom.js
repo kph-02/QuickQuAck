@@ -18,6 +18,7 @@ import {
 
 import { GiftedChat, Bubble, Send, InputToolbar } from 'react-native-gifted-chat';
 import { FontAwesome } from '@expo/vector-icons';
+import { io } from 'socket.io-client';
 
 import { StyledViewPostContainer } from './../components/styles';
 
@@ -26,11 +27,10 @@ import ChatRoomEllipsis from '../components/ChatRoomEllipsis';
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
 
-import { io } from 'socket.io-client';
-
 //Store Authentication Token
 var JWTtoken = '';
 var userId = '';
+var socket;
 //formik
 import { Formik, Field, Form } from 'formik';
 
@@ -52,21 +52,55 @@ const getUserID = async () => {
 const ChatRoom = ({ route }) => {
   const user = route.params.user;
   const avatarColor = route.params.avatarColor;
+  const chatroom_id = route.params.chatroom_id;
   const navigation = useNavigation();
 
   const [messages, setMessages] = useState([]);
+  const [socketChanged, setSocketChanged] = useState(false);
 
   useEffect(() => {
     getUserID();
 
-    //Socket Initialization
-    const socket = io('http://' + serverIp);
+    socket = io('http://' + serverIp);
 
-    //connecting to socket to the server
     socket.on('connect', () => {
       console.log('Connected as: ' + socket.id);
+      console.log('Joining chatroom: ' + chatroom_id);
+      socket.emit('room-messages', chatroom_id);
+
+      socket.on('chat-messages', (messages) => {
+        //Format data to match input structure
+        for (message of messages) {
+          console.log(userId);
+          console.log(message.user);
+
+          if (message.user === userId) {
+            message.user = {
+              _id: 1,
+              name: 'Me',
+              avatar: true,
+            };
+          } else {
+            message.user = {
+              _id: 2,
+              name: user,
+              avatar: true,
+            };
+          }
+
+          message.createdat = new Date(message.createdat);
+
+          console.log('Message Received: ' + JSON.stringify(message));
+          setMessages((previousMessages) => GiftedChat.append(previousMessages, message));
+        }
+      });
     });
 
+    // socket.emit('room-message', (chatroom_id) => {
+    //   console.log('Joining chatroom: ' + chatroom_id);
+    // });
+
+    setSocketChanged(!socketChanged);
     setMessages([
       {
         _id: 1,
@@ -91,12 +125,19 @@ const ChatRoom = ({ route }) => {
     ]);
   }, []);
 
+  useEffect(() => {
+    //connecting to socket to the server
+    //Listening for receiving messages from other user
+    console.log(messages);
+  }, [socketChanged]);
+
+  //Sending messages
   const onSend = useCallback((messages = []) => {
     setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
 
-    //Open socket-connection if the socket was already created
+    // //Open socket-connection if the socket was already created
     if (socket) {
-      socket.on('send-message', previousMessages, userId /*chatroom id */);
+      socket.emit('send-message', messages[0].text, userId, chatroom_id);
     } else {
       console.log('Error, socket is undefined');
     }

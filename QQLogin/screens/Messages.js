@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Button, View, Dimensions, StyleSheet, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 //formik
 import { Formik, Field, Form } from 'formik';
 //search bar
 import { SearchBar } from 'react-native-elements';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { serverIp } from './Login.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,36 +17,36 @@ import { StyledContainer, StyledViewPostContainer, InnerContainer, Colors } from
 var JWTtoken = '';
 
 //Hardcoded Message (room) Data
-const messages = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    user: 'Blue Raccoon',
-    body: 'This is a sample message from your friendly neighborhood raccoon!',
-    color: 'blue',
-    time: '6m',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    user: 'Red Monkey',
-    body: 'I have the power of god and anime on my side!! AHHHHHHHH',
-    color: 'red',
-    time: '7/1/21',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    user: 'Purple Unicorn',
-    body: 'Can I get a waffle? Can I please get a waffle?',
-    color: 'purple',
-    time: '6/29/21',
-  },
-  {
-    id: '58894a0f-3da1-471f-bd96-145571e29d82',
-    user: 'Green Tortoise',
-    body: "I'm washing myself AND my clothes",
-    color: 'green',
-    time: '4/20/21',
-  },
-];
+// const messages = [
+//   {
+//     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+//     user: 'Blue Raccoon',
+//     body: 'This is a sample message from your friendly neighborhood raccoon!',
+//     color: 'blue',
+//     time: '6m',
+//   },
+//   {
+//     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     user: 'Red Monkey',
+//     body: 'I have the power of god and anime on my side!! AHHHHHHHH',
+//     color: 'red',
+//     time: '7/1/21',
+//   },
+//   {
+//     id: '58694a0f-3da1-471f-bd96-145571e29d72',
+//     user: 'Purple Unicorn',
+//     body: 'Can I get a waffle? Can I please get a waffle?',
+//     color: 'purple',
+//     time: '6/29/21',
+//   },
+//   {
+//     id: '58894a0f-3da1-471f-bd96-145571e29d82',
+//     user: 'Green Tortoise',
+//     body: "I'm washing myself AND my clothes",
+//     color: 'green',
+//     time: '4/20/21',
+//   },
+// ];
 
 // Function limiting the number of lines and characters shown for text
 const AdjustTextPreview = ({ style, text }) => {
@@ -65,18 +66,26 @@ const Item = ({ item, onPress, backgroundColor }) => (
       {/* Chat Room Information: User, latest message, date/time sent */}
       <View style={{ marginLeft: 10, width: '85%' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 10 }}>
-          <Text style={[styles.title]}>{item.user}</Text>
-          <Text style={[styles.bodyText, { color: '#BDBDBD' }]}>{item.time}</Text>
+          <Text style={[styles.title]}>{item.anon_name}</Text>
+          <Text style={[styles.bodyText, { color: '#BDBDBD' }]}>{formatTime(item.created_at)}</Text>
         </View>
         {/* Latest Message from User */}
-        <AdjustTextPreview style={[styles.bodyText]} text={item.body} />
+        <AdjustTextPreview style={[styles.bodyText]} text={item.message_preview} />
       </View>
     </View>
   </TouchableOpacity>
 );
 
+const formatTime = (time) => {
+  const segments = time.split('-');
+
+  return segments[1] + '/' + segments[2].substring(0, 2) + '/' + segments[0];
+};
+
 const Messages = ({ navigation }) => {
   const [agree, setAgree] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [refreshChats, setRefreshChats] = useState(false);
 
   const checkboxHandler = () => {
     setAgree(!agree);
@@ -106,14 +115,18 @@ const Messages = ({ navigation }) => {
   //renderItem function
   const renderItem = ({ item }) => {
     // const backgroundColor = item.id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const backgroundColor = item.color;
+    const backgroundColor = item.color.toLowerCase();
 
     return (
       <Item
         item={item}
         onPress={() => {
-          setSelectedId(item.id);
-          navigation.navigate('Chat', { user: item.user, avatarColor: item.color });
+          setSelectedId(item.chatroom_id);
+          navigation.navigate('Chat', {
+            user: item.anon_name,
+            avatarColor: item.color.toLowerCase(),
+            chatroom_id: item.chatroom_id,
+          });
         }}
         backgroundColor={{ backgroundColor }}
       />
@@ -122,6 +135,9 @@ const Messages = ({ navigation }) => {
 
   // Fetch request to get messages from the database and update flatlist
   const getMessages = async () => {
+    //get token
+    await getJWT();
+
     //Get messages from databse
     try {
       const response = await fetch('http://' + serverIp + '/chat/requests-and-chatrooms', {
@@ -130,22 +146,20 @@ const Messages = ({ navigation }) => {
       });
 
       const parseRes = await response.json();
-      console.log(JSON.stringify(parseRes));
+
+      setChatMessages(parseRes.data.chatrooms);
+      setRefreshChats(!refreshChats);
     } catch (err) {
       console.log(err.message);
     }
   };
 
-  //Occurs upon rendering items
-  useEffect(() => {
-    //Get messages from the database
-    const fillMessages = async () => {
-      await getJWT();
-      await getMessages();
-    };
-
-    fillMessages();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      getMessages();
+      console.log('Chat Messages Refreshed: ' + JSON.stringify(chatMessages));
+    }, [navigation]),
+  );
 
   return (
     <StyledViewPostContainer>
@@ -177,9 +191,9 @@ const Messages = ({ navigation }) => {
         <FlatList
           numColumns={1}
           horizontal={false}
-          data={messages}
-          keyExtractor={(item) => item.id}
-          // extraData={id}
+          data={chatMessages}
+          keyExtractor={(item) => item.chatroom_id}
+          extraData={refreshChats}
           renderItem={renderItem}
         />
       </View>

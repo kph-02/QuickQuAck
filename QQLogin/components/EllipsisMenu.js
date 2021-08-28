@@ -106,9 +106,15 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
 
   const sendMessage = async () => {
     //Create a new chatroom in the database
+
+    const color = name.split(' ');
+    color[0].toLowerCase();
+
     const body = {
       recipient_id: commentOwnerID ? commentOwnerID : post.user_id,
-      user: name,
+      anon_name: name,
+      color: color[0],
+      message_preview: 'Send a message!',
     };
 
     try {
@@ -124,7 +130,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
       console.log(err.message);
     }
 
-    navigation.navigate('', {});
+    // navigation.navigate('', {});
   };
 
   return (

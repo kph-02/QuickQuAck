@@ -6,7 +6,7 @@ const pool = require("../db");
 router.post("/create-chatroom", authorization, async (req, res) => {
   try {
     //Reading information contained in request
-    const { recipient_id } = req.body;
+    const { recipient_id, color, anon_name, message_preview } = req.body;
     const initiator_id = req.user;
 
     //Deletes chatrooms matching recipient and author that are older than 24 hours.
@@ -18,12 +18,12 @@ router.post("/create-chatroom", authorization, async (req, res) => {
 
     //Inserts new chatroom into chatrooms if the chatroom doesnt exist with the same 2 participants.
     const newChatroom = await pool.query(
-      "INSERT INTO chatrooms (initiator_id, recipient_id, accepted_invite)" +
+      "INSERT INTO chatrooms (initiator_id, recipient_id, accepted_invite, color, anon_name, message_preview)" +
         " SELECT * FROM (SELECT CAST( $1 AS uuid) AS initiator_id, " +
-        "CAST( $2 AS uuid) AS recipient_id, '0' AS accepted_invite) AS tmp " +
+        "CAST( $2 AS uuid) AS recipient_id, '0' AS accepted_invite, $3 AS color,  $4 AS anon_name, $5 AS message_preview) AS tmp " +
         "WHERE NOT EXISTS ( SELECT initiator_id, recipient_id FROM chatrooms" +
         " WHERE initiator_id= CAST( $1 AS uuid) AND recipient_id = $2 LIMIT 1);",
-      [initiator_id, recipient_id]
+      [initiator_id, recipient_id, color, anon_name, message_preview]
     );
 
     /*

@@ -69,29 +69,41 @@ cron.schedule("0 * * * *", async () => {
 
 /** WEBSOCKET API Socket.io Methods **/
 
-// sends out all messages from recent to old
-const emitMessages = () => {
-  chatSockets
-    .getSocketMessages(chatroom_id)
-    .then((result) => io.emit("chat-messages", result))
-    .catch(console.log);
-};
-
 // connects, creates message, and emits all messages
 io.on("connection", (socket) => {
-  console.log("User connected");
+  console.log("User connected: " + socket.id);
+
+  socket.on("room-messages", (chatroom_id) => {
+    console.log("User In Room: " + chatroom_id);
+
+    chatSockets
+      .getSocketMessages(chatroom_id)
+      .then((result) => socket.emit("chat-messages", result))
+      .catch(console.log);
+  });
 
   socket.on("send-message", (text, author_id, chatroom_id) => {
+    console.log(
+      "Text: " +
+        text +
+        " Author: " +
+        author_id +
+        " Chatroom Id: " +
+        chatroom_id +
+        " Socket: " +
+        socket.id
+    );
+
     chatSockets
       .createSocketMessage(text, author_id, chatroom_id)
       .then((_) => {
-        emitMessages();
+        io.emit("chat-messages", result);
       })
       .catch((err) => io.emit(err));
   });
 
   // close event when user disconnects from app
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("User Disconnected: " + socket.id);
   });
 });
