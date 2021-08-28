@@ -763,8 +763,8 @@ router.post("/create-poll", authorization, async (req, res) => {
     } = req.body;
     const is_poll = 1;
     const author_id = req.user;
-    console.log('req.bod');
-
+    // console.log('req.bod');
+    pollTag.unshift('Poll');
     console.log(req.body);
 
     if (latitude !== null) {

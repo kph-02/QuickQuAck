@@ -192,7 +192,7 @@ const CreatePoll = ({ route, navigation }) => {
 
   const onSelectedItemsChange = (selectedItems) => {
     // Set Selected Items
-    if (selectedItems.length > 3) {
+    if (selectedItems.length > 2) {
       return;
     }
     setSelectedItems(selectedItems);
