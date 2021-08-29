@@ -29,7 +29,7 @@ var userId = '';
 //Set to true to see debug messages
 var debugComments = false;
 //formik
-import { Formik, Field, Form } from 'formik';
+import { Formik, Field, Form, yupToFormErrors } from 'formik';
 
 //icons
 
@@ -581,23 +581,31 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
-  const getPollData = () => {
-      if (post.pollchoices.length > 0){
-          let count = 1;
-          var newOptions = [];
-          for (const i of post.pollchoices) {
-              const newOption: IChoice = {
-                  id: count,
-                  choice: i,
-                  votes: 0
-              }
-              newOptions.push(newOption);
-              ++count;
-          }
-          setOptions(newOptions);
+  const getPollData = async () => {
+    //await getPollVotes();
+    console.log("...Getting Poll Data...");
+    if (post.pollchoices.length > 0){
+      let count = 1;
+      var newOptions = [];
+      for (const i of post.pollchoices) {
+        //may need to getfromdb based on pollchoices choice_id here to get the number of poll_votes
+        // console.log("what even is pollVotes???");
+        // console.log(pollVotes);
+        let choiceVotes = pollVotes.filter(choice => choice.choice_id === i);
+        // console.log("What is choiceVotes?");
+        // console.log(choiceVotes);
+        const newOption: IChoice = {
+            id: count,
+            choice: i,
+            votes: choiceVotes.length === 0 ? 0 : choiceVotes[0].count
+        }
+        newOptions.push(newOption);
+        ++count;
       }
-      return null;
-    };
+      setOptions(newOptions);
+    }
+    return null;
+  };
 
   //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
@@ -618,12 +626,14 @@ const PostView = ({ route, navigation }) => {
       await getUserID();
       await getJWT();
       await getUpvoted();
+      if(post.is_poll){
+        await getPollVotes();
+        await getPollData();
+        await getPollVoted();
+      }
     }
 
     fetchAuthorizations();
-    if(post.is_poll){
-      getPollData();
-    }
     
   }, []);
 
@@ -766,6 +776,133 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
+
+  /* Handling Poll Vote Functionality */
+
+  const [voted, setVoted] = useState();
+
+  //Get from database whether or not user has voted for this poll
+  const getPollVoted = async () => {
+    //posts
+    let userVoted = false;
+
+    try {
+      console.log("...Getting Poll Voted...");
+      const query = 'post_id=' + post.post_id + '&user_id=' + userId;
+
+      // Get whether or not the post has been updated by the user
+      const response = await fetch('http://' + serverIp + '/feed/user-poll-vote?' + query, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+
+      //Vote values will be returned in an array, but we just want the first object here
+      if (parseRes.length !== 0) {
+      // if (parseRes[0]) {
+      // if (parseRes[0].vote_value == 1) {
+          userVoted = true;
+      }
+      // console.log(userId);
+      // console.log(post.post_id);
+      // console.log(parseRes);
+      // console.log(initialVote);
+      console.log("User has voted: ");
+      console.log(userVoted);
+      setVoted(userVoted);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const [totalVotes, setTotalVotes] = useState(null);
+  const [pollVotes, setPollVotes] = useState([]);
+
+  //Get from database the total number of votes for this poll???? Might need to be inside getPollData
+  const getPollVotes = async () => {
+    try {
+      console.log("...Getting Poll Votes...");
+      const query = 'post_id=' + post.post_id ;
+
+      // Get whether or not the post has been updated by the user
+      const response = await fetch('http://' + serverIp + '/feed/get-poll-votes?' + query, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+      console.log(parseRes);
+      setTotalVotes(parseRes.total_votes);
+      setPollVotes(parseRes.poll_votes);
+      // getPollData();
+      //Vote values will be returned in an array, but we just want the first object here
+      // if (parseRes[0]) {
+      //   if (parseRes[0].vote_value == 1) {
+      //     initialVote = true;
+      //   }
+      // }
+
+      // console.log(userId);
+      // console.log(post.post_id);
+      // console.log(parseRes);
+      // console.log(initialVote);
+
+      // setUpvoted(initialVote);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //Updates database with whether this user upvoted post or not
+  const updatePollAttributes = (selectedChoice) => {
+    const body = {
+      post_id: post.post_id,
+      choice_id: selectedChoice.choice,
+      user_id: userId,
+    };
+    console.log("What is selectedChoice's choice in updatePollAttributes?: " + body.choice_id);
+    updatePollValue(body);
+    console.log('Updated Poll Attributes!');
+  };
+
+  const updatePollValue = async (body) => {
+    try {
+      const response = await fetch('http://' + serverIp + '/feed/post-poll-vote', {
+        method: 'POST',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      // console.log('Update Upvotes: ' + JSON.stringify(parseRes));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+  
+  //const [totalVotes, setTotalVotes] = useState(post.total_votes); need a total_votes in query
+  //const [choiceVotes, setChoiceVotes]
+  //function for onChoicePress, handles the user's poll vote
+  // const handlePollVote = (selectedChoice) => {
+  //   let vote = !voted;
+  //   let incrementChoiceVote = 0;
+
+  //   // If true, then upvote was added, else upvote was removed
+  //   if (vote) {
+  //     incrementChoiceVote = 1;
+  //     //toggle upvote button
+  //     setUpvoted(upvote);
+  //     setTotalVotes(totalvotes + incrementVotes);
+  //   } else {
+  //     incrementUpvotes = -1;
+  //   }
+
+    // can't just do this, need this for the different choices
+
   return (
     /* Style for the entire screen, controls how children are aligned */
     <StyledViewPostContainer>
@@ -801,10 +938,15 @@ const PostView = ({ route, navigation }) => {
       {/* If the post is a poll, show the poll*/}
       {post.is_poll &&
         <RNPoll
-          totalVotes={30}
+          // totalVotes={30}
+          totalVotes={totalVotes}
+          // voted is currently one step behind
+          hasBeenVoted={voted}
           choices={options}
-          onChoicePress={(selectedChoice: IChoice) =>
-            console.log("SelectedChoice: ", selectedChoice)
+          onChoicePress={(selectedChoice: IChoice) => {
+            console.log("SelectedChoice: ", selectedChoice);
+            updatePollAttributes(selectedChoice);
+          }
           }
           PollContainer={RNAnimated}
           PollItemContainer={RNAnimated}

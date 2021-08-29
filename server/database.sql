@@ -119,7 +119,7 @@ CREATE TABLE poll_choices (
     post_id BIGSERIAL,
     CONSTRAINT FK_poll_id FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE,
     PRIMARY KEY (choice_id, post_id),
-    UNIQUE(choice_id)
+    UNIQUE(choice_id) --might want to remove this constraint
 );
 
 CREATE TABLE poll_votes (

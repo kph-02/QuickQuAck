@@ -566,7 +566,7 @@ router.post("/post-vote", authorization, async (req, res) => {
         );
       }
     }
-    res.status(201).json("Complete");
+    res.status(201).json({status: "Complete"});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -819,7 +819,6 @@ router.post("/create-poll", authorization, async (req, res) => {
       "INSERT INTO post_names (user_id, anon_name_id, post_id) VALUES ($1, $2, $3) RETURNING *;",
       [author_id, anonName, postID]
     );
-    // need to implement votes here
 
     res.status(201).json({
       status: "Post Success",
@@ -895,65 +894,66 @@ router.post("/create-poll", authorization, async (req, res) => {
 //   }
 // });
 
-// get all poll questions
-// router.get("/get-poll-questions", authorization, async (req, res) => {
-//   try {
-//     const pollQuestions = await pool.query("SELECT * FROM poll");
-//     res.status(201).send({ pollQuestions });
-//   } catch (err) {
-//     res.status(500).send({ error: err.message });
-//   }
-// });
-
-// get all votes from a single poll
-// router.get("/get-poll-votes", authorization, async (req, res) => {
-//   try {
-//     const { poll_id } = req.body;
-//     const pollVotes = await pool.query(
-//       "SELECT * FROM poll_votes WHERE (poll_id = $1)",
-//       [poll_id]
-//     );
-//     res.status(201).json({ pollVotes });
-//   } catch (err) {
-//     res.status(500).send({ error: err.message });
-//   }
-// });
-
-// // delete a poll
-// router.delete("/delete-poll", authorization, async (req, res) => {
-//   try {
-//     const { poll_id } = req.body;
-//     const deletedPoll = await pool.query(
-//       "DELETE FROM poll WHERE (poll_id = $1)",
-//       [poll_id]
-//     );
-//     res.status(201).send("Success");
-//   } catch (err) {
-//     res.status(500).send({ error: err.message });
-//   }
-// });
-
 // vote on a poll
 router.post("/post-poll-vote", authorization, async (req, res) => {
   try {
-    const { poll_id, choice_id, user_id } = req.body;
-    try {
+    const { post_id, choice_id, user_id } = req.body;
+    // try {
       const insertPollVote = await pool.query(
-        "INSERT INTO poll_votes VALUES($1, $2, $3) RETURNING *",
-        [poll_id, choice_id, user_id]
+        "INSERT INTO poll_votes VALUES($1, $2, $3) RETURNING *;",
+        [user_id, choice_id, post_id]
       );
       // means that vote option has already been selected
-    } catch (err) {
-      const deletePollVote = await pool.query(
-        "DELETE FROM poll_votes WHERE (poll_id = $1, user_id = $2)",
-        [poll_id, user_id]
-      );
-      const insertNewPollVote = await pool.query(
-        "INSERT INTO poll_votes VALUES($1, $2, $3) RETURNING *",
-        [poll_id, choice_id, user_id]
-      );
-      res.status(201).send("Complete");
-    }
+    // } catch (err) {
+    //   const deletePollVote = await pool.query(
+    //     "DELETE FROM poll_votes WHERE (post_id = $1, user_id = $2);",
+    //     [post_id, user_id]
+    //   );
+    //   const insertNewPollVote = await pool.query(
+    //     "INSERT INTO poll_votes VALUES($1, $2, $3) RETURNING *;",
+    //     [post_id, choice_id, user_id]
+    //   );
+    //   // res.status(201).send("Complete! Voted for: " + choice_id);
+    // }
+    res.status(201).send({status: "Complete"});
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// used to check if user has already voted for this poll
+router.get("/user-poll-vote", authorization, async(req, res) => {
+  try{
+    const {post_id, user_id } = req.query;
+    const pollVote = await pool.query(
+      "SELECT * FROM poll_votes WHERE post_id = $1 AND user_id = $2;",
+      [post_id, user_id]
+    );
+    res.status(201).json(pollVote.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message});
+  }
+});
+
+// get the number of votes for each poll choice
+router.get("/get-poll-votes", authorization, async (req, res) => {
+  try {
+    const {post_id} = req.query;
+    
+    const pollVotes = await pool.query(
+      "SELECT choice_id, COUNT (choice_id) FROM poll_votes WHERE (post_id = $1) GROUP BY choice_id;",
+      [post_id]
+    );
+
+    const totalVotes = await pool.query(
+      "SELECT COUNT(*) FROM poll_votes WHERE (post_id = $1);",
+      [post_id]
+    );
+    res.status(201).json({
+      total_votes: totalVotes.rows[0].count,
+      poll_votes: pollVotes.rows
+    });
+    // res.status(201).json(pollVotes.rows);
   } catch (err) {
     res.status(500).send({ error: err.message });
   }
