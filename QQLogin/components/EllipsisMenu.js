@@ -126,11 +126,10 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
 
       const parseRes = await response.json();
       console.log(JSON.stringify(parseRes));
+      navigation.navigate('Messages');
     } catch (err) {
       console.log(err.message);
     }
-
-    // navigation.navigate('', {});
   };
 
   return (

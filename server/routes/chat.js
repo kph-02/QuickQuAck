@@ -42,6 +42,23 @@ router.post("/create-chatroom", authorization, async (req, res) => {
   }
 });
 
+router.put("/update-preview", authorization, async (req, res) => {
+  const { message_preview } = req.body;
+  const { chatroom_id } = req.body;
+
+  try {
+    const messagePreview = await pool.query(
+      "UPDATE chatrooms SET message_preview = $1 WHERE chatroom_id = $2",
+      [message_preview, chatroom_id]
+    );
+
+    res.status(201).json({ status: "Preview Updated" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ status: err.message });
+  }
+});
+
 router.put("/accept-chat", authorization, async (req, res) => {
   try {
     //Reading information contained in request

@@ -30,7 +30,6 @@ import { serverIp } from './Login.js';
 //Store Authentication Token
 var JWTtoken = '';
 var userId = '';
-var socket;
 //formik
 import { Formik, Field, Form } from 'formik';
 
@@ -49,6 +48,16 @@ const getUserID = async () => {
   }
 };
 
+const getJWT = async () => {
+  try {
+    await AsyncStorage.getItem('token').then((token) => {
+      JWTtoken = token;
+    });
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
 const ChatRoom = ({ route }) => {
   const user = route.params.user;
   const avatarColor = route.params.avatarColor;
@@ -57,82 +66,66 @@ const ChatRoom = ({ route }) => {
 
   const [messages, setMessages] = useState([]);
   const [socketChanged, setSocketChanged] = useState(false);
+  const [socket, changeSocket] = useState();
 
   useEffect(() => {
     getUserID();
+    getJWT();
 
-    socket = io('http://' + serverIp);
+    let socket = io('http://' + serverIp);
 
-    socket.on('connect', () => {
-      console.log('Connected as: ' + socket.id);
-      console.log('Joining chatroom: ' + chatroom_id);
-      socket.emit('room-messages', chatroom_id);
-
-      socket.on('chat-messages', (messages) => {
-        //Format data to match input structure
-        for (message of messages) {
-          console.log(userId);
-          console.log(message.user);
-
-          if (message.user === userId) {
-            message.user = {
-              _id: 1,
-              name: 'Me',
-              avatar: true,
-            };
-          } else {
-            message.user = {
-              _id: 2,
-              name: user,
-              avatar: true,
-            };
-          }
-
-          message.createdat = new Date(message.createdat);
-
-          console.log('Message Received: ' + JSON.stringify(message));
-          setMessages((previousMessages) => GiftedChat.append(previousMessages, message));
-        }
-      });
-    });
+    changeSocket(socket);
 
     // socket.emit('room-message', (chatroom_id) => {
     //   console.log('Joining chatroom: ' + chatroom_id);
     // });
 
     setSocketChanged(!socketChanged);
-    setMessages([
-      {
-        _id: 1,
-        text: 'Hello there!',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: user,
-          avatar: true,
-        },
-      },
-      {
-        _id: 2,
-        text: 'Hello world',
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'Me',
-          avatar: true,
-        },
-      },
-    ]);
   }, []);
 
   useEffect(() => {
     //connecting to socket to the server
     //Listening for receiving messages from other user
+    if (socket) {
+      socket.on('connect', () => {
+        console.log('Connected as: ' + socket.id);
+        console.log('Joining chatroom: ' + chatroom_id);
+        socket.emit('room-messages', chatroom_id);
+
+        socket.on('chat-messages', (messages) => {
+          //Format data to match input structure
+          for (message of messages) {
+            console.log(userId);
+            console.log(message.user);
+
+            if (message.user === userId) {
+              message.user = {
+                _id: 1,
+                name: 'Me',
+                avatar: true,
+              };
+            } else {
+              message.user = {
+                _id: 2,
+                name: user,
+                avatar: true,
+              };
+            }
+
+            message.createdAt = new Date(message.createdat);
+            message.createdat = undefined;
+
+            console.log('Message Received: ' + JSON.stringify(message));
+            setMessages((previousMessages) => GiftedChat.append(previousMessages, message));
+          }
+        });
+      });
+    }
     console.log(messages);
   }, [socketChanged]);
 
   //Sending messages
-  const onSend = useCallback((messages = []) => {
+  const onSend = useCallback((socket, messages = []) => {
     setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
 
     // //Open socket-connection if the socket was already created
@@ -219,13 +212,39 @@ const ChatRoom = ({ route }) => {
     return <FontAwesome name="arrow-down" size={22} color="#333" />;
   };
 
+  const handleBack = async () => {
+    //update message preview
+    try {
+      const body = {
+        message_preview: messages[0].text,
+        chatroom_id: chatroom_id,
+      };
+
+      console.log(body);
+
+      const response = await fetch('http://' + serverIp + '/chat/update-preview', {
+        method: 'PUT',
+        headers: { token: JWTtoken, 'Content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      console.log(JSON.stringify(parseRes));
+    } catch (err) {
+      console.log(err.message);
+    }
+    socket.disconnect();
+    navigation.pop();
+  };
+
   return (
     <StyledViewPostContainer>
       <StatusBar style="black" />
 
       {/* Container for Upper Portion of the Chat Room Screen: Name of other User, back button, ... button */}
       <View style={styles.screenHeader}>
-        <TouchableOpacity onPress={() => navigation.navigate('Messages')}>
+        <TouchableOpacity onPress={() => handleBack()}>
           <Text style={{ color: '#FFCC15', fontSize: 18 }}>Back</Text>
         </TouchableOpacity>
         <Text style={[styles.pageTitle]}>{user}</Text>
@@ -237,7 +256,7 @@ const ChatRoom = ({ route }) => {
       {/* Rest of the Screen for the Chat */}
       <GiftedChat
         messages={messages}
-        onSend={(messages) => onSend(messages)}
+        onSend={(messages) => onSend(socket, messages)}
         user={{ _id: 1 }}
         renderBubble={renderBubble}
         alwaysShowSend
