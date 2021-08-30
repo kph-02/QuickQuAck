@@ -1,13 +1,11 @@
 # Routes
-Note: May have to make the URIs more intuitive/specific
+
 ## Users
 | Verb | URI | Authenticated | Operation | Description
 | :---: | :--- | :---: | :---: | :---
-| POST      | /auth/register | No | Create | Register a user and create it in the database
-| POST   | /auth/login       | No | Read | Log in a user, generate auth token, refresh token
-| PUT | /auth/edit-password | Yes | Update | Set user's password
-| PUT | /auth/edit-email | Yes | Update | Set user's email
-| TODO
+| POST  | /api/auth/register | No | Create | Register a user and create it in the database
+| POST   | /api/auth/login       | No | Read | Log in a user, generate auth token, refresh token
+| PUT | /api/auth/edit-user-info | Yes | Update | Update user information (name, email, college, grad year, password)
 
 ### [POST] /auth/register
 Parameters
@@ -16,31 +14,42 @@ Parameters
 | username | Yes | Username of user 
 
 Responses
-<table>
-  <tr>
-    <td> 
-      <b>Status</b>
-    </td>
-    <td>
-      <b>Body</b>
-  </tr>
-  <tr>
-    <td>  
-      200
-    </td>
-    <td>   
-      
-      ```
-      {
-        "firstName": "John",
-        "lastName": "Doe",
-        "email": "johndoe@gmail.com",
-        "password": "password",
-        "dob": "01-01-2020",
-        "college": "UCSD",
-        "gy": "2030"
-      }
+<!---<table>
+<tr>
+<th> Status </th> <th> Response </th>
+</tr>
+<tr>
+<td> 200 </td>
+<td> -->
 
-    </td>
-  </tr>
-</table>
+<!--- ^ Extra blank line above! -->
+<!---```json
+json
+{
+    "id": 10,
+    "username": "alanpartridge",
+    "email": "alan@alan.com",
+    "password_hash": "$2a$10$uhUIUmVWVnrBWx9rrDWhS.CPCWCZsyqqa8./whhfzBZydX7yvahHS",
+    "password_salt": "$2a$10$uhUIUmVWVnrBWx9rrDWhS.",
+    "created_at": "2015-02-14T20:45:26.433Z",
+    "updated_at": "2015-02-14T20:45:26.540Z"
+}
+```
+V Extra blank line below!
+
+</td>
+</tr>
+<tr>
+<td> 400 </td>
+<td>
+
+**Markdown** _here_. (Blank lines needed before and after!)
+
+</td>
+</tr>
+</table> -->
+
+| Code | Body | Header | Description
+| :-----: | :---------: | :---: | :---: 
+| 200    |<pre lang="json">{<br>  "id": 10,<br>  "username": "alanpartridge",<br>  "email": "alan@alan.com",<br>  "password_hash": "$2a$10$uhUIUmVWVnrBWx9rrDWhS.CPCWCZsyqqa8./whhfzBZydX7yvahHS",<br>  "password_salt": "$2a$10$uhUIUmVWVnrBWx9rrDWhS.",<br>  "created_at": "2015-02-14T20:45:26.433Z",<br>  "updated_at": "2015-02-14T20:45:26.540Z"<br>}</pre>|
+| 400    |<code>{<br>  "code": 400,<br>  "msg": balabala"<br>}</code>|
