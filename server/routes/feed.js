@@ -764,7 +764,7 @@ router.post("/create-poll", authorization, async (req, res) => {
     const is_poll = 1;
     const author_id = req.user;
     // console.log('req.bod');
-    pollTag.unshift('Poll');
+    pollTag.unshift("Poll");
     console.log(req.body);
 
     if (latitude !== null) {
@@ -1058,11 +1058,33 @@ router.post("/flag-post", authorization, async (req, res) => {
 });
 
 //Getting Information to store on Markers
-router.get("/marker-info", async (req, res) => {
+router.get("/marker-info", authorization, async (req, res) => {
+  const user_id = req.user;
   try {
-    const markerInfo = await pool.query(
-      "SELECT DISTINCT ON (P.post_id) P.is_poll, P.post_id, P.user_id, P.post_text, P.num_comments, post_names.anon_name_id AS anon_name, P.num_upvotes, P.time_posted AS post_age, P.latitude, P.longitude, tar.array_agg AS tagArray, bar.array_agg AS pollChoices FROM post P INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id LEFT JOIN (SELECT post_id, ARRAY_AGG(choice_id) FROM poll_choices GROUP BY post_id) AS bar ON P.post_id = bar.post_id WHERE (latitude IS NOT NULL AND longitude IS NOT NULL) GROUP BY P.post_id, tagArray, post_names.anon_name_id, pollChoices;"
+    //This checks to see if there are any blocked users.
+    const blockedList = await pool.query(
+      "SELECT array_length(blocked_users, 1) FROM users WHERE user_id = $1;",
+      [user_id]
     );
+
+    const blockedListUsers = await pool.query(
+      "SELECT blocked_users FROM users WHERE user_id = $1;",
+      [user_id]
+    );
+
+    // console.log(blockedList.rows[0].array_length);
+    if (blockedList.rows[0].array_length != null) {
+
+      var markerInfo = await pool.query(
+        "SELECT DISTINCT ON (P.post_id) P.is_poll, P.post_id, P.user_id, P.post_text, P.num_comments, post_names.anon_name_id AS anon_name, P.num_upvotes, P.time_posted AS post_age, P.latitude, P.longitude, tar.array_agg AS tagArray, bar.array_agg AS pollChoices FROM post P INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id LEFT JOIN (SELECT post_id, ARRAY_AGG(choice_id) FROM poll_choices GROUP BY post_id) AS bar ON P.post_id = bar.post_id WHERE (latitude IS NOT NULL AND longitude IS NOT NULL AND P.user_id != all ($1)) GROUP BY P.post_id, tagArray, post_names.anon_name_id, pollChoices;",
+        [blockedListUsers.rows[0].blocked_users]
+      );
+    } else {
+
+      var markerInfo = await pool.query(
+        "SELECT DISTINCT ON (P.post_id) P.is_poll, P.post_id, P.user_id, P.post_text, P.num_comments, post_names.anon_name_id AS anon_name, P.num_upvotes, P.time_posted AS post_age, P.latitude, P.longitude, tar.array_agg AS tagArray, bar.array_agg AS pollChoices FROM post P INNER JOIN (SELECT post_id, ARRAY_AGG(tag_id) FROM post_tags GROUP BY post_id) as tar ON tar.post_id = P.post_id INNER JOIN post_names ON P.user_id = post_names.user_id AND P.post_id = post_names.post_id LEFT JOIN (SELECT post_id, ARRAY_AGG(choice_id) FROM poll_choices GROUP BY post_id) AS bar ON P.post_id = bar.post_id WHERE (latitude IS NOT NULL AND longitude IS NOT NULL) GROUP BY P.post_id, tagArray, post_names.anon_name_id, pollChoices;"
+      );
+    }
 
     res.status(201).json({
       data: {
