@@ -59,7 +59,8 @@ const AdjustTextPreview = ({ style, text }) => {
 
 // Function creating each message room item/box
 const Item = ({ item, onPress, backgroundColor }) => (
-  <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor: 'white', paddingVertical: 15 }]}>
+  // <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor: 'white', paddingVertical: 15 }]}>
+  <TouchableOpacity onPress={ item.accepted_invite ==='0' ? sendRequestAlert(item.initiator_id) : onPress} style={[styles.item, { backgroundColor: 'white', paddingVertical: 15 }]}>
     <View style={{ flexDirection: 'row' }}>
       {/* Colored Circle for each User */}
       <View style={[{ justifyContent: 'center', width: 50, height: 50, borderRadius: 50 / 2 }, backgroundColor]} />
@@ -70,11 +71,62 @@ const Item = ({ item, onPress, backgroundColor }) => (
           <Text style={[styles.bodyText, { color: '#BDBDBD' }]}>{formatTime(item.created_at)}</Text>
         </View>
         {/* Latest Message from User */}
-        <AdjustTextPreview style={[styles.bodyText]} text={item.message_preview} />
+         {item.accepted_invite === '0' ? <AdjustTextPreview style={[styles.bodyText]} text={'This user is requesting to chat!'} /> : <AdjustTextPreview style={[styles.bodyText]} text={item.message_preview} />}
+        {/* {<AdjustTextPreview style={[styles.bodyText]} text={item.message_preview} />} */}
       </View>
     </View>
   </TouchableOpacity>
 );
+
+
+const sendRequestAlert = (initiatorID) => {
+  const body = {
+    initiator_id : initiatorID,
+  };
+  Alert.alert('Message Request', 'Would you like to send and recieve messages from this user?', [
+    { text: 'Yes', onPress: () => sendToDB('acceptChatRequst', body ) },
+    { text: 'No', onPress: () => sendToDB('rejectChatRequst', body ) },
+  ]);
+}
+
+const sendToDB = async (operation, body) => {
+  //Create a comment on the post
+  if (operation === 'acceptChatRequst') {
+    await getJWT();
+
+    try {
+      const response = await fetch('http://' + serverIp + '/chat/accept-chat', {
+        method: 'PUT',
+        headers: { token: JWTtoken, 'Content-type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    const parseRes = await response.json();
+
+
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
+  //Update the current post
+  if (operation === 'rejectChatRequst') {
+    await getJWT();
+
+    try {
+      const response = await fetch('http://' + serverIp + '/chat/reject-chat', {
+        method: 'PUT',
+        headers: { token: JWTtoken, 'Content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+};
+
 
 const formatTime = (time) => {
   const segments = time.split('-');

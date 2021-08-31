@@ -19,7 +19,7 @@ module.exports = (req, res, next) => {
             return res.status(401).json("Enter Valid UCSD Email");
         }
         else if (!validPassword(password)) {
-            return res.status(401).json("Enter at least 8 characters");
+            return res.status(401).json("Password is at least 8 characters and should have no numbers or symbols.");
         }
        
     }

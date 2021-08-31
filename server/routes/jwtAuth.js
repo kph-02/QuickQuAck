@@ -43,6 +43,7 @@ router.post("/register", validInfo, async (req, res) => {
     const user_id = {
       user_id: newUser.rows[0].user_id,
     };
+    res.json("user_id");
 
     res.json(user_id);
   } catch (err) {
