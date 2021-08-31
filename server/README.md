@@ -20,7 +20,7 @@ This should bring up a terminal that looks something like this:
 
 If you try to check the local files with `ls`, you might notice that the server isn't set up in this user. That's because we are logged into the root user, which doesn't have sudo access. Therefore, we needed to create another user for sudo access, and so we have another user you will need to access.
 
-In order to access the other user, run the command `su nick` in order to access nick's user. The password is `password123`.
+In order to access the other user, run the command `su nick` in order to access nick's user. The password is `password123`. Then, do `cd ~` to find the folder we are working in.
 
 **Viewing Server Activity**
 
@@ -38,7 +38,7 @@ To monitor the server's activity, input the command `pm2 monit` and navigate dow
 
 In order to interact with postgres, we will need to change to the postgres user. This can be done by running the following command:
 
-`sudo -U postgres psql`
+`sudo -u postgres psql`
 
 **Note:** Make sure to navigate to our database by running `\c main`.
 
