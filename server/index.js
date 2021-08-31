@@ -82,6 +82,10 @@ io.on("connection", (socket) => {
       .catch(console.log);
   });
 
+  socket.on('join-room', chatroom_id => {
+    socket.join(chatroom_id);
+  })
+
   socket.on("send-message", (text, author_id, chatroom_id) => {
     console.log(
       "Text: " +
@@ -96,10 +100,11 @@ io.on("connection", (socket) => {
 
     chatSockets
       .createSocketMessage(text, author_id, chatroom_id)
-      .then((_) => {
-        io.emit("chat-messages", result);
+      .then((result) => {
+        console.log('Emitting')
+        socket.to(chatroom_id).emit("chat-messages", result);
       })
-      .catch((err) => io.emit(err));
+      .catch((err) => socket.to(chatroom_id).emit(err));
   });
 
   // close event when user disconnects from app

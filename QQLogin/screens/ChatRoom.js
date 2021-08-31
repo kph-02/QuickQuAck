@@ -74,6 +74,34 @@ const ChatRoom = ({ route }) => {
 
     let socket = io('http://' + serverIp);
 
+    socket.on('chat-messages', (messages) => {
+      //Format data to match input structure
+      for (message of messages) {
+        console.log(userId);
+        console.log(message.user);
+
+        if (message.user === userId) {
+          message.user = {
+            _id: 1,
+            name: 'Me',
+            avatar: true,
+          };
+        } else {
+          message.user = {
+            _id: 2,
+            name: user,
+            avatar: true,
+          };
+        }
+
+        message.createdAt = new Date(message.createdat);
+        message.createdat = undefined;
+
+        console.log('Message Received: ' + JSON.stringify(message));
+        setMessages((previousMessages) => GiftedChat.append(previousMessages, message));
+      }
+  });
+
     changeSocket(socket);
 
     // socket.emit('room-message', (chatroom_id) => {
@@ -91,35 +119,9 @@ const ChatRoom = ({ route }) => {
         console.log('Connected as: ' + socket.id);
         console.log('Joining chatroom: ' + chatroom_id);
         socket.emit('room-messages', chatroom_id);
-
-        socket.on('chat-messages', (messages) => {
-          //Format data to match input structure
-          for (message of messages) {
-            console.log(userId);
-            console.log(message.user);
-
-            if (message.user === userId) {
-              message.user = {
-                _id: 1,
-                name: 'Me',
-                avatar: true,
-              };
-            } else {
-              message.user = {
-                _id: 2,
-                name: user,
-                avatar: true,
-              };
-            }
-
-            message.createdAt = new Date(message.createdat);
-            message.createdat = undefined;
-
-            console.log('Message Received: ' + JSON.stringify(message));
-            setMessages((previousMessages) => GiftedChat.append(previousMessages, message));
-          }
+        socket.emit('join-room', chatroom_id);
         });
-      });
+
     }
     console.log(messages);
   }, [socketChanged]);
