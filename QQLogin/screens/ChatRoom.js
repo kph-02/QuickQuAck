@@ -249,7 +249,7 @@ const ChatRoom = ({ route }) => {
         </TouchableOpacity>
         <Text style={[styles.pageTitle]}>{user}</Text>
         <View>
-          <ChatRoomEllipsis navigation={navigation} />
+          <ChatRoomEllipsis navigation={navigation} chatroom_id = {chatroom_id} />
         </View>
       </View>
 

@@ -42,6 +42,23 @@ router.post("/create-chatroom", authorization, async (req, res) => {
   }
 });
 
+//Delete chatroom from database
+router.delete("/delete-chatroom", authorization, async (req,res) => {
+  const {chatroom_id} = req.body;
+
+  console.log(chatroom_id)
+
+  try {
+
+    const deletedChat = await pool.query("DELETE FROM chatrooms WHERE chatroom_id = $1", [chatroom_id]);
+    res.status(201).json({status: "Chatroom Deleted"});
+  }
+  catch(err) {
+    console.log(err.message)
+    res.status(500).json({status: err.message});
+  }
+});
+
 router.put("/update-preview", authorization, async (req, res) => {
   const { message_preview } = req.body;
   const { chatroom_id } = req.body;
