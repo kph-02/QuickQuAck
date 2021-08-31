@@ -95,7 +95,7 @@ const ChatRoom = ({ route }) => {
         message.createdAt = new Date(message.createdat);
         message.createdat = undefined;
 
-        console.log('Message Received: ' + JSON.stringify(message));
+        // console.log('Message Received: ' + JSON.stringify(message));
         setMessages((previousMessages) => GiftedChat.append(previousMessages, message));
       }
   });

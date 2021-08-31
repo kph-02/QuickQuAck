@@ -74,7 +74,6 @@ io.on("connection", (socket) => {
   console.log("User connected: " + socket.id);
 
   socket.on("room-messages", (chatroom_id) => {
-    console.log("User In Room: " + chatroom_id);
 
     chatSockets
       .getSocketMessages(chatroom_id)
@@ -102,7 +101,7 @@ io.on("connection", (socket) => {
     chatSockets
       .createSocketMessage(text, author_id, chatroom_id)
       .then((result) => {
-        console.log('Emitting: ' + result);
+        // console.log('Emitting: ' + JSON.stringify(result));
         socket.to(chatroom_id).emit("chat-messages", result);
       })
       .catch((err) => socket.to(chatroom_id).emit(err));
