@@ -83,6 +83,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on('join-room', chatroom_id => {
+    console.log("Joined Room: " + chatroom_id);
     socket.join(chatroom_id);
   })
 
@@ -101,7 +102,7 @@ io.on("connection", (socket) => {
     chatSockets
       .createSocketMessage(text, author_id, chatroom_id)
       .then((result) => {
-        console.log('Emitting')
+        console.log('Emitting: ' + result);
         socket.to(chatroom_id).emit("chat-messages", result);
       })
       .catch((err) => socket.to(chatroom_id).emit(err));

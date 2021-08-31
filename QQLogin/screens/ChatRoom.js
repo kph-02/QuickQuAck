@@ -77,8 +77,6 @@ const ChatRoom = ({ route }) => {
     socket.on('chat-messages', (messages) => {
       //Format data to match input structure
       for (message of messages) {
-        console.log(userId);
-        console.log(message.user);
 
         if (message.user === userId) {
           message.user = {
