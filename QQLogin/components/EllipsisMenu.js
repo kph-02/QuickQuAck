@@ -8,7 +8,7 @@ import { serverIp } from '../screens/Login.js';
 
 const { SlideInMenu } = renderers;
 
-const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, commentOwnerID, JWTtoken }) => {
+const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, commentOwnerID, JWTtoken, name }) => {
   const { anon_name, post_id, post_text, tagarray } = post;
   // console.log("This is comment:");
   // console.log(commentOwnerID);
@@ -104,6 +104,34 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
     }
   };
 
+  const sendMessage = async () => {
+    //Create a new chatroom in the database
+
+    const color = name.split(' ');
+    color[0].toLowerCase();
+
+    const body = {
+      recipient_id: commentOwnerID ? commentOwnerID : post.user_id,
+      anon_name: name,
+      color: color[0],
+      message_preview: 'Send a message!',
+    };
+
+    try {
+      const response = await fetch('http://' + serverIp + '/chat/create-chatroom', {
+        method: 'POST',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+      console.log(JSON.stringify(parseRes));
+      navigation.navigate('Messages');
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   return (
     <Menu renderer={SlideInMenu}>
       {/* Slide-in Menu from the bottom is triggered by the Ellipsis (...) button */}
@@ -121,7 +149,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
                 style={{ paddingVertical: 10 }}
                 onSelect={() => {
                   Alert.alert('Send Message to User?', 'Would you like to send a message to this user?', [
-                    { text: 'Yes', onPress: () => console.log('User Pressed Yes') },
+                    { text: 'Yes', onPress: () => sendMessage() },
                     { text: 'No', onPress: () => console.log('User Pressed No') },
                   ]);
                 }}

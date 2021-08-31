@@ -27,6 +27,7 @@ import Map from '../screens/Map';
 import UserInfo from '../screens/UserInfo';
 import TagModal from '../components/TagModal';
 import ReportModal from '../components/ReportModal';
+import Messages from '../screens/Messages';
 import CreatePoll from '../screens/CreatePoll';
 import PollView from '../screens/PollView';
 
@@ -65,6 +66,7 @@ const RootStack = () => {
       <Stack.Screen name="UserInfo" component={UserInfo} />
       <Stack.Screen name="TagModal" component={TagModal} />
       <Stack.Screen name="ReportModal" component={ReportModal} />
+      <Stack.Screen name="Messages" component={Messages} />
     </Stack.Navigator>
   );
 };
