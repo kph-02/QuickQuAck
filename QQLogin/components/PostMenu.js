@@ -47,7 +47,7 @@ const PostMenu = ({ navigation }) => {
             style={styles.menuOptions}
             onSelect={() => {
               const postType = { post_type: 'Poll' };
-              navigation.navigate('Create Post', { postType });
+              navigation.navigate('Create Poll', { postType });
             }}
           >
             <View style={styles.options}>

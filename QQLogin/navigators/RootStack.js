@@ -28,6 +28,8 @@ import UserInfo from '../screens/UserInfo';
 import TagModal from '../components/TagModal';
 import ReportModal from '../components/ReportModal';
 import Messages from '../screens/Messages';
+import CreatePoll from '../screens/CreatePoll';
+import PollView from '../screens/PollView';
 
 const Stack = createStackNavigator();
 
@@ -37,6 +39,7 @@ const RootStack = () => {
       initialRouteName="Splash"
       screenOptions={({ route, navigation }) => ({
         gestureEnabled: true,
+         gestureEnabled: false,
         headerShown: false,
         headerTransparent: true,
       })}
@@ -49,7 +52,9 @@ const RootStack = () => {
       <Stack.Screen name="Notifications" component={Notifications} />
       <Stack.Screen name="TabNav" component={TabNav} />
       <Stack.Screen name="Create Post" component={CreatePost} />
+      <Stack.Screen name="Create Poll" component={CreatePoll} />
       <Stack.Screen name="Post View" component={PostView} />
+      <Stack.Screen name="Poll View" component={PollView} />
       <Stack.Screen name="Feed Views" component={FeedViews} />
       <Stack.Screen name="Flag Post" component={FlagPost} />
       <Stack.Screen name="Menu" component={EllipsisMenu} />

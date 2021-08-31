@@ -35,7 +35,7 @@ import {
   ExtraViewRight,
 } from './../components/styles';
 
-import { Button, View } from 'react-native';
+import { Button, View, Text } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 //colors
@@ -94,6 +94,7 @@ const Signup = ({ navigation }) => {
 
           <SubTitle></SubTitle>
           <Formik
+            // validationSchema={loginValidationSchema}
             initialValues={{
               toggle: false,
               checked: [],
@@ -120,7 +121,7 @@ const Signup = ({ navigation }) => {
               sendToDB(body);
             }}
           >
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
+            {({ handleChange, handleBlur, handleSubmit, values}) => (
               <StyledFormArea>
                 {/* might need to separate name into first and last name, add additional fields */}
                 <MyTextInput
@@ -161,7 +162,7 @@ const Signup = ({ navigation }) => {
                   selectionColor="#FFCC15"
                   style={{ color: 'black' }}
                 />
-
+                
                 <MyTextInput
                   label=""
                   icon=""
@@ -177,7 +178,7 @@ const Signup = ({ navigation }) => {
                   selectionColor="#FFCC15"
                   style={{ color: 'black' }}
                 />
-
+              
                 <MyTextInput
                   label=""
                   icon=""
@@ -216,7 +217,7 @@ const Signup = ({ navigation }) => {
 
                 <MsgBox>By clicking Sign Up, you agree to Quick QuAck's Terms & Conditions.</MsgBox>
 
-                <StyledButton onPress={handleSubmit}>
+                <StyledButton onPress={handleSubmit} >
                   <ButtonText>Sign Up</ButtonText>
                 </StyledButton>
                 <Line />
@@ -244,3 +245,116 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
 };
 
 export default Signup;
+
+// import React from 'react'
+// import {
+//   SafeAreaView,
+//   StyleSheet,
+//   ScrollView,
+//   View,
+//   Text,
+//   StatusBar,
+//   TextInput,
+//   Button
+// } from 'react-native'
+// import { Formik } from 'formik'
+// import * as yup from 'yup'
+
+// const loginValidationSchema = yup.object().shape({
+//   email: yup
+//     .string()
+//     .email("Please enter valid email")
+//     .required('Email Address is Required'),
+//   password: yup
+//     .string()
+//     .min(8, ({ min }) => `Password must be at least ${min} characters`)
+//     .required('Password is required'),
+// })
+
+// const App = () => {
+//   return (
+//     <>
+//       <View style={styles.loginContainer}>
+//         <Text>Login Screen</Text>
+//         <Formik
+//           initialValues={{ email: '', password: '' }}
+//           onSubmit={values => console.log(values)}
+//         >
+//           {({ handleChange, handleBlur, handleSubmit, values }) => (
+//             <>
+//               <Formik
+//                 validationSchema={loginValidationSchema}
+//                 initialValues={{ email: '', password: '' }}
+//                 onSubmit={values => console.log(values)}
+//               >
+//                 {({
+//                   handleChange,
+//                   handleBlur,
+//                   handleSubmit,
+//                   values,
+//                   errors,
+//                   isValid,
+//                 }) => (
+//                   <>
+//                     <TextInput
+//                       name="email"
+//                       placeholder="Email Address"
+//                       style={styles.textInput}
+//                       onChangeText={handleChange('email')}
+//                       onBlur={handleBlur('email')}
+//                       value={values.email}
+//                       keyboardType="email-address"
+//                     />
+//                     {errors.email &&
+//                       <Text style={{ fontSize: 10, color: 'red' }}>{errors.email}</Text>
+//                     }
+//                     <TextInput
+//                       name="password"
+//                       placeholder="Password"
+//                       style={styles.textInput}
+//                       onChangeText={handleChange('password')}
+//                       onBlur={handleBlur('password')}
+//                       value={values.password}
+//                       secureTextEntry
+//                     />
+//                     {errors.password &&
+//                       <Text style={{ fontSize: 10, color: 'red' }}>{errors.password}</Text>
+//                     }
+//                     <Button
+//                       onPress={handleSubmit}
+//                       title="LOGIN"
+//                       disabled={!isValid}
+//                     />
+//                   </>
+//                 )}
+//               </Formik>
+//             </>
+//           )}
+//         </Formik>
+//       </View>
+//     </>
+//   )
+// }
+
+// const styles = StyleSheet.create({
+
+//   loginContainer: {
+//     width: '80%',
+//     alignItems: 'center',
+//     backgroundColor: 'white',
+//     padding: 10,
+//     elevation: 10,
+//     backgroundColor: '#e6e6e6'
+//   },
+//   textInput: {
+//     height: 40,
+//     width: '100%',
+//     margin: 10,
+//     backgroundColor: 'white',
+//     borderColor: 'gray',
+//     borderWidth: StyleSheet.hairlineWidth,
+//     borderRadius: 10,
+//   },
+// })
+
+// export default App

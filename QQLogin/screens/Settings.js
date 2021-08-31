@@ -82,6 +82,9 @@ const Settings = ({ navigation }) => {
     const { latitude, longitude } = location.coords;
     // this.getGeocodeAsync({ latitude, longitude });
     setLocationPermission({ location: { latitude, longitude } });
+    // console.log(errorMessage);
+    console.log(location.coords);
+
   };
 
   return (

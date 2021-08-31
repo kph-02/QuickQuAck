@@ -4,7 +4,11 @@ module.exports = (req, res, next) => {
 
     //checks if email follows regular expression pattern
     function validEmail(userEmail){
-        return /^\w+([\.-]?\w+)*@\w+([\.-]\w+)*(\.\w{2,3})+$/.test(userEmail);
+        return /^\w+([\.-]?\w+)*@ucsd\.edu$/.test(userEmail);
+    }
+
+    function validPassword(userPassword) {
+        return /^[a-zA-Z]{8,}$/.test(userPassword);
     }
 
     if (req.path === "/register"){
@@ -12,8 +16,12 @@ module.exports = (req, res, next) => {
             return res.status(401).json("Missing Credentials.");
         } 
         else if (!validEmail(email)){
-            return res.status(401).json("Invalid Email");
+            return res.status(401).json("Enter Valid UCSD Email");
         }
+        else if (!validPassword(password)) {
+            return res.status(401).json("Enter at least 8 characters");
+        }
+       
     }
     else if (req.path === "/login"){
         if (![email, password].every(Boolean)){

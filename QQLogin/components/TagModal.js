@@ -119,15 +119,11 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
       <RenderStyledTags tags={item.tagarray} />
     </View>
     <View style={{ borderColor: '#F4F4F4', borderWidth: 1 }} />
+
     {/* The Data of each Post */}
     <View style={[styles.postTouchables]}>
-      <View style={[styles.infoRow]}>
-        {/*number of people who've viewed the post*/}
-        <MaterialCommunityIcons name="eye-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>12</Text>
-      </View>
+      {/*Number of Upvotes*/}
       <View style={[styles.infoRow, { justifyContent: 'flex-start', marginRight: 5 }]}>
-        {/*number of upvotes*/}
         <MaterialCommunityIcons
           name="chevron-up"
           color="#BDBDBD"
@@ -136,15 +132,16 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
         />
         <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_upvotes}</Text>
       </View>
+      {/*Number of Comments*/}
       <View style={[styles.infoRow]}>
-        {/*number of comments*/}
         <MaterialCommunityIcons name="chat-outline" color="#BDBDBD" size={20} />
-        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.num_comments}</Text>
+        <Text style={[styles.commentText, { color: '#BDBDBD', marginHorizontal: 5 }]}>{item.num_comments}</Text>
       </View>
+      {/*Anonymous name of user*/}
       <View style={[styles.infoRow]}>
-        {/*Anonymous name of user*/}
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{item.anon_name}</Text>
       </View>
+      {/* Age of Post */}
       <View style={[styles.infoRow]}>
         <Text style={[styles.name, { color: '#BDBDBD', marginHorizontal: 0 }]}>{formatTime(item.post_age)}</Text>
       </View>
@@ -344,12 +341,24 @@ const TagModal = ({ navigation }) => {
       onSwipeDown={() => navigation.pop()}
     >
       <StyledViewPostContainer>
+        <TouchableOpacity onPress={() => navigation.pop()} style={styles.touchableStyle}>
+          <MaterialCommunityIcons
+            name="close-thick"
+            color={'#BDBDBD'}
+            size={25}
+            style={{ alignItems: 'center', right: 3, bottom: 2 }}
+          />
+        </TouchableOpacity>
         {/* <Image source={require('./../assets/map.png')} style={styles.mapIcon} /> */}
         <StatusBar style="black" />
         {/* Header Content */}
         <View style={styles.headerContainer}>
+          <Text style={styles.headline}>Filter Tags</Text>
+        </View>
+        <View style={styles.headerContainer}>
           <MultiSelect
-            styleTextDropdownSelected={{textAlign: 'right'}}
+            styleTextDropdown={{ textAlign: 'left', marginLeft: width * 0.05 }}
+            styleTextDropdownSelected={{ textAlign: 'left', marginLeft: width * 0.05 }}
             single
             hideTags={true}
             items={items}
@@ -466,6 +475,21 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#EFEFEF',
+  },
+
+  touchableStyle: {
+    position: 'absolute',
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 20,
+    top: 40,
+  },
+  floatingButtonStyle: {
+    resizeMode: 'contain',
+    width: width * 0.18,
+    height: width * 0.18,
   },
 });
 
