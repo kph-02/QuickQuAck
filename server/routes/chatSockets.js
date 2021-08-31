@@ -19,7 +19,7 @@ const getSocketMessages = (chatroom_id) => {
 const createSocketMessage = (text, author_id, chatroom_id) => {
   return new Promise((resolve) => {
     pool.query(
-      "INSERT INTO messages (text, author_id, chatroom_id) VALUES ($1, $2, $3) RETURNING *;",
+      "INSERT INTO messages (text, author_id, chatroom_id) VALUES ($1, $2, $3) RETURNING message_id AS _id, text AS text, time_sent AS createdAt, author_id AS user;",
       [text, author_id, chatroom_id],
       (error, results) => {
         if (error) {

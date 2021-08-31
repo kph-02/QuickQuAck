@@ -124,8 +124,8 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
         body: JSON.stringify(body),
       });
 
-      const parseRes = await response.json();
-      console.log(JSON.stringify(parseRes));
+      const parseRes = await response.text();
+      console.log(parseRes);
       navigation.navigate('Messages');
     } catch (err) {
       console.log(err.message);

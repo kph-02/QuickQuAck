@@ -8,12 +8,55 @@ import {
   renderers,
 } from 'react-native-popup-menu';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { serverIp } from '../screens/Login';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 
 
 const {SlideInMenu} = renderers;
 
+var JWTtoken = '';
 
-const ChatRoomEllipsis = ({navigation}) => {
+const ChatRoomEllipsis = ({navigation, chatroom_id}) => {
+
+  const getJWT = async () => {
+    try {
+      await AsyncStorage.getItem('token').then((token) => {
+        JWTtoken = token;
+      });
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+  
+
+  const handleDelete = async (navigation, chatroom_id) => {
+
+    await getJWT();
+
+    //Tell database to delete chatroom
+    try{
+
+      console.log(JWTtoken)
+
+      const body = {chatroom_id : chatroom_id};
+
+      console.log(body)
+
+      const response = await fetch("http://" +serverIp + "/chat/delete-chatroom",{
+        method: 'DELETE',
+        headers: {token: JWTtoken, 'Content-type' : 'application/json'},
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+      console.log(JSON.stringify(parseRes));
+    }
+    catch(err){console.log(err.message)}    
+
+    navigation.navigate('TabNav', { Screen: 'Messages' });
+  };
+
     return (  
     <Menu renderer={SlideInMenu}>
 
@@ -25,7 +68,7 @@ const ChatRoomEllipsis = ({navigation}) => {
       {/* Three menu options: Send Message, Flag as inappropriate, Block Posts from User */}
       <MenuOptions style={{paddingBottom: 25, paddingTop: 8}}>
 
-        {/* Send Message */}
+        {/* Anonymous Messaging toggle */}
         <MenuOption 
           style={{paddingVertical: 10}}
           onSelect={() => {
@@ -41,7 +84,7 @@ const ChatRoomEllipsis = ({navigation}) => {
           <Text style={styles.text}>Turn off anonymous messaging</Text>
         </MenuOption>
 
-        {/* Flag as Inappropriate */}
+        {/* Delete the current chatroom */}
         <MenuOption 
         style={{paddingVertical: 10}}
         onSelect={() => {
@@ -49,7 +92,7 @@ const ChatRoomEllipsis = ({navigation}) => {
               "Delete Chat?",
               "Would you like to delete the current chat?",
               [
-                {text: 'Yes', onPress: () => navigation.navigate('Messages')},
+                {text: 'Yes', onPress: () => handleDelete(navigation, chatroom_id)},
                 {text: 'No', onPress: () => console.log("User Pressed No")},
               ]
           );
