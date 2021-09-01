@@ -27,41 +27,19 @@ import ChatRoomEllipsis from '../components/ChatRoomEllipsis';
 //Testing purposes, change serverIP in login.js to your local IPV4 address
 import { serverIp } from './Login.js';
 
-//Store Authentication Token
-var JWTtoken = '';
-var userId = '';
 //formik
 import { Formik, Field, Form } from 'formik';
 
 //icons
 import { MaterialCommunityIcons, EvilIcons, Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 
-//Get's the user's id from local storage
-const getUserID = async () => {
-  try {
-    await AsyncStorage.getItem('user_id').then((user_id) => {
-      //console.log('Retrieved Token: ' + token);
-      userId = user_id;
-    });
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
-const getJWT = async () => {
-  try {
-    await AsyncStorage.getItem('token').then((token) => {
-      JWTtoken = token;
-    });
-  } catch (err) {
-    console.log(err.message);
-  }
-};
-
 const ChatRoom = ({ route }) => {
   const user = route.params.user;
   const avatarColor = route.params.avatarColor;
   const chatroom_id = route.params.chatroom_id;
+  const userId = route.params.userId;
+  const JWTtoken = route.params.JWTtoken;
+  const initiator = route.params.initiator; //boolean if this user started the chat.
   const navigation = useNavigation();
 
   const [messages, setMessages] = useState([]);
@@ -69,8 +47,8 @@ const ChatRoom = ({ route }) => {
   const [socket, changeSocket] = useState();
 
   useEffect(() => {
-    getUserID();
-    getJWT();
+
+    console.log("Initiator: " + initiator);
 
     let socket = io('http://' + serverIp);
 
@@ -121,7 +99,7 @@ const ChatRoom = ({ route }) => {
         });
 
     }
-    console.log(messages);
+    // console.log(messages);
   }, [socketChanged]);
 
   //Sending messages
@@ -220,7 +198,7 @@ const ChatRoom = ({ route }) => {
         chatroom_id: chatroom_id,
       };
 
-      console.log(body);
+      // console.log(body);
 
       const response = await fetch('http://' + serverIp + '/chat/update-preview', {
         method: 'PUT',
@@ -230,7 +208,7 @@ const ChatRoom = ({ route }) => {
 
       const parseRes = await response.json();
 
-      console.log(JSON.stringify(parseRes));
+      // console.log(JSON.stringify(parseRes));
     } catch (err) {
       console.log(err.message);
     }
@@ -249,7 +227,7 @@ const ChatRoom = ({ route }) => {
         </TouchableOpacity>
         <Text style={[styles.pageTitle]}>{user}</Text>
         <View>
-          <ChatRoomEllipsis navigation={navigation} chatroom_id = {chatroom_id} />
+          <ChatRoomEllipsis navigation={navigation} chatroom_id = {chatroom_id} initiator = {initiator} userId = {userId}/>
         </View>
       </View>
 

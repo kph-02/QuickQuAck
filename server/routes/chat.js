@@ -2,11 +2,14 @@ const express = require("express"); //import Express
 const router = express(); //create an Express application on the app variable
 const authorization = require("../middleware/authorization");
 const pool = require("../db");
+const e = require("cors");
 
 router.post("/create-chatroom", authorization, async (req, res) => {
   try {
     //Reading information contained in request
-    const { recipient_id, color, anon_name, message_preview } = req.body;
+    const { recipient_id, message_preview } = req.body;
+    const {initiator_anon_name, recipient_anon_name, initiator_color, recipient_color} = req.body;
+    const {initiator_name, recipient_name} = req.body;
     const initiator_id = req.user;
 
     //Deletes chatrooms matching recipient and author that are older than 24 hours.
@@ -18,12 +21,12 @@ router.post("/create-chatroom", authorization, async (req, res) => {
 
     //Inserts new chatroom into chatrooms if the chatroom doesnt exist with the same 2 participants.
     const newChatroom = await pool.query(
-      "INSERT INTO chatrooms (initiator_id, recipient_id, accepted_invite, color, anon_name, message_preview)" +
+      "INSERT INTO chatrooms (initiator_id, recipient_id, initiator_reveal, recipient_reveal, initiator_color, initiator_anon_name, recipient_color, recipient_anon_name, initiator_name, recipient_name, message_preview)" +
         " SELECT * FROM (SELECT CAST( $1 AS uuid) AS initiator_id, " +
-        "CAST( $2 AS uuid) AS recipient_id, '0' AS accepted_invite, $3 AS color,  $4 AS anon_name, $5 AS message_preview) AS tmp " +
+        "CAST( $2 AS uuid) AS recipient_id, '0' AS initiator_reveal, '0' AS recipient_reveal, $3 AS initiator_color,  $4 AS initiator_anon_name, $5 AS recipient_color,  $6 AS recipient_anon_name, $7 AS initiator_name, $8 AS recipient_name, $9 AS message_preview) AS tmp " +
         "WHERE NOT EXISTS ( SELECT initiator_id, recipient_id FROM chatrooms" +
         " WHERE initiator_id= CAST( $1 AS uuid) AND recipient_id = $2 LIMIT 1);",
-      [initiator_id, recipient_id, color, anon_name, message_preview]
+      [initiator_id, recipient_id, initiator_color, initiator_anon_name, recipient_color, recipient_anon_name, initiator_name, recipient_name, message_preview]
     );
 
     /*
@@ -45,8 +48,6 @@ router.post("/create-chatroom", authorization, async (req, res) => {
 //Delete chatroom from database
 router.delete("/delete-chatroom", authorization, async (req,res) => {
   const {chatroom_id} = req.body;
-
-  console.log(chatroom_id)
 
   try {
 
@@ -74,6 +75,35 @@ router.put("/update-preview", authorization, async (req, res) => {
     console.log(err.message);
     res.status(500).json({ status: err.message });
   }
+});
+
+router.put("/reveal-chat", authorization, async (req,res) => {
+
+  const {chatroom_id, initiator, reveal} = req.body;
+
+  try{
+    //user was initiator of the chat, update accordingly
+    if( initiator === true){
+
+      const initiatorReveal = await pool.query("UPDATE chatrooms SET initiator_reveal = $1 WHERE chatroom_id = $2",
+      [reveal, chatroom_id]);
+    }
+    //user was recipient of chat, update accordingly
+    else {
+      const recipientReveal = await pool.query("UPDATE chatrooms SET recipient_reveal = $1 WHERE chatroom_id = $2",
+      [reveal, chatroom_id]);
+    }
+
+    res.status(201).json({
+      status: "Value Updated"
+    })
+  }
+  catch(err) {
+    
+    console.log(err.message)
+    res.status(500).json({status : err.message})
+  }
+
 });
 
 router.put("/accept-chat", authorization, async (req, res) => {
@@ -127,8 +157,7 @@ router.get("/requests-and-chatrooms", authorization, async (req, res) => {
     //Gets all accepted chatrooms and pending chatrooms
     const allChatrooms = await pool.query(
       "SELECT * FROM chatrooms WHERE (initiator_id = $1 OR recipient_id = $1)" +
-        " AND (accepted_invite = '1' OR accepted_invite = '0') AND created_at" +
-        " > NOW() - INTERVAL'24 HOURS';",
+        " AND created_at > NOW() - INTERVAL'24 HOURS';",
       [user_id]
     );
 

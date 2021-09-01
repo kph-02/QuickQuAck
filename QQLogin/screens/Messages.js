@@ -15,6 +15,7 @@ import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 import { StyledContainer, StyledViewPostContainer, InnerContainer, Colors } from './../components/styles';
 
 var JWTtoken = '';
+var userId = '';
 
 //Hardcoded Message (room) Data
 // const messages = [
@@ -66,7 +67,7 @@ const Item = ({ item, onPress, backgroundColor }) => (
       {/* Chat Room Information: User, latest message, date/time sent */}
       <View style={{ marginLeft: 10, width: '85%' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 10 }}>
-          <Text style={[styles.title]}>{item.anon_name}</Text>
+          <Text style={[styles.title]}>{getName(item)}</Text>
           <Text style={[styles.bodyText, { color: '#BDBDBD' }]}>{formatTime(item.created_at)}</Text>
         </View>
         {/* Latest Message from User */}
@@ -76,6 +77,37 @@ const Item = ({ item, onPress, backgroundColor }) => (
   </TouchableOpacity>
 );
 
+//Get the right name based on display properties
+const getName = (item) => {
+
+  //if the user was the initiator, display recipient name
+  if(userId !== item.initiator_id){
+    //if initiator chose to reveal, return real name, else return anon name
+    if(item.initiator_reveal === '1') {
+
+      return item.initiator_name;
+    }
+    else{
+
+      return item.initiator_anon_name;
+    }
+  }
+  // get recipient name
+  else {
+    //if recipient chose to reveal, return real name, else return anon name
+    if(item.recipient_reveal === '1') {
+
+      return item.recipient_name;
+    }
+    else{
+
+      return item.recipient_anon_name;
+    }
+
+  }
+};
+
+//Format the time to display it nicely
 const formatTime = (time) => {
   const segments = time.split('-');
 
@@ -112,10 +144,22 @@ const Messages = ({ navigation }) => {
     }
   };
 
+//Get's the user's id from local storage
+const getUserID = async () => {
+  try {
+    await AsyncStorage.getItem('user_id').then((user_id) => {
+      //console.log('Retrieved Token: ' + token);
+      userId = user_id;
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
   //renderItem function
   const renderItem = ({ item }) => {
     // const backgroundColor = item.id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const backgroundColor = item.color.toLowerCase();
+    const backgroundColor = (item.initiator_id === userId ? item.initiator_color : item.recipient_color).toLowerCase();
 
     return (
       <Item
@@ -123,9 +167,12 @@ const Messages = ({ navigation }) => {
         onPress={() => {
           setSelectedId(item.chatroom_id);
           navigation.navigate('Chat', {
-            user: item.anon_name,
-            avatarColor: item.color.toLowerCase(),
+            user: getName(item),
+            avatarColor: (item.initiator_id === userId ? item.initiator_color : item.recipient_color).toLowerCase(),
             chatroom_id: item.chatroom_id,
+            userId: userId,
+            JWTtoken : JWTtoken,
+            initiator : item.initiator_id === userId ? true : false,
           });
         }}
         backgroundColor={{ backgroundColor }}
@@ -137,9 +184,13 @@ const Messages = ({ navigation }) => {
   const getMessages = async () => {
     //get token
     await getJWT();
+    await getUserID();
 
     //Get messages from databse
     try {
+
+      let chats = [];
+
       const response = await fetch('http://' + serverIp + '/chat/requests-and-chatrooms', {
         method: 'GET',
         headers: { token: JWTtoken, 'Content-type': 'application/json' },
@@ -147,7 +198,12 @@ const Messages = ({ navigation }) => {
 
       const parseRes = await response.json();
 
-      setChatMessages(parseRes.data.chatrooms);
+      if( parseRes.data !== undefined) {
+      
+        chats = parseRes.data.chatrooms;
+        console.log('Chat Messages Refreshed: ' + JSON.stringify(parseRes.data.chatrooms));
+      }
+      setChatMessages(chats);
       setRefreshChats(!refreshChats);
     } catch (err) {
       console.log(err.message);
@@ -157,7 +213,6 @@ const Messages = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       getMessages();
-      console.log('Chat Messages Refreshed: ' + JSON.stringify(chatMessages));
     }, [navigation]),
   );
 
