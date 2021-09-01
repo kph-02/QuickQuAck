@@ -485,6 +485,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     left: 20,
     top: 40,
+    zIndex: 2,
   },
   floatingButtonStyle: {
     resizeMode: 'contain',
