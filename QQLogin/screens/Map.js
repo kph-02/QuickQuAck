@@ -112,15 +112,10 @@ class Maps extends Component {
   };
 
   //Requesting permissions to access location as soon as map is opened
-  componentDidMount() {
-    this.getLocationAsync();
-    // this.getJWT();
-    this.getFromDB();
-
-    // console.log(this.state.location);
-    // console.log("meep");
-    // console.log(this.parseRes);
-    // console.log(this.state.geocode);
+  async componentDidMount() {
+    this.getJWT();
+    await this.getLocationAsync();
+    await this.getFromDB();
   }
 
   

@@ -367,7 +367,7 @@ const SecondRoute = ({scrollEventThrottle, onScroll}) => {
        * ]
        * */
       post = parseRes.data.post;
-      console.log(post);
+      // console.log(post);
     } catch (error) {
       console.error(error.message);
     }
