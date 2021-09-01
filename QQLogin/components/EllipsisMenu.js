@@ -8,7 +8,7 @@ import { serverIp } from '../screens/Login.js';
 
 const { SlideInMenu } = renderers;
 
-const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, commentOwnerID, JWTtoken, name }) => {
+const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, commentOwnerID, JWTtoken, name, userId }) => {
   const { anon_name, post_id, post_text, tagarray } = post;
   // console.log("This is comment:");
   // console.log(commentOwnerID);
@@ -104,7 +104,11 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
     }
   };
 
+  //Sending a message to user
   const sendMessage = async () => {
+    
+    const names = await getNames();
+    
     //Create a new chatroom in the database
 
     const color = name.split(' ');
@@ -112,8 +116,12 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
 
     const body = {
       recipient_id: commentOwnerID ? commentOwnerID : post.user_id,
-      anon_name: name,
-      color: color[0],
+      recipient_anon_name: name,
+      recipient_color: color[0],
+      initiator_anon_name: name,
+      initiator_color: color[0],
+      initiator_name: names.initiator_name,
+      recipient_name: names.recipient_name,
       message_preview: 'Send a message!',
     };
 
@@ -124,13 +132,54 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
         body: JSON.stringify(body),
       });
 
-      const parseRes = await response.text();
-      console.log(parseRes);
-      navigation.navigate('Messages');
+      const parseRes = await response.json();
+      // console.log(parseRes);
+      navigation.navigate('TabNav', { Screen: 'Messages' });
     } catch (err) {
       console.log(err.message);
     }
   };
+
+  const getNames = async () => {
+
+    //get user id of the recipient
+    let recipient_id = commentOwnerID === undefined ? post.user_id : commentOwnerID;
+    let names = {recipient_name : '', initiator_name : ''}
+
+    //Get recipient user information from the database
+    try{
+
+      const response = await fetch('http://' + serverIp + '/feed/user-information?user_id=' + recipient_id, {
+        method: "GET",
+        headers: {token:JWTtoken, 'Content-type' : 'application/json'},
+      });
+
+      const parseRes = await response.json();
+      names.recipient_name = parseRes.first_name + ' ' + parseRes.last_name;
+    }
+    catch(err){
+     
+      console.log(err.message)
+    }
+
+        //Get recipient user information from the database
+        try{
+
+          const response = await fetch('http://' + serverIp + '/feed/user-information?user_id=' + userId, {
+            method: "GET",
+            headers: {token:JWTtoken, 'Content-type' : 'application/json'},
+          });
+    
+          const parseRes = await response.json();
+          names.initiator_name = parseRes.first_name + ' ' + parseRes.last_name;
+        }
+        catch(err){
+         
+          console.log(err.message)
+        }
+
+        return names;
+  }
 
   return (
     <Menu renderer={SlideInMenu}>

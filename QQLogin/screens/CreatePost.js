@@ -234,9 +234,9 @@ const CreatePost = ({ route, navigation }) => {
     setInputs({ ...inputs, latitude: location.coords.latitude, longitude: location.coords.longitude });
   };
 
-  useEffect(() => {
-    console.log(inputs);
-  }, [inputs]);
+  // useEffect(() => {
+  //   console.log(inputs);
+  // }, [inputs]);
 
   const toggleSwitch = () => {
     // setAnimation(true);

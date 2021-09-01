@@ -17,7 +17,7 @@ const {SlideInMenu} = renderers;
 
 var JWTtoken = '';
 
-const ChatRoomEllipsis = ({navigation, chatroom_id}) => {
+const ChatRoomEllipsis = ({navigation, chatroom_id, initiator}) => {
 
   const getJWT = async () => {
     try {
@@ -28,7 +28,30 @@ const ChatRoomEllipsis = ({navigation, chatroom_id}) => {
       console.log(err.message);
     }
   };
-  
+
+  const revealUser = async (reveal) => {
+    await getJWT();
+
+    const body = {
+      chatroom_id : chatroom_id,
+      initiator : initiator,
+      reveal : reveal,
+    };
+
+    try{
+
+        const response = await fetch('http://' + serverIp + '/chat/reveal-chat', {
+          method: 'PUT',
+          headers: {token: JWTtoken, 'Content-type' : 'application/json'},
+          body : JSON.stringify(body)
+        });
+
+        const parseRes = await response.text();
+        console.log('Reveal: ' + parseRes);
+      }
+        catch(err){console.log(err.message)};
+
+  };
 
   const handleDelete = async (navigation, chatroom_id) => {
 
@@ -76,12 +99,12 @@ const ChatRoomEllipsis = ({navigation, chatroom_id}) => {
               "Turn off anonymous messaging",
               "Would you like to reveal yourself to this user?",
               [
-                {text: 'Yes', onPress: () => console.log("User Pressed Yes")},
-                {text: 'No', onPress: () => console.log("User Pressed No")},
+                {text: 'Reveal', onPress: () => revealUser(1)},
+                {text: 'Hide', onPress: () => revealUser(0)},
               ]
             );
           }}>
-          <Text style={styles.text}>Turn off anonymous messaging</Text>
+          <Text style={styles.text}>Anonymous messaging</Text>
         </MenuOption>
 
         {/* Delete the current chatroom */}
