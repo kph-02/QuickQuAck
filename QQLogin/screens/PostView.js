@@ -129,7 +129,7 @@ const formatTime = (post_age) => {
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
-  const { post } = route.params; //post data
+  const { post, votedBool } = route.params; //post data
   const [comments, SetComments] = useState([]); //stores all comments for the post
   const [newComments, refreshNewComments] = useState(false); //determines when to get new comments from db
 
@@ -581,7 +581,7 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
-  const getPollData = async () => {
+  const getPollData = async (poll_votes) => {
     //await getPollVotes();
     console.log("...Getting Poll Data...");
     if (post.pollchoices.length > 0){
@@ -591,14 +591,19 @@ const PostView = ({ route, navigation }) => {
         //may need to getfromdb based on pollchoices choice_id here to get the number of poll_votes
         // console.log("what even is pollVotes???");
         // console.log(pollVotes);
-        let choiceVotes = pollVotes.filter(choice => choice.choice_id === i);
-        // console.log("What is choiceVotes?");
-        // console.log(choiceVotes);
+        console.log("What is poll_votes??");
+        console.log(poll_votes);
+        //let choiceVotes = pollVotes.filter(choice => choice.choice_id === i);
+        let choiceVotes = poll_votes.filter(choice => choice.choice_id === i);
+        console.log("What is choiceVotes?");
+        console.log(choiceVotes);
         const newOption: IChoice = {
             id: count,
             choice: i,
-            votes: choiceVotes.length === 0 ? 0 : choiceVotes[0].count
+            votes: choiceVotes.length === 0 ? 0 : parseInt(choiceVotes[0].count)
         }
+        console.log("This is newOption for choice ----" + newOption.choice);
+        console.log(newOption);
         newOptions.push(newOption);
         ++count;
       }
@@ -628,7 +633,7 @@ const PostView = ({ route, navigation }) => {
       await getUpvoted();
       if(post.is_poll){
         await getPollVotes();
-        await getPollData();
+        //await getPollData();
         await getPollVoted();
       }
     }
@@ -811,11 +816,20 @@ const PostView = ({ route, navigation }) => {
       // console.log(initialVote);
       console.log("User has voted: ");
       console.log(userVoted);
+      console.log("This is parseRes for getPollVoted");
+      console.log(parseRes);
       setVoted(userVoted);
+      getVoted(userVoted);
     } catch (error) {
       console.error(error.message);
     }
   };
+
+  const getVoted = (voted) => {
+    console.log("This is getVoted");
+    console.log(voted);
+    return voted;
+  }
 
   const [totalVotes, setTotalVotes] = useState(null);
   const [pollVotes, setPollVotes] = useState([]);
@@ -834,10 +848,11 @@ const PostView = ({ route, navigation }) => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
+      console.log("getPollVotes");
       console.log(parseRes);
       setTotalVotes(parseRes.total_votes);
       setPollVotes(parseRes.poll_votes);
-      // getPollData();
+      getPollData(parseRes.poll_votes);
       //Vote values will be returned in an array, but we just want the first object here
       // if (parseRes[0]) {
       //   if (parseRes[0].vote_value == 1) {
@@ -883,25 +898,6 @@ const PostView = ({ route, navigation }) => {
       console.error(error.message);
     }
   };
-  
-  //const [totalVotes, setTotalVotes] = useState(post.total_votes); need a total_votes in query
-  //const [choiceVotes, setChoiceVotes]
-  //function for onChoicePress, handles the user's poll vote
-  // const handlePollVote = (selectedChoice) => {
-  //   let vote = !voted;
-  //   let incrementChoiceVote = 0;
-
-  //   // If true, then upvote was added, else upvote was removed
-  //   if (vote) {
-  //     incrementChoiceVote = 1;
-  //     //toggle upvote button
-  //     setUpvoted(upvote);
-  //     setTotalVotes(totalvotes + incrementVotes);
-  //   } else {
-  //     incrementUpvotes = -1;
-  //   }
-
-    // can't just do this, need this for the different choices
 
   return (
     /* Style for the entire screen, controls how children are aligned */
@@ -936,16 +932,25 @@ const PostView = ({ route, navigation }) => {
         <AdjustLabel fontSize={30} text={post.post_text} style={styles.ogPostText} numberOfLines={8} />
       </View>
       {/* If the post is a poll, show the poll*/}
+      {console.log("This is totalVotes")}
+      {console.log(totalVotes)}
+      {console.log("This is choices")}
+      {console.log(options)}
+
+
       {post.is_poll &&
         <RNPoll
           // totalVotes={30}
           totalVotes={totalVotes}
+          // votedChoiceByID={2}
           // voted is currently one step behind
-          hasBeenVoted={voted}
+          // hasBeenVoted={getVoted}
+          hasBeenVoted={votedBool} //passed in from feedviews
           choices={options}
           onChoicePress={(selectedChoice: IChoice) => {
             console.log("SelectedChoice: ", selectedChoice);
             updatePollAttributes(selectedChoice);
+            setTotalVotes(parseInt(totalVotes) + 1);
           }
           }
           PollContainer={RNAnimated}
