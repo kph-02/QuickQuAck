@@ -256,7 +256,7 @@ const TagModal = ({ navigation }) => {
           setSelectedId(item.post_id);
 
           //navigate to post view page, sends through post information as parameter
-          navigation.navigate('Post View', { post: item });
+          navigation.navigate('Post View', { post: item, votedBool: item.has_voted ? true : false });
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
@@ -485,6 +485,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     left: 20,
     top: 40,
+    zIndex: 2,
   },
   floatingButtonStyle: {
     resizeMode: 'contain',

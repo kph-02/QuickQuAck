@@ -44,6 +44,15 @@ CREATE TABLE post (
     CONSTRAINT post_unique UNIQUE (post_id)
 );
 
+CREATE TABLE poll_voted (
+    post_id INTEGER NOT NULL,
+    user_id uuid NOT NULL,
+    has_voted BOOLEAN,
+    PRIMARY KEY (user_id, post_id),
+    FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
 CREATE TABLE comment (
     comment_id BIGSERIAL,
     post_id INTEGER NOT NULL,
@@ -119,7 +128,7 @@ CREATE TABLE poll_choices (
     post_id BIGSERIAL,
     CONSTRAINT FK_poll_id FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE,
     PRIMARY KEY (choice_id, post_id),
-    UNIQUE(choice_id)
+    UNIQUE(choice_id) --might want to remove this constraint
 );
 
 CREATE TABLE poll_votes (

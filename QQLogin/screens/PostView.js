@@ -29,7 +29,7 @@ var userId = '';
 //Set to true to see debug messages
 var debugComments = false;
 //formik
-import { Formik, Field, Form } from 'formik';
+import { Formik, Field, Form, yupToFormErrors } from 'formik';
 
 //icons
 
@@ -129,7 +129,7 @@ const formatTime = (post_age) => {
 //passing through route allows us to take in input from feedviews.js
 const PostView = ({ route, navigation }) => {
   //Get input from feedViews.js into post by calling on route.params
-  const { post } = route.params; //post data
+  const { post, votedBool } = route.params; //post data
   const [comments, SetComments] = useState([]); //stores all comments for the post
   const [newComments, refreshNewComments] = useState(false); //determines when to get new comments from db
 
@@ -582,23 +582,36 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
-  const getPollData = () => {
-      if (post.pollchoices.length > 0){
-          let count = 1;
-          var newOptions = [];
-          for (const i of post.pollchoices) {
-              const newOption: IChoice = {
-                  id: count,
-                  choice: i,
-                  votes: 0
-              }
-              newOptions.push(newOption);
-              ++count;
-          }
-          setOptions(newOptions);
+  const getPollData = async (poll_votes) => {
+    //await getPollVotes();
+    console.log("...Getting Poll Data...");
+    if (post.pollchoices.length > 0){
+      let count = 1;
+      var newOptions = [];
+      for (const i of post.pollchoices) {
+        //may need to getfromdb based on pollchoices choice_id here to get the number of poll_votes
+        // console.log("what even is pollVotes???");
+        // console.log(pollVotes);
+        console.log("What is poll_votes??");
+        console.log(poll_votes);
+        //let choiceVotes = pollVotes.filter(choice => choice.choice_id === i);
+        let choiceVotes = poll_votes.filter(choice => choice.choice_id === i);
+        console.log("What is choiceVotes?");
+        console.log(choiceVotes);
+        const newOption: IChoice = {
+            id: count,
+            choice: i,
+            votes: choiceVotes.length === 0 ? 0 : parseInt(choiceVotes[0].count)
+        }
+        console.log("This is newOption for choice ----" + newOption.choice);
+        console.log(newOption);
+        newOptions.push(newOption);
+        ++count;
       }
-      return null;
-    };
+      setOptions(newOptions);
+    }
+    return null;
+  };
 
   //Triggered everytime a new comment is submitted, gets comment from DB to display it
   useEffect(() => {
@@ -619,12 +632,14 @@ const PostView = ({ route, navigation }) => {
       await getUserID();
       await getJWT();
       await getUpvoted();
+      if(post.is_poll){
+        await getPollVotes();
+        //await getPollData();
+        await getPollVoted();
+      }
     }
 
     fetchAuthorizations();
-    if(post.is_poll){
-      getPollData();
-    }
     
   }, []);
 
@@ -767,6 +782,124 @@ const PostView = ({ route, navigation }) => {
     }
   };
 
+
+  /* Handling Poll Vote Functionality */
+
+  const [voted, setVoted] = useState();
+
+  //Get from database whether or not user has voted for this poll
+  const getPollVoted = async () => {
+    //posts
+    let userVoted = false;
+
+    try {
+      console.log("...Getting Poll Voted...");
+      const query = 'post_id=' + post.post_id + '&user_id=' + userId;
+
+      // Get whether or not the post has been updated by the user
+      const response = await fetch('http://' + serverIp + '/feed/user-poll-vote?' + query, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+
+      //Vote values will be returned in an array, but we just want the first object here
+      if (parseRes.length !== 0) {
+      // if (parseRes[0]) {
+      // if (parseRes[0].vote_value == 1) {
+          userVoted = true;
+      }
+      // console.log(userId);
+      // console.log(post.post_id);
+      // console.log(parseRes);
+      // console.log(initialVote);
+      console.log("User has voted: ");
+      console.log(userVoted);
+      console.log("This is parseRes for getPollVoted");
+      console.log(parseRes);
+      setVoted(userVoted);
+      getVoted(userVoted);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const getVoted = (voted) => {
+    console.log("This is getVoted");
+    console.log(voted);
+    return voted;
+  }
+
+  const [totalVotes, setTotalVotes] = useState(null);
+  const [pollVotes, setPollVotes] = useState([]);
+
+  //Get from database the total number of votes for this poll???? Might need to be inside getPollData
+  const getPollVotes = async () => {
+    try {
+      console.log("...Getting Poll Votes...");
+      const query = 'post_id=' + post.post_id ;
+
+      // Get whether or not the post has been updated by the user
+      const response = await fetch('http://' + serverIp + '/feed/get-poll-votes?' + query, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', token: JWTtoken },
+      });
+
+      //The response includes post information, need in json format
+      const parseRes = await response.json();
+      console.log("getPollVotes");
+      console.log(parseRes);
+      setTotalVotes(parseRes.total_votes);
+      setPollVotes(parseRes.poll_votes);
+      getPollData(parseRes.poll_votes);
+      //Vote values will be returned in an array, but we just want the first object here
+      // if (parseRes[0]) {
+      //   if (parseRes[0].vote_value == 1) {
+      //     initialVote = true;
+      //   }
+      // }
+
+      // console.log(userId);
+      // console.log(post.post_id);
+      // console.log(parseRes);
+      // console.log(initialVote);
+
+      // setUpvoted(initialVote);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  //Updates database with whether this user upvoted post or not
+  const updatePollAttributes = (selectedChoice) => {
+    const body = {
+      post_id: post.post_id,
+      choice_id: selectedChoice.choice,
+      user_id: userId,
+    };
+    console.log("What is selectedChoice's choice in updatePollAttributes?: " + body.choice_id);
+    updatePollValue(body);
+    console.log('Updated Poll Attributes!');
+  };
+
+  const updatePollValue = async (body) => {
+    try {
+      const response = await fetch('http://' + serverIp + '/feed/post-poll-vote', {
+        method: 'POST',
+        headers: { token: JWTtoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      // console.log('Update Upvotes: ' + JSON.stringify(parseRes));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   return (
     /* Style for the entire screen, controls how children are aligned */
     <StyledViewPostContainer>
@@ -802,12 +935,26 @@ const PostView = ({ route, navigation }) => {
         <AdjustLabel fontSize={30} text={post.post_text} style={styles.ogPostText} numberOfLines={8} />
       </View>
       {/* If the post is a poll, show the poll*/}
+      {console.log("This is totalVotes")}
+      {console.log(totalVotes)}
+      {console.log("This is choices")}
+      {console.log(options)}
+
+
       {post.is_poll &&
         <RNPoll
-          totalVotes={30}
+          // totalVotes={30}
+          totalVotes={totalVotes}
+          // votedChoiceByID={2}
+          // voted is currently one step behind
+          // hasBeenVoted={getVoted}
+          hasBeenVoted={votedBool} //passed in from feedviews
           choices={options}
-          onChoicePress={(selectedChoice: IChoice) =>
-            console.log("SelectedChoice: ", selectedChoice)
+          onChoicePress={(selectedChoice: IChoice) => {
+            console.log("SelectedChoice: ", selectedChoice);
+            updatePollAttributes(selectedChoice);
+            setTotalVotes(parseInt(totalVotes) + 1);
+          }
           }
           PollContainer={RNAnimated}
           PollItemContainer={RNAnimated}

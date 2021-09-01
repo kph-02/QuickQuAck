@@ -189,7 +189,7 @@ const FirstRoute = ({scrollEventThrottle, onScroll}) => {
           setSelectedId(item.post_id);
 
           //navigate to post view page, sends through post information as parameter
-          navigation.navigate('Post View', { post: item });
+          navigation.navigate('Post View', { post: item, votedBool: item.has_voted ? true : false });
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
@@ -311,7 +311,7 @@ const SecondRoute = ({scrollEventThrottle, onScroll}) => {
           setSelectedId(item.post_id);
 
           //navigate to post view page, sends through post information as parameter
-          navigation.navigate('Post View', { post: item });
+          navigation.navigate('Post View', { post: item, votedBool: item.has_voted ? true : false});
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
