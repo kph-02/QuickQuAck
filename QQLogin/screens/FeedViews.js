@@ -189,8 +189,7 @@ const FirstRoute = ({scrollEventThrottle, onScroll}) => {
           setSelectedId(item.post_id);
 
           //navigate to post view page, sends through post information as parameter
-          //votedBool temporarily set to false for now, use item.has_voted ? true : false instead
-          navigation.navigate('Post View', { post: item, votedBool: false });
+          navigation.navigate('Post View', { post: item, votedBool: item.has_voted ? true : false });
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}

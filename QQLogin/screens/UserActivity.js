@@ -194,7 +194,7 @@ const UserActivity = ({ navigation }) => {
           setSelectedId(item.post_id);
 
           //navigate to post view page, sends through post information as parameter
-          navigation.navigate('Post View', { post: item });
+          navigation.navigate('Post View', { post: item, votedBool: item.has_voted ? true : false });
         }}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
@@ -229,6 +229,8 @@ const UserActivity = ({ navigation }) => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
+      console.log("This is in USERACTIVITY");
+      console.log(parseRes);
       /*
        *"post":[
        * {"post_id":,
