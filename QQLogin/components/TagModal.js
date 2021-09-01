@@ -230,16 +230,6 @@ const TagModal = ({ navigation }) => {
 
   const onSelectedItemsChange = (selectedItems) => {
     setSelectedItems(selectedItems);
-    // const itemz = selectedItems;
-    // console.log('This is itemz');
-    // console.log(itemz);
-    // console.log('This is selectedItems after the state update');
-    // console.log(selectedItems);
-    // console.log('This is postTag before the state update');
-    // console.log(postTag);
-    // setInputs({ ...inputs, postTag: itemz });
-    // console.log('This is postTag after setInputs');
-    // console.log(inputs;
   };
 
   //renderItem function for each item passed through
@@ -297,25 +287,6 @@ const TagModal = ({ navigation }) => {
       console.error(error.message);
     }
   };
-
-  //Communicating with the database to get all the posts
-  //   const getFromDB = async () => {
-  //     await getJWT(); //gets JWTtoken from local storage and stores in JWTtoken
-
-  //     if (inputs.postTag.toString() == 'Muir')
-  //       try {
-  //         const response = await fetch('http://' + serverIp + ':5000/feed/tag-filter', {
-  //           method: 'GET',
-  //           headers: { 'Content-Type': 'application/json', token: JWTtoken },
-  //         });
-
-  //         //The response includes post information, need in json format
-  //         const parseRes = await response.json();
-  //         setPostData(parseRes.data.post);
-  //       } catch (error) {
-  //         console.error(error.message);
-  //       }
-  //   };
 
   //useFocusEffect triggers works like useEffect, but only when this screen is focused
   // this lets us use navigation as the variable to track changes with, so feed updates
@@ -449,7 +420,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    backgroundColor: 'white',
     marginBottom: 10,
     marginTop: 5,
     marginHorizontal: 30,

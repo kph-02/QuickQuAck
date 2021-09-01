@@ -592,19 +592,19 @@ const PostView = ({ route, navigation }) => {
         //may need to getfromdb based on pollchoices choice_id here to get the number of poll_votes
         // console.log("what even is pollVotes???");
         // console.log(pollVotes);
-        console.log("What is poll_votes??");
-        console.log(poll_votes);
+        // console.log("What is poll_votes??");
+        // console.log(poll_votes);
         //let choiceVotes = pollVotes.filter(choice => choice.choice_id === i);
         let choiceVotes = poll_votes.filter(choice => choice.choice_id === i);
-        console.log("What is choiceVotes?");
-        console.log(choiceVotes);
+        // console.log("What is choiceVotes?");
+        // console.log(choiceVotes);
         const newOption: IChoice = {
             id: count,
             choice: i,
             votes: choiceVotes.length === 0 ? 0 : parseInt(choiceVotes[0].count)
         }
-        console.log("This is newOption for choice ----" + newOption.choice);
-        console.log(newOption);
+        // console.log("This is newOption for choice ----" + newOption.choice);
+        // console.log(newOption);
         newOptions.push(newOption);
         ++count;
       }
@@ -817,20 +817,13 @@ const PostView = ({ route, navigation }) => {
       // console.log(initialVote);
       console.log("User has voted: ");
       console.log(userVoted);
-      console.log("This is parseRes for getPollVoted");
-      console.log(parseRes);
+      // console.log("This is parseRes for getPollVoted");
+      // console.log(parseRes);
       setVoted(userVoted);
-      getVoted(userVoted);
     } catch (error) {
       console.error(error.message);
     }
   };
-
-  const getVoted = (voted) => {
-    console.log("This is getVoted");
-    console.log(voted);
-    return voted;
-  }
 
   const [totalVotes, setTotalVotes] = useState(null);
   const [pollVotes, setPollVotes] = useState([]);
@@ -849,8 +842,8 @@ const PostView = ({ route, navigation }) => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
-      console.log("getPollVotes");
-      console.log(parseRes);
+      // console.log("getPollVotes");
+      // console.log(parseRes);
       setTotalVotes(parseRes.total_votes);
       setPollVotes(parseRes.poll_votes);
       getPollData(parseRes.poll_votes);
@@ -938,22 +931,29 @@ const PostView = ({ route, navigation }) => {
       {console.log(totalVotes)}
       {console.log("This is choices")}
       {console.log(options)}
+      {console.log("This is VOTED")}
+      {console.log(voted)}
+      {console.log("This is votedBool")}
+      {console.log(votedBool)}
 
 
       {post.is_poll &&
         <RNPoll
-          // totalVotes={30}
           totalVotes={totalVotes}
-          // votedChoiceByID={2}
-          // voted is currently one step behind
-          // hasBeenVoted={getVoted}
           hasBeenVoted={votedBool} //passed in from feedviews
           choices={options}
+          disableBuiltInIncreaseVote={voted} //used for filter-feed issue
           onChoicePress={(selectedChoice: IChoice) => {
-            console.log("SelectedChoice: ", selectedChoice);
-            updatePollAttributes(selectedChoice);
-            setTotalVotes(parseInt(totalVotes) + 1);
-          }
+              console.log("SelectedChoice: ", selectedChoice);
+              if(voted){
+                alert('Already Voted!');
+              }
+              else{
+                updatePollAttributes(selectedChoice);
+                setTotalVotes(parseInt(totalVotes) + 1);
+              }
+              
+            }
           }
           PollContainer={RNAnimated}
           PollItemContainer={RNAnimated}

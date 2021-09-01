@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react';
-import { StyleSheet, Switch, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, Switch, Text, View, Image, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login';
@@ -98,12 +98,12 @@ const Settings = ({ navigation }) => {
       <Image style={styles.avatar} source={require('./../assets/AnonDuck.jpg')} />
 
       {/* User's Name */}
-      <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 45}}>
+      <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 45, marginBottom: height * 0.02}}>
            <Text style={styles.name}>{userName}</Text>
       </View>
 
       {/* Settings Options/Selections */}
-      <View style={[styles.bodyContent]}>
+      <ScrollView contentContainerStyle={styles.bodyContent}>
          <View style={styles.divider}/>
           <TouchableOpacity style={[styles.buttonContainer]}>
             <Text style={{fontSize: 15}}>Allow Notifications</Text>
@@ -139,15 +139,18 @@ const Settings = ({ navigation }) => {
            <TouchableOpacity style={[styles.buttonContainer]}>
             <Text style={{fontSize: 15 }}>Terms and Conditions</Text>
           </TouchableOpacity>
-          <View style={styles.divider}/>
-          
-          {/* Logout Button */}
-          <TouchableOpacity 
+        <View style={styles.divider}/>
+         
+        {/* Logout Button */}
+        <View style={{alignItems: 'center', justifyContent: 'center', marginVertical: height * 0.05}}>
+         <TouchableOpacity 
               onPress={() => navigation.navigate('Login')}
               style={styles.logoutButton}>
               <Text style={styles.buttonText}>Logout</Text>
           </TouchableOpacity>
-        </View>
+       </View>
+      </ScrollView>
+        
       </View>
   );
 };
@@ -180,12 +183,8 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   bodyContent: {
-    // flex: 1,
     alignItems: 'center',
-    // padding: 20,
-    marginTop: 20,
     paddingHorizontal: 20,
-    // marginRight: 20,
   },
   name: {
     fontSize: 30,
@@ -199,9 +198,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    // backgroundColor: '#FFFFFF',
-    // borderTopColor: '#DEE2E6',
-    // borderTopWidth: 1,
   },
   headline: {
     textAlign: 'center',
@@ -228,7 +224,7 @@ const styles = StyleSheet.create({
     height: 50, 
     justifyContent: 'center', 
     alignItems: 'center', 
-    marginTop: height * 0.05, 
+    //marginTop: height * 0.05, 
     borderRadius: 100
   }
 });

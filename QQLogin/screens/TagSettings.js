@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
 
 //icons
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   StyledContainer,
   PageLogo,
@@ -21,7 +21,7 @@ import {
   ButtonText,
   StyledButton2,
 } from './../components/styles';
-import { Button, View, Modal, StyleSheet, Text, Dimensions } from 'react-native';
+import { Button, View, Modal, StyleSheet, Text, Dimensions, TouchableOpacity } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 import MultiSelect from 'react-native-multiple-select';
@@ -139,6 +139,14 @@ const TagSettings = ({ navigation }) => {
   return (
     <StyledContainer>
       <StatusBar style="black" />
+      <TouchableOpacity onPress={() => navigation.pop()} style={styles.touchableStyle}>
+            <MaterialCommunityIcons
+              name="close-thick"
+              color={'#BDBDBD'}
+              size={25}
+              style={{ alignSelf: 'center', justifyContent: 'center', top: 10 }}
+            />
+      </TouchableOpacity>
       <PageTitle>Personalize QuickQuAck</PageTitle>
       <Text style={styles.welcome}>
         Select a few interest tags to get better, more personalized post recommendations on your feed
@@ -181,6 +189,19 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginBottom: 50,
     color: Colors.darkgray,
+  },
+  touchableStyle: {
+    // position: 'absolute',
+    width: 40,
+    height: 40,
+    alignSelf: 'flex-start',
+    justifyContent: 'flex-start',
+    marginBottom: 10,
+    right: 10,
+    bottom: 10
+    // left: 20,
+    // top: 40,
+    // zIndex: 2,
   },
 });
 

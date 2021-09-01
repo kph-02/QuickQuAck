@@ -380,7 +380,7 @@ const CreatePost = ({ route, navigation }) => {
             }}
           >
             <TextInput
-              placeholder={postType.post_type === 'Text' ? 'Post Text' : 'Poll Title'}
+              placeholder={postType.post_type === 'Text' ? 'Post Text' : (postType.post_type === 'Poll' ? 'Poll Title' : 'Update Post Text')}
               name="postText"
               style={styles.input}
               placeholderTextColor={darkgray}
@@ -483,8 +483,10 @@ const styles = StyleSheet.create({
   input: {
     // margin: 12,
     padding: 15,
-    borderWidth: 1,
-    borderColor: '#DADADA',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderTopColor: '#DADADA',
+    borderBottomColor: '#DADADA',
   },
   loading: {
     position: 'absolute',

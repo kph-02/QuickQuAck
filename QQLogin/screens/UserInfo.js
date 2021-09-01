@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { serverIp } from './Login.js';
+import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 
 import { useFocusEffect } from '@react-navigation/native';
 //formik
@@ -186,6 +187,14 @@ const UserInfo = ({ navigation }) => {
         <View style={styles.modalBodyContent}>
           {/* <TextInput style={styles.input} onChangeText={onChangeFirstName} value={firstName} />
           <TextInput style={styles.input} onChangeText={onChangeLastName} value={lastName} /> */}
+          <TouchableOpacity onPress={handleModal} style={styles.touchableStyle}>
+            <MaterialCommunityIcons
+              name="close-thick"
+              color={'#BDBDBD'}
+              size={25}
+              style={{ alignSelf: 'center', justifyContent: 'center', top: 10 }}
+            />
+        </TouchableOpacity>
           <Text style={styles.welcome}>
             Please enter your first and last name. This information will not be shown anywhere unless you choose to show
             it.
@@ -194,7 +203,7 @@ const UserInfo = ({ navigation }) => {
           <MyTextInput
             placeholder="First Name"
             name="firstName"
-            // style={{ backgroundColor: 'white', borderTopColor: '#DADADA', borderTopWidth: 1 }}
+            style={{ width: '40%', borderBottomColor: '#DADADA', borderBottomWidth: 1 }}
             placeholderTextColor={darkgray}
             onChangeText={(e) => onChange('firstName', e)} //update inputs to match user input
             value={firstName}
@@ -226,6 +235,14 @@ const UserInfo = ({ navigation }) => {
         <View style={styles.modalBodyContent}>
           {/* <TextInput style={styles.input} onChangeText={onChangeFirstName} value={firstName} />
           <TextInput style={styles.input} onChangeText={onChangeLastName} value={lastName} /> */}
+          <TouchableOpacity onPress={handleModal2} style={styles.touchableStyle}>
+            <MaterialCommunityIcons
+              name="close-thick"
+              color={'#BDBDBD'}
+              size={25}
+              style={{ alignSelf: 'center', justifyContent: 'center', top: 10 }}
+            />
+        </TouchableOpacity>
           <Text style={styles.welcome}>Please enter a new email.</Text>
 
           <MyTextInput
@@ -253,6 +270,14 @@ const UserInfo = ({ navigation }) => {
         onBackButtonPress={handleModal3}
       >
         <View style={styles.modalBodyContent}>
+          <TouchableOpacity onPress={handleModal3} style={styles.touchableStyle}>
+            <MaterialCommunityIcons
+              name="close-thick"
+              color={'#BDBDBD'}
+              size={25}
+              style={{ alignSelf: 'center', justifyContent: 'center', top: 10 }}
+            />
+          </TouchableOpacity>
           <Text style={styles.welcome}>Please enter a new password.</Text>
           <MyTextInput
             placeholder="Current Password"
@@ -289,6 +314,14 @@ const UserInfo = ({ navigation }) => {
         <View style={styles.modalBodyContent}>
           {/* <TextInput style={styles.input} onChangeText={onChangeFirstName} value={firstName} />
           <TextInput style={styles.input} onChangeText={onChangeLastName} value={lastName} /> */}
+          <TouchableOpacity onPress={handleModal4} style={styles.touchableStyle}>
+            <MaterialCommunityIcons
+              name="close-thick"
+              color={'#BDBDBD'}
+              size={25}
+              style={{ alignSelf: 'center', justifyContent: 'center', top: 10 }}
+            />
+          </TouchableOpacity>
           <Text style={styles.welcome}>
             Change information about your school here. This information will not be shown anywhere unless you choose to
             show it.
@@ -329,18 +362,27 @@ const UserInfo = ({ navigation }) => {
 
       <View style={styles.body}>
         <View style={styles.bodyContent}>
-          <TouchableOpacity activeOpacity={1} style={styles.buttonContainer} onPress={handleModal}>
-            <Text style={{ marginLeft: 15, fontSize: 13 }}>Name</Text>
+          <View style={styles.divider}/>
+          <TouchableOpacity style={styles.buttonContainer} onPress={handleModal}>
+            <Text style={{fontSize: 15 }}>Name</Text>
+            <AntDesign name="right" size={20} color="#BDBDBD" style={{paddingHorizontal: 10}}/>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={1} style={styles.buttonContainer} onPress={handleModal2}>
-            <Text style={{ marginLeft: 15, fontSize: 13 }}>Email</Text>
+          <View style={styles.divider}/>
+          <TouchableOpacity style={styles.buttonContainer} onPress={handleModal2}>
+            <Text style={{fontSize: 15 }}>Email</Text>
+            <AntDesign name="right" size={20} color="#BDBDBD" style={{paddingHorizontal: 10}}/>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={1} style={styles.buttonContainer} onPress={handleModal3}>
-            <Text style={{ marginLeft: 15, fontSize: 13 }}>Password</Text>
+          <View style={styles.divider}/>
+          <TouchableOpacity style={styles.buttonContainer} onPress={handleModal3}>
+            <Text style={{fontSize: 15 }}>Password</Text>
+            <AntDesign name="right" size={20} color="#BDBDBD" style={{paddingHorizontal: 10}}/>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={1} style={styles.buttonContainer} onPress={handleModal4}>
-            <Text style={{ marginLeft: 15, fontSize: 13 }}>School</Text>
+          <View style={styles.divider}/>
+          <TouchableOpacity style={styles.buttonContainer} onPress={handleModal4}>
+            <Text style={{fontSize: 15 }}>School</Text>
+            <AntDesign name="right" size={20} color="#BDBDBD" style={{paddingHorizontal: 10}}/>
           </TouchableOpacity>
+          <View style={styles.divider}/>
         </View>
       </View>
     </View>
@@ -366,7 +408,8 @@ const styles = StyleSheet.create({
   bodyContent: {
     flex: 1,
     alignItems: 'center',
-    padding: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
   },
   container: {
     flex: 1,
@@ -375,11 +418,12 @@ const styles = StyleSheet.create({
   buttonContainer: {
     height: 45,
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    width: '120%',
-    borderTopColor: '#DEE2E6',
-    borderTopWidth: 1,
+    width: '100%',
+    // borderTopColor: '#DEE2E6',
+    // borderTopWidth: 1,
+    // backgroundColor: 'pink'
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -398,6 +442,25 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
+  },
+  divider: {
+    width: '120%',
+    borderColor:'#DEE2E6',
+    borderTopWidth: 1,
+    marginVertical: 1
+  },
+  touchableStyle: {
+    // position: 'absolute',
+    width: 40,
+    height: 40,
+    alignSelf: 'flex-start',
+    justifyContent: 'flex-start',
+    marginBottom: 10,
+    right: 10,
+    bottom: 10
+    // left: 20,
+    // top: 40,
+    // zIndex: 2,
   },
 });
 
