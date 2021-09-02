@@ -95,7 +95,7 @@ const Settings = ({ navigation }) => {
           <Text style={styles.headline}>Settings</Text>
         </View>
       </View>
-      <Image style={styles.avatar} source={require('./../assets/AnonDuck.jpg')} />
+      <Image style={styles.avatar} source={require('./../assets/Logo.png')} />
 
       {/* User's Name */}
       <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 45, marginBottom: height * 0.02}}>

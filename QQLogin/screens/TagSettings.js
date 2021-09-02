@@ -171,8 +171,8 @@ const TagSettings = ({ navigation }) => {
       <AdjustLabel 
         fontSize={40} 
         text="Personalize QuickQuAck" 
-        style={{textAlign: 'center', fontWeight: 'bold', color: 'black', padding: 50, backgroundColor: 'yellow'}} 
-        numberOfLines={2} 
+        style={{textAlign: 'center', fontWeight: 'bold', color: 'black', padding: 50}} 
+        numberOfLines={2}   
       />
       {/* <PageTitle style={{backgroundColor: 'pink'}}>Personalize QuickQuAck</PageTitle> */}
       <Text style={styles.welcome}>
