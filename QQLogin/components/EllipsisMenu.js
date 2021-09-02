@@ -118,8 +118,6 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
       recipient_id: commentOwnerID ? commentOwnerID : post.user_id,
       recipient_anon_name: name,
       recipient_color: color[0],
-      initiator_anon_name: name,
-      initiator_color: color[0],
       initiator_name: names.initiator_name,
       recipient_name: names.recipient_name,
       message_preview: 'Send a message!',
@@ -134,7 +132,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
 
       const parseRes = await response.json();
       // console.log(parseRes);
-      navigation.navigate('TabNav', { Screen: 'Messages' });
+      navigation.navigate('TabNav', { screen: 'Messages' });
     } catch (err) {
       console.log(err.message);
     }

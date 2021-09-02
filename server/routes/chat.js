@@ -4,11 +4,52 @@ const authorization = require("../middleware/authorization");
 const pool = require("../db");
 const e = require("cors");
 
+const randomNameGenerator = () => {
+  const nameAdjectives = [
+    "Red",
+    "Orange",
+    "Yellow",
+    "Green",
+    "Blue",
+    "Purple",
+    "Pink",
+    "Gray",
+    "Turquoise",
+    "Brown",
+  ];
+  const nameAnimals = [
+    "Dog",
+    "Cat",
+    "Raccoon",
+    "Giraffe",
+    "Elephant",
+    "Panda",
+    "Koala",
+    "Rabbit",
+    "Turtle",
+    "Fox",
+  ];
+
+  const adjIndex = parseInt(Math.random() * 10);
+  const animalIndex = parseInt(Math.random() * 10);
+
+  let anonAdj = nameAdjectives[adjIndex];
+  let anonAnimal = nameAnimals[animalIndex];
+  const anonName = {name : anonAdj + " " + anonAnimal, color : anonAdj};
+
+  return anonName;
+};
+
 router.post("/create-chatroom", authorization, async (req, res) => {
+
+  const name = randomNameGenerator();
+  const initiator_anon_name = name.name;
+  const initiator_color = name.color;
+
   try {
     //Reading information contained in request
     const { recipient_id, message_preview } = req.body;
-    const {initiator_anon_name, recipient_anon_name, initiator_color, recipient_color} = req.body;
+    const { recipient_anon_name, recipient_color} = req.body;
     const {initiator_name, recipient_name} = req.body;
     const initiator_id = req.user;
 

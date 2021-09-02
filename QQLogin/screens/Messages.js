@@ -159,7 +159,7 @@ const getUserID = async () => {
   //renderItem function
   const renderItem = ({ item }) => {
     // const backgroundColor = item.id === selectedId ? '#FFCC15' : '#FFFFFF';
-    const backgroundColor = (item.initiator_id === userId ? item.initiator_color : item.recipient_color).toLowerCase();
+    const backgroundColor = (item.initiator_id !== userId ? item.initiator_color : item.recipient_color).toLowerCase();
 
     return (
       <Item
