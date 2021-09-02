@@ -11,13 +11,13 @@ import { Formik } from 'formik';
 
 //icons
 
-import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
+import { Octicons, Ionicons, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
 
 //IP (WHEN TESTING, CHANGE TO YOUR LOCAL IPV4 ADDRESS)
 // const serverIp = '100.115.35.200:5000';
-// const serverIp = '192.168.0.153:5000';
+const serverIp = '192.168.0.153:5000';
 // const serverIp = '192.168.50.115:5000';
-const serverIp = '192.168.0.114:5000';
+// const serverIp = '192.168.0.114:5000';
 // const serverIp = '100.83.38.217:5000';
 // const serverIp = '10.128.124.246:5000';
 // const serverIp = '132.249.242.71'; //Ip for the server :)
@@ -44,7 +44,7 @@ import {
   ExtraViewRight,
 } from './../components/styles';
 
-import { Button, View } from 'react-native';
+import { Button, View, StyleSheet, TouchableOpacity } from 'react-native';
 
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
@@ -123,6 +123,14 @@ const Login = ({ navigation }) => {
       {/* <KeyboardAvoidingWrapper> */}
       <StatusBar style="yellow" />
       <InnerContainer>
+        <TouchableOpacity onPress={() => navigation.pop()} style={styles.backButton}>
+            <MaterialCommunityIcons
+              name="arrow-left"
+              color={'#BDBDBD'}
+              size={40}
+              // style={{ alignSelf: 'center', justifyContent: 'center', top: 10, backgroundColor: 'yellow' }}
+            />
+        </TouchableOpacity>
         {/* removed/commented InnerContainer, attempted to move into KBWrapper */}
         <PageTitle>Log In</PageTitle>
 
@@ -213,6 +221,16 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  backButton: {
+    width: 40,
+    height: 40,
+    alignSelf: 'flex-start',
+    justifyContent: 'flex-start',
+    marginBottom: 10,
+  },
+})
 
 export default Login;
 //testing purposes, so don't have to redefine across multiple files

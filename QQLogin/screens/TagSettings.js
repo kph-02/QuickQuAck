@@ -134,6 +134,27 @@ const TagSettings = ({ navigation }) => {
     setInputs({ ...inputs, postTag: selectedItems, user_id: userId });
   };
 
+  /* Controls the size of the font in the original post, so that it fits in the View */
+  const AdjustLabel = ({ fontSize, text, style, numberOfLines }) => {
+    const [currentFont, setCurrentFont] = useState(fontSize);
+
+    return (
+      <Text
+        numberOfLines={numberOfLines}
+        adjustsFontSizeToFit
+        style={[style, { fontSize: currentFont }]}
+        onTextLayout={(e) => {
+          const { lines } = e.nativeEvent;
+          if (lines.length > numberOfLines) {
+            setCurrentFont(currentFont - 1);
+          }
+        }}
+      >
+        {text}
+      </Text>
+    );
+  };
+
   getUserId();
 
   return (
@@ -147,7 +168,13 @@ const TagSettings = ({ navigation }) => {
               style={{ alignSelf: 'center', justifyContent: 'center', top: 10 }}
             />
       </TouchableOpacity>
-      <PageTitle>Personalize QuickQuAck</PageTitle>
+      <AdjustLabel 
+        fontSize={40} 
+        text="Personalize QuickQuAck" 
+        style={{textAlign: 'center', fontWeight: 'bold', color: 'black', padding: 50, backgroundColor: 'yellow'}} 
+        numberOfLines={2} 
+      />
+      {/* <PageTitle style={{backgroundColor: 'pink'}}>Personalize QuickQuAck</PageTitle> */}
       <Text style={styles.welcome}>
         Select a few interest tags to get better, more personalized post recommendations on your feed
       </Text>

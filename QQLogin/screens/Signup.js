@@ -10,7 +10,7 @@ import { Formik, Field, Form } from 'formik';
 
 //icons
 
-import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
+import { Octicons, Ionicons, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import {
   StyledContainer,
@@ -35,7 +35,7 @@ import {
   ExtraViewRight,
 } from './../components/styles';
 
-import { Button, View, Text } from 'react-native';
+import { Button, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import KeyboardAvoidingWrapper from '../components/KBWrapper';
 
 //colors
@@ -90,6 +90,14 @@ const Signup = ({ navigation }) => {
       <StyledContainer>
         <StatusBar style="black" />
         <InnerContainer>
+          <TouchableOpacity onPress={() => navigation.pop()} style={styles.backButton}>
+            <MaterialCommunityIcons
+              name="arrow-left"
+              color={'#BDBDBD'}
+              size={40}
+              // style={{ alignSelf: 'center', justifyContent: 'center', top: 10, backgroundColor: 'yellow' }}
+            />
+            </TouchableOpacity>
           <PageTitle>Sign Up</PageTitle>
 
           <SubTitle></SubTitle>
@@ -243,6 +251,17 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, .
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  backButton: {
+    width: 40,
+    height: 40,
+    alignSelf: 'flex-start',
+    justifyContent: 'flex-start',
+    marginBottom: 10,
+  },
+})
+
 
 export default Signup;
 
