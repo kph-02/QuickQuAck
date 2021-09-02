@@ -48,8 +48,6 @@ const ChatRoom = ({ route }) => {
 
   useEffect(() => {
 
-    console.log("Initiator: " + initiator);
-
     let socket = io('http://' + serverIp);
 
     socket.on('chat-messages', (messages) => {
