@@ -92,8 +92,8 @@ const ChatRoom = ({ route }) => {
     //Listening for receiving messages from other user
     if (socket) {
       socket.on('connect', () => {
-        console.log('Connected as: ' + socket.id);
-        console.log('Joining chatroom: ' + chatroom_id);
+        // console.log('Connected as: ' + socket.id);
+        // console.log('Joining chatroom: ' + chatroom_id);
         socket.emit('room-messages', chatroom_id);
         socket.emit('join-room', chatroom_id);
         });

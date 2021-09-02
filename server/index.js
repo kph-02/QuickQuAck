@@ -71,7 +71,7 @@ cron.schedule("0 * * * *", async () => {
 
 // connects, creates message, and emits all messages
 io.on("connection", (socket) => {
-  console.log("User connected: " + socket.id);
+  // console.log("User connected: " + socket.id);
 
   socket.on("room-messages", (chatroom_id) => {
 
@@ -82,21 +82,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on('join-room', chatroom_id => {
-    console.log("Joined Room: " + chatroom_id);
+    // console.log("Joined Room: " + chatroom_id);
     socket.join(chatroom_id);
   })
 
   socket.on("send-message", (text, author_id, chatroom_id) => {
-    console.log(
-      "Text: " +
-        text +
-        " Author: " +
-        author_id +
-        " Chatroom Id: " +
-        chatroom_id +
-        " Socket: " +
-        socket.id
-    );
+    // console.log(
+    //   "Text: " +
+    //     text +
+    //     " Author: " +
+    //     author_id +
+    //     " Chatroom Id: " +
+    //     chatroom_id +
+    //     " Socket: " +
+    //     socket.id
+    // );
 
     chatSockets
       .createSocketMessage(text, author_id, chatroom_id)
@@ -109,6 +109,6 @@ io.on("connection", (socket) => {
 
   // close event when user disconnects from app
   socket.on("disconnect", () => {
-    console.log("User Disconnected: " + socket.id);
+    // console.log("User Disconnected: " + socket.id);
   });
 });

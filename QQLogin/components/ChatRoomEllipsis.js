@@ -46,8 +46,7 @@ const ChatRoomEllipsis = ({navigation, chatroom_id, initiator}) => {
           body : JSON.stringify(body)
         });
 
-        const parseRes = await response.text();
-        console.log('Reveal: ' + parseRes);
+        const parseRes = await response.json();
       }
         catch(err){console.log(err.message)};
 
@@ -60,11 +59,7 @@ const ChatRoomEllipsis = ({navigation, chatroom_id, initiator}) => {
     //Tell database to delete chatroom
     try{
 
-      console.log(JWTtoken)
-
       const body = {chatroom_id : chatroom_id};
-
-      console.log(body)
 
       const response = await fetch("http://" +serverIp + "/chat/delete-chatroom",{
         method: 'DELETE',

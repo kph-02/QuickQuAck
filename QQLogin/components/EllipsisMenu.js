@@ -250,7 +250,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
         })()}
         {/* Show Update Post if user is Original Poster */}
         {(() => {
-          if (postOwner) {
+          if (postOwner && !(post.is_poll)) {
             return (
               <MenuOption onSelect={updatePost} style={{ paddingVertical: 10 }}>
                 <Text style={styles.text}>Update Post</Text>
