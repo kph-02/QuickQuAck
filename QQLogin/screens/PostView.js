@@ -644,11 +644,11 @@ const PostView = ({ route, navigation }) => {
   }, []);
 
   //update values when screens change
-  useFocusEffect(
-    React.useCallback(() => {
-      updatePostAttributes();
-    }, [navigation]),
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     updatePostAttributes();
+  //   }, [navigation]),
+  // );
 
   /* Controls the look of each "item", or comment in this context */
   const renderItem = ({ item }) => {
@@ -659,6 +659,7 @@ const PostView = ({ route, navigation }) => {
 
   //Updates database with whether this user upvoted post or not
   const updatePostValue = async (body) => {
+    
     try {
       const response = await fetch('http://' + serverIp + '/feed/post-vote', {
         method: 'POST',
@@ -688,7 +689,7 @@ const PostView = ({ route, navigation }) => {
     const bodyUpvotes = {
       user_id: userId,
       post_id: post.post_id,
-      vote_value: upvoted ? 1 : 0,
+      vote_value: upvoted === true ? 1 : 0,
     };
     updatePostValue(bodyUpvotes);
 
