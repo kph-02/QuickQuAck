@@ -183,7 +183,6 @@ const CreatePoll = ({ route, navigation }) => {
     { id: '{Sixth}', name: 'Sixth' },
     { id: '{Seventh}', name: 'Seventh' },
     { id: '{Question}', name: 'Question' },
-    { id: '{Poll}', name: 'Poll' },
     { id: '{Food}', name: 'Food' },
     { id: '{Social}', name: 'Social' },
   ];
