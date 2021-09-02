@@ -214,6 +214,7 @@ const EllipsisMenu = ({ navigation, post, comment_id, postOwner, commentOwner, c
               user: post.user_id,
               postid: post_id,
               comment_owner: commentOwnerID,
+              anon_name: anon_name,
             })
           }
           style={{ paddingVertical: 10 }}
