@@ -281,7 +281,7 @@ const PostView = ({ route, navigation }) => {
         //console.log('Retrieved Token: ' + token);
         userId = user_id;
       });
-      console.log(userId);
+      // console.log(userId);
     } catch (error) {
       console.error(error.message);
     }
@@ -449,8 +449,8 @@ const PostView = ({ route, navigation }) => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
-      console.log('Does this even do anything ;-;'); //Yes, yes it does
-      console.log(parseRes.data);
+      // console.log('Does this even do anything ;-;'); //Yes, yes it does
+      // console.log(parseRes.data);
 
       //Copy useState parameters b/c shouldn't call useState in if statements
       let map = mapComments;
@@ -460,8 +460,8 @@ const PostView = ({ route, navigation }) => {
       //Updates postData to have post information using useState
       if (parseRes.data) {
         comments = parseRes.data.comment;
-        console.log('This is comments');
-        console.log(comments);
+        // console.log('This is comments');
+        // console.log(comments);
         //iterate through the comments to update upvotes array
         for (const comment of comments) {
           //comment hasn't been mapped yet, so map it.
@@ -545,7 +545,7 @@ const PostView = ({ route, navigation }) => {
       let map = mapComments;
 
       if (parseRes === []) {
-        console.log('No Comments Upvoted!');
+        // console.log('No Comments Upvoted!');
       } else {
         //Populate upvoted table with initial values from database
         for (const comment of parseRes) {
@@ -815,8 +815,8 @@ const PostView = ({ route, navigation }) => {
       // console.log(post.post_id);
       // console.log(parseRes);
       // console.log(initialVote);
-      console.log("User has voted: ");
-      console.log(userVoted);
+      // console.log("User has voted: ");
+      // console.log(userVoted);
       // console.log("This is parseRes for getPollVoted");
       // console.log(parseRes);
       setVoted(userVoted);
@@ -872,7 +872,7 @@ const PostView = ({ route, navigation }) => {
       choice_id: selectedChoice.choice,
       user_id: userId,
     };
-    console.log("What is selectedChoice's choice in updatePollAttributes?: " + body.choice_id);
+    // console.log("What is selectedChoice's choice in updatePollAttributes?: " + body.choice_id);
     updatePollValue(body);
     console.log('Updated Poll Attributes!');
   };
@@ -928,14 +928,14 @@ const PostView = ({ route, navigation }) => {
         <AdjustLabel fontSize={30} text={post.post_text} style={styles.ogPostText} numberOfLines={8} />
       </View>
       {/* If the post is a poll, show the poll*/}
-      {console.log("This is totalVotes")}
+      {/* {console.log("This is totalVotes")}
       {console.log(totalVotes)}
       {console.log("This is choices")}
       {console.log(options)}
       {console.log("This is VOTED")}
       {console.log(voted)}
       {console.log("This is votedBool")}
-      {console.log(votedBool)}
+      {console.log(votedBool)} */}
 
 
       {post.is_poll &&
@@ -945,7 +945,7 @@ const PostView = ({ route, navigation }) => {
           choices={options}
           disableBuiltInIncreaseVote={voted} //used for filter-feed issue
           onChoicePress={(selectedChoice: IChoice) => {
-              console.log("SelectedChoice: ", selectedChoice);
+              // console.log("SelectedChoice: ", selectedChoice);
               if(voted){
                 alert('Already Voted!');
               }

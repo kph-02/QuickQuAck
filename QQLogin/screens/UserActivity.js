@@ -229,8 +229,8 @@ const UserActivity = ({ navigation }) => {
 
       //The response includes post information, need in json format
       const parseRes = await response.json();
-      console.log("This is in USERACTIVITY");
-      console.log(parseRes);
+      // console.log("This is in USERACTIVITY");
+      // console.log(parseRes);
       /*
        *"post":[
        * {"post_id":,

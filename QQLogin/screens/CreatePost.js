@@ -252,7 +252,7 @@ const CreatePost = ({ route, navigation }) => {
     } else {
       setIsEnabled((previousState) => !previousState);
       setInputs({ ...inputs, latitude: null, longitude: null });
-      console.log(inputs);
+      // console.log(inputs);
     }
     const boop = () => {
       setIsEnabled((previousState) => !previousState);
@@ -260,7 +260,7 @@ const CreatePost = ({ route, navigation }) => {
         getLocationAsync();
         handleModal();
         // setTimeout(() => {Alert.alert('Please Hold', "This will take a few seconds.", []), 3000);
-        console.log(inputs);
+        // console.log(inputs);
       }
     };
   };

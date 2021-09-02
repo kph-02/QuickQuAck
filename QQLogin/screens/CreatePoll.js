@@ -216,9 +216,9 @@ const CreatePoll = ({ route, navigation }) => {
     setInputs({ ...inputs, latitude: location.coords.latitude, longitude: location.coords.longitude });
   };
 
-  useEffect(() => {
-    console.log(inputs);
-  }, [inputs]);
+  // useEffect(() => {
+  //   console.log(inputs);
+  // }, [inputs]);
 
   const toggleSwitch = () => {
     // setAnimation(true);
@@ -234,7 +234,7 @@ const CreatePoll = ({ route, navigation }) => {
     } else {
       setIsEnabled((previousState) => !previousState);
       setInputs({ ...inputs, latitude: null, longitude: null });
-      console.log(inputs);
+      // console.log(inputs);
     }
     const boop = () => {
       setIsEnabled((previousState) => !previousState);

@@ -201,7 +201,7 @@ const getUserID = async () => {
       if( parseRes.data !== undefined) {
       
         chats = parseRes.data.chatrooms;
-        console.log('Chat Messages Refreshed: ' + JSON.stringify(parseRes.data.chatrooms));
+        console.log('Chat Messages Refreshed');
       }
       setChatMessages(chats);
       setRefreshChats(!refreshChats);
